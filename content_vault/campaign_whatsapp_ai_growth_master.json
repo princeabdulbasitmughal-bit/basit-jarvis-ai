@@ -1,0 +1,142 @@
+{
+  "campaignId": "camp_content_whatsapp_growth_001",
+  "generatedAt": "2026-09-01T21:24:45.000Z",
+  "topic": "Automate 80% of WhatsApp Sales in 10 Minutes with SuperSender Pro",
+  "niche": "E-Commerce & B2B SaaS Growth",
+  "agentsInvolved": [
+    "HookMaster (Agent 1)",
+    "ShortsDirector (Agent 2)",
+    "CarouselGenius (Agent 3)",
+    "RepurposePro (Agent 4)",
+    "CalendarStrategist (Agent 5)",
+    "Vault (Agent 6)"
+  ],
+  "hooks": [
+    {
+      "id": 1,
+      "type": "Contrarian / Shocking Truth",
+      "hook": "Most Shopify stores lose 70% of their revenue before checkout... and standard email marketing only recovers 4% of it. Here is the exact WhatsApp AI flywheel that recovers 28% in under 15 minutes."
+    },
+    {
+      "id": 2,
+      "type": "Curiosity Gap / Behind-the-Scenes",
+      "hook": "I gave an AI voice agent full control of my WhatsApp customer support for 24 hours. Here is how it closed $3,400 in sales while I was asleep."
+    },
+    {
+      "id": 3,
+      "type": "Negative Pain Agitation",
+      "hook": "Stop paying thousands to marketing agencies who just blast cold emails that land in spam. This 1-click WhatsApp automation gets a 98% open rate on day one."
+    },
+    {
+      "id": 4,
+      "type": "Authority & Proof Breakdown",
+      "hook": "How a Pakistani apparel brand recovered PKR 5.4 Million in abandoned carts with zero human agents, just 3 automated WhatsApp messages."
+    },
+    {
+      "id": 5,
+      "type": "Direct Challenge / Micro-Commitment",
+      "hook": "If your WhatsApp business messages still say 'Dear Customer, check our website', you are literally burning cash. Copy this 3-step high-converting script instead."
+    }
+  ],
+  "videoScript": {
+    "title": "How to Automate WhatsApp Sales with AI (9:16 Vertical Reel)",
+    "aspectRatio": "9:16",
+    "targetDurationSeconds": 48,
+    "scenes": [
+      {
+        "sceneIndex": 1,
+        "timeRange": "00:00 - 00:04",
+        "visualCue": "Fast zoom-in on phone screen showing 14 unread WhatsApp cart notifications, then glowing green AI HUD overlay",
+        "onScreenText": "Stop Losing 70% of Cart Abandonments 💸",
+        "voiceover": "Stop losing 70% of your store's checkouts to dead email reminders.",
+        "soundEffect": "Subtle bass drop whoosh"
+      },
+      {
+        "sceneIndex": 2,
+        "timeRange": "00:04 - 00:15",
+        "visualCue": "Split screen: Traditional cold email (0% response) vs SuperSender Pro interactive WhatsApp button (1-click checkout)",
+        "onScreenText": "Email Open Rate: 12% 📉 | WhatsApp Open Rate: 98% 🚀",
+        "voiceover": "Standard emails get a 12% open rate. But WhatsApp messages get opened 98% of the time, usually within 3 minutes.",
+        "soundEffect": "Notification chime + quick pop"
+      },
+      {
+        "sceneIndex": 3,
+        "timeRange": "00:15 - 00:28",
+        "visualCue": "Screen recording of SuperSender Pro dashboard showing the 3-Tier Recovery Ladder activating automatically",
+        "onScreenText": "The 3-Tier Recovery Ladder 🪜",
+        "voiceover": "Here is the exact 3-step recovery ladder: Minute 15 sends an interactive 1-click checkout button. Hour 2 sends a dynamic 7.5% discount voucher.",
+        "soundEffect": "Upbeat synthesizer rise"
+      },
+      {
+        "sceneIndex": 4,
+        "timeRange": "00:28 - 00:38",
+        "visualCue": "Audio waveform pulsing with Zara AI voice note being automatically sent to prospect in Urdu/English",
+        "onScreenText": "AI Voice Concierge (Kokoro-82M) 🎙️",
+        "voiceover": "And if they still haven't bought by Hour 24, our Zara AI voice agent sends a personalized voice note offering free shipping.",
+        "soundEffect": "Futuristic UI beep + crisp voice playback"
+      },
+      {
+        "sceneIndex": 5,
+        "timeRange": "00:38 - 00:48",
+        "visualCue": "Founder holding phone showing revenue counter jumping by $5,400. Text overlay with CTA",
+        "onScreenText": "Comment 'GROWTH' for Free Setup Template 🎁",
+        "voiceover": "Comment 'GROWTH' below and I'll send you the exact template and automation workflow for free!",
+        "soundEffect": "Cash register sound (cha-ching) + smooth outro fade"
+      }
+    ]
+  },
+  "carouselBlueprint": {
+    "title": "The Zero-Human WhatsApp Sales Engine (LinkedIn & IG Carousel)",
+    "slideCount": 7,
+    "slides": [
+      {
+        "slide": 1,
+        "headline": "How to Recover 28% of Abandoned Carts in 15 Minutes",
+        "body": "The step-by-step WhatsApp AI automation blueprint that generated $54,000+ in extra monthly revenue for direct-to-consumer brands.",
+        "badge": "SWIPE TO READ ➔"
+      },
+      {
+        "slide": 2,
+        "headline": "The Hidden Leak in E-Commerce",
+        "body": "• 7 out of 10 shoppers add items to cart and leave.\n• Traditional email recovery only gets 3-5% open rates on mobile.\n• Result: Millions lost in ad spend every single month.",
+        "badge": "THE PROBLEM"
+      },
+      {
+        "slide": 3,
+        "headline": "Tier 1: The 15-Minute Frictionless Nudge",
+        "body": "• Trigger: 15 minutes after cart abandonment.\n• Channel: WhatsApp Interactive Button.\n• Strategy: Zero discount, just direct 1-click checkout URL.\n• Conversion Lift: 14.2%",
+        "badge": "STAGE 1"
+      },
+      {
+        "slide": 4,
+        "headline": "Tier 2: The 2-Hour Scarcity Voucher",
+        "body": "• Trigger: 120 minutes after abandonment.\n• Channel: WhatsApp + Resend Email Dual-Blast.\n• Strategy: Auto-generated 7.5% time-limited voucher code.\n• Conversion Lift: 8.7%",
+        "badge": "STAGE 2"
+      },
+      {
+        "slide": 5,
+        "headline": "Tier 3: The 24-Hour AI Voice Concierge",
+        "body": "• Trigger: 24 hours after abandonment.\n• Channel: Kokoro-82M AI Audio Voice Note.\n• Strategy: Bilingual concierge (Urdu/English) answering doubts and offering final VIP voucher.\n• Conversion Lift: 5.1%",
+        "badge": "STAGE 3"
+      },
+      {
+        "slide": 6,
+        "headline": "The Net Impact on Cashflow",
+        "body": "• Total Cart Recovery Rate: 28.0%\n• Average Setup Time: 10 Minutes\n• Extra Monthly Profit: +$4,200 to +$18,000 per brand.",
+        "badge": "THE RESULTS"
+      },
+      {
+        "slide": 7,
+        "headline": "Ready to Deploy This on Your Store?",
+        "body": "Comment 'SCALE' or visit supersenderpro.pk to launch your autonomous WhatsApp recovery system in 10 minutes.",
+        "badge": "SAVE & SHARE 📌"
+      }
+    ]
+  },
+  "contentCalendar30Days": {
+    "week1": "The Abandoned Cart Recovery Blueprint & Live Demonstration",
+    "week2": "B2B Lead Harvesting with Stealth Playwright & Email MX Validation",
+    "week3": "AI Voice Notes vs Text Messages: The 400% Response Rate Case Study",
+    "week4": "Building a Multi-Tenant WhatsApp SaaS from Scratch: Full Architecture Breakdown"
+  }
+}

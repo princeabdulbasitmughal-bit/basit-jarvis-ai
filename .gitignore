@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+tunnel_err.log
+tunnel_out.log
+node_modules/
+.vscode/
+.idea/

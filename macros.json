@@ -1,0 +1,71 @@
+{
+  "macros": {
+    "coding mode": {
+      "description": "Start full coding environment",
+      "actions": [
+        {"type": "open_app", "app": "vscode"},
+        {"type": "open_app", "app": "terminal"},
+        {"type": "open_app", "app": "chrome"},
+        {"type": "speak", "text": "Coding mode activated. VS Code, terminal, and Chrome are ready, sir."}
+      ]
+    },
+
+    "work mode": {
+      "description": "Start work environment",
+      "actions": [
+        {"type": "open_app", "app": "chrome"},
+        {"type": "open_app", "app": "word"},
+        {"type": "open_app", "app": "excel"},
+        {"type": "speak", "text": "Work mode activated. Chrome, Word, and Excel are open."}
+      ]
+    },
+
+    "focus mode": {
+      "description": "Kill distractions, open only essentials",
+      "actions": [
+        {"type": "close_app", "app": "spotify"},
+        {"type": "set_volume", "value": 20},
+        {"type": "set_brightness", "value": 60},
+        {"type": "speak", "text": "Focus mode on. Distractions eliminated."}
+      ]
+    },
+
+    "night mode": {
+      "description": "Dim screen and lower volume for night",
+      "actions": [
+        {"type": "set_brightness", "value": 30},
+        {"type": "set_volume", "value": 15},
+        {"type": "speak", "text": "Night mode activated. Brightness and volume reduced."}
+      ]
+    },
+
+    "presentation mode": {
+      "description": "Prepare for a presentation",
+      "actions": [
+        {"type": "open_app", "app": "powerpoint"},
+        {"type": "set_brightness", "value": 100},
+        {"type": "set_volume", "value": 80},
+        {"type": "speak", "text": "Presentation mode ready. PowerPoint is open, brightness and volume maximized."}
+      ]
+    },
+
+    "content mode": {
+      "description": "Prepare workstation for content creation and social studio",
+      "actions": [
+        {"type": "open_app", "app": "chrome"},
+        {"type": "set_brightness", "value": 85},
+        {"type": "set_volume", "value": 45},
+        {"type": "speak", "text": "Content Studio mode activated. Let's create viral content, Basit."}
+      ]
+    },
+
+    "shutdown sequence": {
+      "description": "Close apps and prepare shutdown",
+      "actions": [
+        {"type": "speak", "text": "Initiating shutdown sequence. Closing all applications."},
+        {"type": "close_all"},
+        {"type": "shutdown"}
+      ]
+    }
+  }
+}

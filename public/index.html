@@ -1,0 +1,3166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👑 Basit Jarvis — Sovereign Voice & Autonomous PC Control OS</title>
+  <style>
+    :root {
+      --bg: #050811;
+      --card-bg: rgba(13, 20, 36, 0.88);
+      --card-hover: rgba(20, 32, 58, 0.95);
+      --cyan: #00f0ff;
+      --neon-blue: #3b82f6;
+      --neon-green: #10b981;
+      --neon-purple: #a855f7;
+      --neon-pink: #ec4899;
+      --neon-amber: #f59e0b;
+      --neon-red: #ef4444;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(0, 240, 255, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top center, #0f172a 0%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1150px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Top Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.12);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .reactor-core {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 3px solid var(--cyan);
+      box-shadow: 0 0 20px var(--cyan);
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: pulse 2.5s infinite ease-in-out;
+    }
+
+    .reactor-core.listening {
+      border-color: var(--neon-green);
+      box-shadow: 0 0 25px var(--neon-green), 0 0 50px rgba(16, 185, 129, 0.5);
+      animation: listeningPulse 1s infinite alternate;
+    }
+
+    .reactor-core.speaking {
+      border-color: var(--neon-purple);
+      box-shadow: 0 0 25px var(--neon-purple), 0 0 50px rgba(168, 85, 247, 0.5);
+      animation: speakingPulse 0.8s infinite alternate;
+    }
+
+    .reactor-core::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
+      transition: background 0.3s ease;
+    }
+
+    .reactor-core.listening::after {
+      background: var(--neon-green);
+      box-shadow: 0 0 15px var(--neon-green);
+    }
+
+    .reactor-core.speaking::after {
+      background: var(--neon-purple);
+      box-shadow: 0 0 15px var(--neon-purple);
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 15px var(--cyan); }
+      50% { box-shadow: 0 0 35px var(--cyan), 0 0 60px rgba(0,240,255,0.35); }
+    }
+
+    @keyframes listeningPulse {
+      0% { transform: scale(0.96); box-shadow: 0 0 20px var(--neon-green); }
+      100% { transform: scale(1.06); box-shadow: 0 0 40px var(--neon-green), 0 0 70px rgba(16, 185, 129, 0.6); }
+    }
+
+    @keyframes speakingPulse {
+      0% { transform: scale(0.96); box-shadow: 0 0 20px var(--neon-purple); }
+      100% { transform: scale(1.08); box-shadow: 0 0 45px var(--neon-purple), 0 0 80px rgba(168, 85, 247, 0.6); }
+    }
+
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn:hover {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 18px var(--cyan);
+      transform: translateY(-1px);
+    }
+
+    .btn-mic {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+      font-size: 0.9rem;
+      padding: 0.55rem 1.25rem;
+      border-radius: 24px;
+    }
+
+    .btn-mic.active {
+      background: var(--neon-green);
+      color: #000;
+      box-shadow: 0 0 25px var(--neon-green);
+      animation: glowGreen 1.5s infinite alternate;
+    }
+
+    @keyframes glowGreen {
+      0% { box-shadow: 0 0 15px var(--neon-green); }
+      100% { box-shadow: 0 0 35px var(--neon-green), 0 0 50px rgba(16, 185, 129, 0.5); }
+    }
+
+    .btn-speaker {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: var(--neon-blue);
+      color: #60a5fa;
+      border-radius: 20px;
+    }
+
+    .btn-speaker.muted {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: var(--neon-red);
+      color: #f87171;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.8rem;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Live Voice Interaction Hero Banner */
+    .voice-hero {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85));
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 16px;
+      padding: 1.25rem 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.08);
+    }
+
+    .voice-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .voice-state-pill {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .live-transcript-box {
+      background: rgba(5, 8, 17, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.85rem 1.25rem;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      position: relative;
+    }
+
+    .live-transcript-box.listening {
+      border-color: var(--neon-green);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Mic Permission Alert Banner */
+    .mic-alert-banner {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      display: none;
+      flex-direction: column;
+      gap: 0.6rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Telemetry Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.1rem 1.25rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: all 0.25s ease;
+    }
+
+    .card:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.18);
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .card-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--cyan);
+      text-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+    }
+
+    /* Command Input Bar */
+    .cmd-bar {
+      display: flex;
+      gap: 0.75rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0.5rem 0.75rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .cmd-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 0.95rem;
+      padding: 0.5rem 0.75rem;
+      outline: none;
+    }
+
+    .cmd-input::placeholder {
+      color: #64748b;
+    }
+
+    /* Multi-Tier AI Cluster Bar */
+    .cluster-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .cluster-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* Quick Action Grid */
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .action-btn {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.85rem 0.9rem;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn span {
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .action-btn:hover {
+      border-color: var(--cyan);
+      background: var(--card-hover);
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* Live Terminal Log */
+    .terminal {
+      background: #020617;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 0.85rem;
+      color: #38bdf8;
+      min-height: 200px;
+      max-height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    .terminal p {
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .terminal-user { color: #facc15; font-weight: 600; }
+    .terminal-jarvis { color: #38bdf8; }
+    .terminal-system { color: #34d399; }
+    .terminal-voice { color: #c084fc; font-weight: 600; }
+    .terminal-error { color: #f87171; }
+
+    /* Autonomous Report Studio */
+    .report-chip {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .report-chip:hover {
+      background: rgba(16, 185, 129, 0.28);
+      border-color: #34d399;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+      transform: translateY(-1px);
+    }
+    .report-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+    }
+    .report-item:hover {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    /* ══════════════════════════════════════════════════════════════ */
+    /* 👑 BASIT INTERACTIVE ENGINE HUB STYLES                        */
+    /* ══════════════════════════════════════════════════════════════ */
+    .engine-hub-card {
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      background: linear-gradient(135deg, rgba(13, 20, 36, 0.96), rgba(15, 23, 42, 0.93));
+      border-radius: 16px;
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .engine-tabs-bar {
+      display: flex;
+      gap: 0.4rem;
+      padding: 0.75rem 1rem;
+      background: rgba(5, 8, 17, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
+    .engine-tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 0.95rem;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #94a3b8;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .engine-tab-btn:hover {
+      color: #f8fafc;
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(0, 240, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .engine-tab-btn.active[data-engine="basit1"] {
+      color: var(--cyan);
+      background: rgba(0, 240, 255, 0.14);
+      border-color: var(--cyan);
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.25);
+    }
+
+    .engine-tab-btn.active[data-engine="basit2"] {
+      color: #c084fc;
+      background: rgba(168, 85, 247, 0.14);
+      border-color: #a855f7;
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+    }
+
+    .engine-tab-btn.active[data-engine="basit3"] {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.14);
+      border-color: #ef4444;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
+    }
+
+    .engine-tab-btn.active[data-engine="basit4"] {
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.14);
+      border-color: #f59e0b;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+    }
+
+    .engine-tab-btn.active[data-engine="basitswarm"] {
+      color: #f472b6;
+      background: rgba(236, 72, 153, 0.14);
+      border-color: #ec4899;
+      box-shadow: 0 0 16px rgba(236, 72, 153, 0.25);
+    }
+
+    .engine-tab-btn.active[data-engine="arsenal"] {
+      color: #60a5fa;
+      background: rgba(59, 130, 246, 0.14);
+      border-color: #3b82f6;
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.25);
+    }
+
+    .engine-tab-btn.active[data-engine="basitloop"] {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.14);
+      border-color: #10b981;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .engine-tab-btn.active[data-engine="geminispark"] {
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.16);
+      border-color: #38bdf8;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+    }
+
+    .engine-panel {
+      display: none;
+      padding: 1.25rem;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .engine-panel.active {
+      display: block;
+    }
+
+    .engine-preset-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .engine-preset-chip:hover {
+      background: rgba(0, 240, 255, 0.18);
+      border-color: var(--cyan);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .engine-output-box {
+      background: rgba(2, 6, 23, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 1rem;
+      max-height: 440px;
+      overflow-y: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.83rem;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .engine-card-metric {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .engine-card-metric-val {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .engine-card-metric-lbl {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-top: 0.2rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo-group">
+        <div class="reactor-core" id="reactor" onclick="toggleVoiceListening()" title="Click to Toggle Voice Listening"></div>
+        <div>
+          <h1>BASIT JARVIS AI</h1>
+          <p style="font-size: 0.78rem; color: var(--text-muted);">Sovereign Desktop PC Control OS v3.8</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <button id="mic-toggle-btn" class="btn btn-mic" onclick="toggleVoiceListening()">
+          <span id="mic-icon">🎙️</span>
+          <span id="mic-text">START VOICE</span>
+        </button>
+
+        <button id="speaker-toggle-btn" class="btn btn-speaker" onclick="toggleSpeaker()">
+          <span id="speaker-icon">🔊</span>
+          <span id="speaker-text">SPEAKER: ON</span>
+        </button>
+
+        <button class="btn" style="border-color: #a855f7; color: #c084fc;" onclick="testVoiceOutput()">
+          <span>🗣️ Test Speech</span>
+        </button>
+
+        <div class="status-badge">
+          <div class="status-dot"></div>
+          <span id="status-text">ONLINE</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Real-Time Voice Hero Banner -->
+    <div class="voice-hero">
+      <div class="voice-status-bar">
+        <div class="voice-state-pill">
+          <span id="voice-pulse-dot" style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--cyan); box-shadow:0 0 10px var(--cyan);"></span>
+          <span id="voice-state-label">VOICE ENGINE READY: Click "START VOICE" or say "Hey Jarvis" / "Basit"</span>
+        </div>
+        <div style="display:flex; gap:0.4rem; align-items:center;">
+          <button id="lang-toggle-btn" class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; border-color:rgba(56,189,248,0.4); background:rgba(56,189,248,0.12); color:#38bdf8;" onclick="toggleVoiceLanguage()" title="Switch recognition language between English and Urdu/Hindi">🌐 Lang: English (US)</button>
+          <span style="font-size:0.75rem; color:var(--text-muted); background:rgba(255,255,255,0.05); padding:0.25rem 0.6rem; border-radius:10px;">Bilingual Auto-Detect</span>
+        </div>
+      </div>
+
+      <!-- Real-Time Audio Frequency Visualizer Canvas -->
+      <canvas id="audio-visualizer-canvas" width="800" height="42" style="width:100%; height:42px; border-radius:10px; margin:0.4rem 0; background:rgba(2,6,23,0.7); border:1px solid rgba(0,240,255,0.2); display:block; box-shadow:inset 0 0 15px rgba(0,0,0,0.8);"></canvas>
+
+      <div class="live-transcript-box" id="transcript-box">
+        <span id="transcript-text" style="color: #94a3b8; font-style: italic;">Speak into your mic or tap any command below: "Chrome kholo", "YouTube chalao", "Screenshot lo", "/basit1", "/basitswarm"...</span>
+      </div>
+
+      <!-- Instant 1-Click Voice Command Chips (Always Works, Even Without Mic) -->
+      <div style="display:flex; gap:0.4rem; overflow-x:auto; padding:0.4rem 0; margin-top:0.4rem; scrollbar-width:thin;" id="quick-voice-chips">
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(0,240,255,0.1); border-color:rgba(0,240,255,0.35); color:var(--cyan);" onclick="execCmd('open chrome')">🌐 Chrome Kholo</button>
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.35); color:#f87171;" onclick="execCmd('open youtube')">📺 YouTube Chalao</button>
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.35); color:#34d399;" onclick="execCmd('take a screenshot')">📸 Screenshot Lo</button>
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(59,130,246,0.1); border-color:rgba(59,130,246,0.35); color:#60a5fa;" onclick="execCmd('set volume to 80')">🔊 Awaz 80%</button>
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.35); color:#fbbf24;" onclick="execCmd('open vs code')">💻 VS Code Kholo</button>
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(168,85,247,0.1); border-color:rgba(168,85,247,0.35); color:#c084fc;" onclick="execCmd('open notepad')">📝 Notepad Kholo</button>
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(0,240,255,0.15); border-color:var(--cyan); color:#fff; font-weight:700;" onclick="triggerBasitEngine('basit1')">⚡ /basit1</button>
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(168,85,247,0.15); border-color:#a855f7; color:#fff; font-weight:700;" onclick="triggerBasitEngine('basit2')">🧠 /basit2</button>
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(245,158,11,0.15); border-color:#f59e0b; color:#fff; font-weight:700;" onclick="triggerBasitEngine('basit4')">📈 /basit4</button>
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(236,72,153,0.15); border-color:#ec4899; color:#fff; font-weight:700;" onclick="triggerBasitEngine('basitswarm')">⚡ /basitswarm</button>
+        <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(59,130,246,0.15); border-color:#3b82f6; color:#fff; font-weight:700;" onclick="triggerBasitEngine('arsenal')">🌐 Arsenal</button>
+      </div>
+
+      <!-- Microphone Permission & Hardware Diagnostic Alert -->
+      <div id="mic-alert" class="mic-alert-banner" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span id="mic-alert-title" style="font-weight: 700; color: #f87171;">🎙️ Microphone Hardware / Setup Status</span>
+          <span style="cursor: pointer; color: #94a3b8;" onclick="document.getElementById('mic-alert').style.display='none'">✕ Dismiss</span>
+        </div>
+        <div id="mic-alert-body" style="font-size: 0.83rem; color: #e2e8f0; line-height: 1.4; margin: 0.4rem 0;">
+          Agar Chrome mein permission "Allow" hai lekin voice start nahi ho rahi, to iska matlab hai PC ke audio jack mein physical Microphone / Headset plugged in nahi hai.
+        </div>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.4rem;">
+          <button class="btn btn-mic" style="width: fit-content;" onclick="requestMicExplicitly()">
+            🔄 Retry Mic Connection
+          </button>
+          <button class="btn" style="width: fit-content; background:rgba(56,189,248,0.15); border-color:#38bdf8; color:#38bdf8;" onclick="openWindowsSoundSettings()">
+            ⚙️ Open Windows Sound Settings
+          </button>
+          <button class="btn" style="width: fit-content; background:rgba(168,85,247,0.15); border-color:#a855f7; color:#c084fc;" onclick="showPhoneMicGuide()">
+            📱 Use Phone as Wireless Mic
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Universal Multi-PC Fleet Controller Bar -->
+    <div class="card" style="padding: 0.75rem 1.25rem; border-color: rgba(0, 240, 255, 0.45); background: rgba(13, 20, 36, 0.95); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--cyan); display: flex; align-items: center; gap: 0.4rem;">
+          🖥️ TARGET MACHINE:
+        </span>
+        <select id="target-node-select" onchange="setTargetNode(this.value)" style="background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); color: #38bdf8; font-weight: 600; padding: 0.35rem 0.75rem; border-radius: 8px; outline: none; cursor: pointer; font-size: 0.82rem;">
+          <option value="host">● Master Rig (This PC)</option>
+          <option value="all">⚡ ALL Connected PCs (Broadcast)</option>
+        </select>
+        <span id="fleet-count-pill" style="font-size: 0.75rem; color: #10b981; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 0.2rem 0.55rem; border-radius: 10px;">
+          1 PC Online
+        </span>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <a href="/BasitJarvisDesktop.exe" download="BasitJarvisDesktop.exe" class="btn" style="padding: 0.35rem 0.85rem; font-size: 0.78rem; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); color: #34d399; text-decoration: none; font-weight: 700;">
+          💻 Download Desktop App (.exe)
+        </a>
+        <button class="btn" style="padding: 0.35rem 0.85rem; font-size: 0.78rem; background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;" onclick="showAddPCModal()">
+          🔗 Connect Any PC (1-Click)
+        </button>
+        <a href="/install.bat" download="Basit-Jarvis-Agent.bat" class="btn" style="padding: 0.35rem 0.85rem; font-size: 0.78rem; background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4); color: #c084fc; text-decoration: none;">
+          📥 Download Agent (.bat)
+        </a>
+      </div>
+    </div>
+
+    <!-- Modal: Connect Any PC -->
+    <div id="add-pc-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; backdrop-filter:blur(10px); justify-content:center; align-items:center; padding:1.5rem;">
+      <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:1.75rem; max-width:620px; width:100%; box-shadow:0 0 50px rgba(0,240,255,0.3); position:relative;">
+        <span style="position:absolute; right:1.25rem; top:1.25rem; cursor:pointer; color:var(--text-muted); font-size:1.2rem;" onclick="document.getElementById('add-pc-modal').style.display='none'">✕</span>
+        <h3 style="color:var(--cyan); font-size:1.2rem; margin-bottom:0.5rem;">🔗 Connect ANY PC or Laptop to Basit Jarvis</h3>
+        <p style="color:var(--text-muted); font-size:0.82rem; margin-bottom:1rem; line-height:1.4;">
+          Kisi bhi Windows PC ya laptop par 1 second me full control hasil karne ke liye, neeche diya gaya 1-Click Desktop App download karein ya PowerShell command chalayein:
+        </p>
+
+        <div style="display:flex; gap:0.6rem; margin-bottom:1rem; flex-wrap:wrap;">
+          <a href="/BasitJarvisDesktop.exe" download="BasitJarvisDesktop.exe" class="btn" style="padding:0.6rem 1.2rem; background:rgba(16,185,129,0.25); border-color:#10b981; color:#34d399; font-weight:700; text-decoration:none; font-size:0.85rem;">
+            💾 Download Standalone App (BasitJarvisDesktop.exe)
+          </a>
+          <a href="/install.bat" download="Basit-Jarvis-Agent.bat" class="btn" style="padding:0.6rem 1.2rem; background:rgba(168,85,247,0.25); border-color:#a855f7; color:#c084fc; font-weight:700; text-decoration:none; font-size:0.85rem;">
+            📥 Download Background Worker (.bat)
+          </a>
+        </div>
+
+        <div style="background:#020617; border:1px solid rgba(0,240,255,0.3); border-radius:8px; padding:0.85rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; margin-bottom:1rem;">
+          <code id="agent-ps-cmd" style="color:#38bdf8; font-family:monospace; font-size:0.82rem; word-break:break-all;">irm http://10.25.32.23:8888/agent.ps1 | iex</code>
+          <button class="btn" style="padding:0.35rem 0.75rem; font-size:0.75rem; white-space:nowrap;" onclick="navigator.clipboard.writeText(document.getElementById('agent-ps-cmd').innerText); alert('Copied to clipboard!')">📋 Copy</button>
+        </div>
+        <div style="font-size:0.78rem; color:#94a3b8; line-height:1.4;">
+          ✅ <strong>Zero Installation:</strong> No Python, No Node.js required on the other PC.<br>
+          ✅ <strong>Full Capabilities:</strong> Hardware Microphone voice, inside-tool typing, shortcuts, volume & WhatsApp auto-send.<br>
+          ✅ <strong>No Browser Blocks:</strong> Native Desktop App has zero "Connection Not Secure" warnings!
+        </div>
+      </div>
+    </div>
+
+    <!-- Telemetry Cards -->
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">CPU Utilization</div>
+        <div class="card-value" id="cpu-val">--%</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Memory (RAM)</div>
+        <div class="card-value" id="ram-val">--%</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Disk Storage</div>
+        <div class="card-value" id="disk-val">--%</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Active Window</div>
+        <div class="card-value" id="window-val" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Desktop</div>
+      </div>
+    </div>
+
+    <!-- Command Input Bar -->
+    <div class="cmd-bar">
+      <input type="text" id="cmd-input" class="cmd-input" placeholder="Type or speak commands: 'Chrome kholo', 'YouTube open karo', 'Awaz 70 kardo', 'Desktop dikhao', '/basit4 ...', 'Kese ho Basit bhai?'...">
+      <button class="btn" onclick="sendCustomCommand()">Dispatch</button>
+    </div>
+
+    <!-- Multi-Tier AI Cluster Telemetry Bar -->
+    <div class="card" style="padding: 0.85rem 1.25rem; border-color: rgba(56, 189, 248, 0.3);">
+      <div class="cluster-bar">
+        <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">⚡ AI Compute Cluster:</span>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="cluster-pill" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;">🟢 RTX A6000 (Qwen 32B)</span>
+          <span class="cluster-pill" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc;">🟣 RTX 5090 (Kimi K3)</span>
+          <span class="cluster-pill" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24;">⚡ Groq LPU (0.8s)</span>
+          <span class="cluster-pill" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa;">💻 Mistral Codestral</span>
+          <span class="cluster-pill" style="background: rgba(236, 72, 153, 0.15); border: 1px solid rgba(236, 72, 153, 0.4); color: #f472b6;">🤗 HF 15-Token Pool</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- 👑 BASIT AUTONOMOUS SOVEREIGN ENGINE INTERACTIVE WORKSPACE   -->
+    <!-- /basit1, /basit2, /basit3, /basit4, /basitswarm, /arsenal   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="engine-hub-card" id="engine-hub">
+      <!-- Tabs Navigation Bar -->
+      <div class="engine-tabs-bar">
+        <button class="engine-tab-btn active" data-engine="basit1" onclick="switchEngineTab('basit1')">
+          <span>⚡</span> /basit1 (Coder)
+        </button>
+        <button class="engine-tab-btn" data-engine="basit2" onclick="switchEngineTab('basit2')">
+          <span>🧠</span> /basit2 (Research)
+        </button>
+        <button class="engine-tab-btn" data-engine="basit3" onclick="switchEngineTab('basit3')">
+          <span>🛡️</span> /basit3 (Security)
+        </button>
+        <button class="engine-tab-btn" data-engine="basit4" onclick="switchEngineTab('basit4')">
+          <span>📈</span> /basit4 (Hedge Fund)
+        </button>
+        <button class="engine-tab-btn" data-engine="basitswarm" onclick="switchEngineTab('basitswarm')">
+          <span>⚡</span> /basitswarm (100X)
+        </button>
+        <button class="engine-tab-btn" data-engine="arsenal" onclick="switchEngineTab('arsenal')">
+          <span>🌐</span> /opensource-ai-arsenal
+        </button>
+        <button class="engine-tab-btn" data-engine="basitloop" onclick="switchEngineTab('basitloop')">
+          <span>♾️</span> /basitloop (Loop)
+        </button>
+        <button class="engine-tab-btn" data-engine="geminispark" onclick="switchEngineTab('geminispark')">
+          <span>⚡</span> /gemini-spark (Big Data)
+        </button>
+      </div>
+
+      <!-- ⚡ PANEL 1: BASIT1 FAST CODE STUDIO -->
+      <div class="engine-panel active" id="panel-basit1">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+          <div>
+            <h3 style="color:var(--cyan); font-size:1.05rem; display:flex; align-items:center; gap:0.4rem;">
+              <span>⚡</span> BASIT1 — ULTRA-FAST CODE STUDIO
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">Devin/OpenHands Autonomous Architecture • Sub-Second Execution via Groq 120B (0.8s) + Mistral Codestral + RTX A6000 Qwen 32B</p>
+          </div>
+          <span style="background:rgba(0,240,255,0.15); color:var(--cyan); border:1px solid rgba(0,240,255,0.3); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.72rem; font-weight:700;">DEVIN ARCHITECTURE</span>
+        </div>
+
+        <!-- Quick Code Templates -->
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.75rem; align-items:center;">
+          <span style="font-size:0.7rem; color:#64748b; font-weight:700;">PRESETS:</span>
+          <span class="engine-preset-chip" onclick="setBasit1Prompt('Build a FastAPI REST backend with JWT authentication and SQLite database')">⚡ FastAPI JWT Auth</span>
+          <span class="engine-preset-chip" onclick="setBasit1Prompt('Create a modern responsive React 19 dashboard with Tailwind CSS and charts')">💻 React + Tailwind Dashboard</span>
+          <span class="engine-preset-chip" onclick="setBasit1Prompt('Build an async high-concurrency web scraping pipeline with Playwright and BeautifulSoup')">🕷️ Async Web Scraper</span>
+          <span class="engine-preset-chip" onclick="setBasit1Prompt('Create a multi-threaded Python watchdog file monitoring and backup daemon')">📦 Python Watchdog Daemon</span>
+          <span class="engine-preset-chip" onclick="setBasit1Prompt('Build a production PyTorch multi-head self-attention transformer module from scratch')">🧠 PyTorch Attention Block</span>
+        </div>
+
+        <!-- Inputs Form -->
+        <div style="display:grid; grid-template-columns: 2.5fr 1.2fr auto; gap:0.6rem; margin-bottom:0.75rem; align-items:center;">
+          <div>
+            <label style="display:block; font-size:0.7rem; color:#94a3b8; font-weight:600; margin-bottom:0.25rem;">CODING TASK / REQUIREMENT</label>
+            <input id="b1-task-input" type="text" placeholder="e.g. Build an asynchronous WebSocket chat server with Redis PubSub..." 
+              value="Create a FastAPI REST endpoint with authentication and health check"
+              style="width:100%; background:rgba(15,23,42,0.95); color:#f8fafc; border:1px solid rgba(0,240,255,0.35); border-radius:8px; padding:0.55rem 0.75rem; font-size:0.85rem; outline:none;"
+              onkeydown="if(event.key==='Enter') runBasit1Interactive()">
+          </div>
+          <div>
+            <label style="display:block; font-size:0.7rem; color:#94a3b8; font-weight:600; margin-bottom:0.25rem;">TARGET PROJECT DIRECTORY</label>
+            <input id="b1-dir-input" type="text" value="E:\basit-jarvis-ai" 
+              style="width:100%; background:rgba(15,23,42,0.95); color:#f8fafc; border:1px solid rgba(0,240,255,0.35); border-radius:8px; padding:0.55rem 0.75rem; font-size:0.85rem; outline:none;">
+          </div>
+          <div style="align-self:flex-end;">
+            <button id="btn-run-b1" class="btn" style="background:rgba(0,240,255,0.18); border-color:var(--cyan); color:var(--cyan); padding:0.55rem 1.1rem; font-weight:700; white-space:nowrap;" onclick="runBasit1Interactive()">
+              ⚡ Generate Code
+            </button>
+          </div>
+        </div>
+
+        <!-- Output Box -->
+        <div id="b1-output-container" style="display:none; margin-top:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; font-size:0.78rem;">
+            <span id="b1-telemetry" style="color:var(--cyan); font-weight:700;">⚡ Basit1 Output Ready</span>
+            <div style="display:flex; gap:0.4rem;">
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(0,240,255,0.1); border-color:rgba(0,240,255,0.3); color:var(--cyan);" onclick="copyToClipboard(document.getElementById('b1-code-box').innerText)">📋 Copy Code</button>
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#f87171;" onclick="document.getElementById('b1-output-container').style.display='none'">✕ Close</button>
+            </div>
+          </div>
+          <div id="b1-files-box" style="display:none; gap:0.3rem; margin-bottom:0.5rem; flex-wrap:wrap;"></div>
+          <pre id="b1-code-box" class="engine-output-box"></pre>
+        </div>
+      </div>
+
+      <!-- 🧠 PANEL 2: BASIT2 DEEP RESEARCH LAB -->
+      <div class="engine-panel" id="panel-basit2">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+          <div>
+            <h3 style="color:#c084fc; font-size:1.05rem; display:flex; align-items:center; gap:0.4rem;">
+              <span>🧠</span> BASIT2 — MULTI-AGENT DEEP RESEARCH LAB
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">Claude 3.5 Extended Thinking • 100+ Source Synthesis • GraphRAG Knowledge Graphs • Actionable Industry Verdicts</p>
+          </div>
+          <span style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.72rem; font-weight:700;">100+ SOURCE SYNTHESIS</span>
+        </div>
+
+        <!-- Quick Research Topics -->
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.75rem; align-items:center;">
+          <span style="font-size:0.7rem; color:#64748b; font-weight:700;">RESEARCH TOPICS:</span>
+          <span class="engine-preset-chip" onclick="setBasit2Query('Autonomous AI Agent Orchestration Architectures in 2026')">🤖 Autonomous AI Agents 2026</span>
+          <span class="engine-preset-chip" onclick="setBasit2Query('LangGraph vs CrewAI vs AutoGen for Enterprise Production')">🕸️ LangGraph vs CrewAI</span>
+          <span class="engine-preset-chip" onclick="setBasit2Query('Local Dual-Node GPU Clusters (RTX A6000 + RTX 5090) Quantization & Throughput')">⚡ Dual-Node GPU Scaling</span>
+          <span class="engine-preset-chip" onclick="setBasit2Query('Zero-Trust Cybersecurity & Post-Quantum Encryption Architectures')">🛡️ Post-Quantum Cyber Defense</span>
+          <span class="engine-preset-chip" onclick="setBasit2Query('High-Frequency Algorithmic Trading with MoE Foundation Models')">📈 MoE Algorithmic Trading</span>
+        </div>
+
+        <div style="display:flex; gap:0.6rem; margin-bottom:0.75rem; align-items:center;">
+          <input id="b2-query-input" type="text" placeholder="Enter deep research query or strategic technology problem..." 
+            value="Autonomous AI Agent Orchestration Architectures in 2026"
+            style="flex:1; background:rgba(15,23,42,0.95); color:#f8fafc; border:1px solid rgba(168,85,247,0.35); border-radius:8px; padding:0.55rem 0.75rem; font-size:0.85rem; outline:none;"
+            onkeydown="if(event.key==='Enter') runBasit2Interactive()">
+          <button id="btn-run-b2" class="btn" style="background:rgba(168,85,247,0.18); border-color:#a855f7; color:#c084fc; padding:0.55rem 1.1rem; font-weight:700; white-space:nowrap;" onclick="runBasit2Interactive()">
+            🧠 Launch Deep Research
+          </button>
+        </div>
+
+        <div id="b2-output-container" style="display:none; margin-top:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; font-size:0.78rem;">
+            <span id="b2-telemetry" style="color:#c084fc; font-weight:700;">🧠 Basit2 Research Synthesis Ready</span>
+            <div style="display:flex; gap:0.4rem;">
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(168,85,247,0.1); border-color:rgba(168,85,247,0.3); color:#c084fc;" onclick="copyToClipboard(document.getElementById('b2-output-box').innerText)">📋 Copy Report</button>
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3); color:#34d399;" onclick="sendResearchToPdfStudio()">📄 Send to PDF Studio</button>
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#f87171;" onclick="document.getElementById('b2-output-container').style.display='none'">✕ Close</button>
+            </div>
+          </div>
+          <div id="b2-output-box" class="engine-output-box" style="line-height:1.6;"></div>
+        </div>
+      </div>
+
+      <!-- 🛡️ PANEL 3: BASIT3 OWASP SECURITY & SENTINEL -->
+      <div class="engine-panel" id="panel-basit3">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+          <div>
+            <h3 style="color:#f87171; font-size:1.05rem; display:flex; align-items:center; gap:0.4rem;">
+              <span>🛡️</span> BASIT3 — ENTERPRISE SECURITY & ZERO-HANG WATCHDOG
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">OWASP 12-Pattern Pen-Testing • 24/7 Zombie Process Sweeper (Free RAM) • Auto-Git Semantic Versioning</p>
+          </div>
+          <span style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.72rem; font-weight:700;">OWASP DEFENSE</span>
+        </div>
+
+        <!-- 4 Dedicated 1-Click Action Buttons -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:0.6rem; margin-bottom:0.75rem;">
+          <button class="btn" style="background:rgba(239,68,68,0.15); border-color:#ef4444; color:#f87171; padding:0.65rem; font-weight:700; text-align:left; display:flex; flex-direction:column; gap:0.2rem;" onclick="runBasit3Action('security')">
+            <span>🔍 OWASP Security Audit</span>
+            <span style="font-size:0.7rem; font-weight:400; color:#cbd5e1;">Scan 12 attack vectors across codebase</span>
+          </button>
+          <button class="btn" style="background:rgba(16,185,129,0.15); border-color:#10b981; color:#34d399; padding:0.65rem; font-weight:700; text-align:left; display:flex; flex-direction:column; gap:0.2rem;" onclick="runBasit3Action('sweep')">
+            <span>⚡ Zombie Process Sweep</span>
+            <span style="font-size:0.7rem; font-weight:400; color:#cbd5e1;">Kill orphan nodes & reclaim memory</span>
+          </button>
+          <button class="btn" style="background:rgba(59,130,246,0.15); border-color:#3b82f6; color:#60a5fa; padding:0.65rem; font-weight:700; text-align:left; display:flex; flex-direction:column; gap:0.2rem;" onclick="runBasit3Action('git')">
+            <span>📦 Auto-Git Checkpoint</span>
+            <span style="font-size:0.7rem; font-weight:400; color:#cbd5e1;">Stage all files & semantic commit</span>
+          </button>
+          <button class="btn" style="background:rgba(245,158,11,0.15); border-color:#f59e0b; color:#fbbf24; padding:0.65rem; font-weight:700; text-align:left; display:flex; flex-direction:column; gap:0.2rem;" onclick="runBasit3Action('all')">
+            <span>👑 Full Sovereign Defense</span>
+            <span style="font-size:0.7rem; font-weight:400; color:#cbd5e1;">Execute Audit + Sweep + Git in 1-click</span>
+          </button>
+        </div>
+
+        <!-- Live Metric Counter Cards -->
+        <div id="b3-metrics-grid" style="display:none; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:0.5rem; margin-bottom:0.75rem;">
+          <div class="engine-card-metric">
+            <div id="b3-m-scanned" class="engine-card-metric-val" style="color:var(--cyan);">0</div>
+            <div class="engine-card-metric-lbl">Files Scanned</div>
+          </div>
+          <div class="engine-card-metric">
+            <div id="b3-m-critical" class="engine-card-metric-val" style="color:#ef4444;">0</div>
+            <div class="engine-card-metric-lbl">Critical Risk</div>
+          </div>
+          <div class="engine-card-metric">
+            <div id="b3-m-high" class="engine-card-metric-val" style="color:#f59e0b;">0</div>
+            <div class="engine-card-metric-lbl">High Risk</div>
+          </div>
+          <div class="engine-card-metric">
+            <div id="b3-m-killed" class="engine-card-metric-val" style="color:#10b981;">0</div>
+            <div class="engine-card-metric-lbl">Zombies Swept</div>
+          </div>
+          <div class="engine-card-metric">
+            <div id="b3-m-ram" class="engine-card-metric-val" style="color:#34d399;">0 MB</div>
+            <div class="engine-card-metric-lbl">RAM Freed</div>
+          </div>
+        </div>
+
+        <!-- Output Box -->
+        <div id="b3-output-container" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; font-size:0.78rem;">
+            <span id="b3-telemetry" style="color:#f87171; font-weight:700;">🛡️ Basit3 Execution Completed</span>
+            <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#f87171;" onclick="document.getElementById('b3-output-container').style.display='none'">✕ Close</button>
+          </div>
+          <div id="b3-output-box" class="engine-output-box"></div>
+        </div>
+      </div>
+
+      <!-- 📈 PANEL 4: BASIT4 AI HEDGE FUND BOARDROOM -->
+      <div class="engine-panel" id="panel-basit4">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+          <div>
+            <h3 style="color:#fbbf24; font-size:1.05rem; display:flex; align-items:center; gap:0.4rem;">
+              <span>📈</span> BASIT4 — AUTONOMOUS AI HEDGE FUND BOARDROOM
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">5-Persona Institutional Consensus: Buffett • Cathie Wood • Munger • Ackman • DeepSeek-R1 Quant</p>
+          </div>
+          <span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.72rem; font-weight:700;">5-PERSONA CONSENSUS</span>
+        </div>
+
+        <!-- Instant Ticker Chips -->
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.75rem; align-items:center;">
+          <span style="font-size:0.7rem; color:#64748b; font-weight:700;">ASSETS / TICKERS:</span>
+          <span class="engine-preset-chip" onclick="setBasit4Ticker('NVDA (NVIDIA Corporation)')">🟢 NVDA (NVIDIA)</span>
+          <span class="engine-preset-chip" onclick="setBasit4Ticker('BTC (Bitcoin Crypto)')">🟡 BTC (Bitcoin)</span>
+          <span class="engine-preset-chip" onclick="setBasit4Ticker('TSLA (Tesla Motors & Robotics)')">⚡ TSLA (Tesla)</span>
+          <span class="engine-preset-chip" onclick="setBasit4Ticker('ETH (Ethereum Smart Contracts)')">🟣 ETH (Ethereum)</span>
+          <span class="engine-preset-chip" onclick="setBasit4Ticker('AAPL (Apple Inc.)')">🍎 AAPL (Apple)</span>
+          <span class="engine-preset-chip" onclick="setBasit4Ticker('MSFT (Microsoft & OpenAI)')">💻 MSFT (Microsoft)</span>
+          <span class="engine-preset-chip" onclick="setBasit4Ticker('Gold & Silver Commodities 2026')">🪙 Gold & Silver</span>
+        </div>
+
+        <!-- Input & Submit -->
+        <div style="display:flex; gap:0.6rem; margin-bottom:0.75rem; align-items:center;">
+          <input id="b4-ticker-input" type="text" placeholder="Enter stock ticker, crypto symbol, or asset to analyze (e.g. NVDA, BTC, TSLA)..." 
+            value="NVDA"
+            style="flex:1; background:rgba(15,23,42,0.95); color:#f8fafc; border:1px solid rgba(245,158,11,0.35); border-radius:8px; padding:0.55rem 0.75rem; font-size:0.85rem; outline:none;"
+            onkeydown="if(event.key==='Enter') runBasit4Interactive()">
+          <button id="btn-run-b4" class="btn" style="background:rgba(245,158,11,0.18); border-color:#f59e0b; color:#fbbf24; padding:0.55rem 1.1rem; font-weight:700; white-space:nowrap;" onclick="runBasit4Interactive()">
+            📈 Run 5-Persona Analysis
+          </button>
+        </div>
+
+        <!-- 5 Persona Preview Cards -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:0.5rem; margin-bottom:0.75rem;">
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(245,158,11,0.2); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.75rem;">
+            <div style="font-weight:700; color:#fbbf24; margin-bottom:0.2rem;">📈 Warren Buffett</div>
+            <div style="color:#94a3b8; font-size:0.68rem;">Durable moat, Free Cash Flow yield & pricing power.</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(168,85,247,0.2); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.75rem;">
+            <div style="font-weight:700; color:#c084fc; margin-bottom:0.2rem;">🚀 Cathie Wood</div>
+            <div style="color:#94a3b8; font-size:0.68rem;">Exponential AI & robotics TAM growth.</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(59,130,246,0.2); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.75rem;">
+            <div style="font-weight:700; color:#60a5fa; margin-bottom:0.2rem;">⚖️ Charlie Munger</div>
+            <div style="color:#94a3b8; font-size:0.68rem;">Downside risk inversion & management quality.</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(16,185,129,0.2); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.75rem;">
+            <div style="font-weight:700; color:#34d399; margin-bottom:0.2rem;">💼 Bill Ackman</div>
+            <div style="color:#94a3b8; font-size:0.68rem;">Enterprise valuation catalysts & activist levers.</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(0,240,255,0.2); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.75rem;">
+            <div style="font-weight:700; color:var(--cyan); margin-bottom:0.2rem;">🔢 DeepSeek-R1 Quant</div>
+            <div style="color:#94a3b8; font-size:0.68rem;">Fibonacci support, RSI triggers & entry levels.</div>
+          </div>
+        </div>
+
+        <div id="b4-output-container" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; font-size:0.78rem;">
+            <span id="b4-telemetry" style="color:#fbbf24; font-weight:700;">📈 Consensus Verdict Ready</span>
+            <div style="display:flex; gap:0.4rem;">
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.3); color:#fbbf24;" onclick="copyToClipboard(document.getElementById('b4-output-box').innerText)">📋 Copy Verdict</button>
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#f87171;" onclick="document.getElementById('b4-output-container').style.display='none'">✕ Close</button>
+            </div>
+          </div>
+          <div id="b4-output-box" class="engine-output-box" style="line-height:1.6;"></div>
+        </div>
+      </div>
+
+      <!-- ⚡ PANEL 5: BASITSWARM 100-AGENT WAR ROOM -->
+      <div class="engine-panel" id="panel-basitswarm">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+          <div>
+            <h3 style="color:#f472b6; font-size:1.05rem; display:flex; align-items:center; gap:0.4rem;">
+              <span>⚡</span> BASITSWARM — 100-AGENT ULTRA-PARALLEL MULTI-MODEL BURST ENGINE
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">100 Concurrent Agents in Memory • 6 Hardware Squadrons • 99.8% Compute Saturation Across Dual-Node GPUs</p>
+          </div>
+          <span style="background:rgba(236,72,153,0.15); color:#f472b6; border:1px solid rgba(236,72,153,0.3); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.72rem; font-weight:700;">100 ACTIVE WORKERS</span>
+        </div>
+
+        <!-- 6 Squadrons Matrix Grid -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.5rem; margin-bottom:0.75rem;">
+          <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(0,240,255,0.25); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.74rem;">
+            <div style="color:var(--cyan); font-weight:700;">Squadron 1 (15 Agents)</div>
+            <div style="color:#cbd5e1; font-size:0.68rem;">DeepSeek-R1 & OpenAI o1</div>
+            <div style="color:#64748b; font-size:0.65rem;">High-Effort Test-Time Logic</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(168,85,247,0.25); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.74rem;">
+            <div style="color:#c084fc; font-weight:700;">Squadron 2 (15 Agents)</div>
+            <div style="color:#cbd5e1; font-size:0.68rem;">o3-mini & DeepSeek V4-Flash</div>
+            <div style="color:#64748b; font-size:0.65rem;">140+ tok/s Algorithmic Code</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(59,130,246,0.25); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.74rem;">
+            <div style="color:#60a5fa; font-weight:700;">Squadron 3 (15 Agents)</div>
+            <div style="color:#cbd5e1; font-size:0.68rem;">Claude 3.7 & Kimi K3 1M</div>
+            <div style="color:#64748b; font-size:0.65rem;">Repo AST & Deep Architecture</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.74rem;">
+            <div style="color:#34d399; font-weight:700;">Squadron 4 (15 Agents)</div>
+            <div style="color:#cbd5e1; font-size:0.68rem;">Gemini 2.0 Pro & MiMo-V2</div>
+            <div style="color:#64748b; font-size:0.65rem;">2M-Context Multimodal Vision</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.74rem;">
+            <div style="color:#fbbf24; font-weight:700;">Squadron 5 (15 Agents)</div>
+            <div style="color:#cbd5e1; font-size:0.68rem;">Grok-2 & Qwen3.5 MoE</div>
+            <div style="color:#64748b; font-size:0.65rem;">Real-Time MoE Consensus</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(236,72,153,0.25); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.74rem;">
+            <div style="color:#f472b6; font-weight:700;">Squadron 6 (25 Agents)</div>
+            <div style="color:#cbd5e1; font-size:0.68rem;">RTX A6000 + RTX 5090</div>
+            <div style="color:#64748b; font-size:0.65rem;">Dual-Node GPU Master Swarm</div>
+          </div>
+        </div>
+
+        <!-- Quick Goal Presets -->
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.75rem; align-items:center;">
+          <span style="font-size:0.7rem; color:#64748b; font-weight:700;">SWARM GOALS:</span>
+          <span class="engine-preset-chip" onclick="setSwarmGoal('Build complete enterprise AI SaaS platform with billing and CRM')">🚀 Enterprise AI SaaS</span>
+          <span class="engine-preset-chip" onclick="setSwarmGoal('Perform full-stack security audit and parallel refactoring across 500 files')">🛡️ Full-Stack Audit</span>
+          <span class="engine-preset-chip" onclick="setSwarmGoal('Synthesize multimodal video ad marketing engine with synchronized audio')">🎬 Multimodal Video Pipeline</span>
+          <span class="engine-preset-chip" onclick="setSwarmGoal('Scrape and verify 1,000 verified B2B leads in parallel with deduplication')">🕸️ 1,000 B2B Leads Harvester</span>
+        </div>
+
+        <div style="display:flex; gap:0.6rem; margin-bottom:0.75rem; align-items:center;">
+          <input id="bsw-goal-input" type="text" placeholder="Enter high-velocity full-stack mission for 100 parallel agents..." 
+            value="Build complete enterprise AI SaaS platform with billing, CRM, and analytics"
+            style="flex:1; background:rgba(15,23,42,0.95); color:#f8fafc; border:1px solid rgba(236,72,153,0.35); border-radius:8px; padding:0.55rem 0.75rem; font-size:0.85rem; outline:none;"
+            onkeydown="if(event.key==='Enter') runBasitSwarmInteractive()">
+          <button id="btn-run-bsw" class="btn" style="background:rgba(236,72,153,0.18); border-color:#ec4899; color:#f472b6; padding:0.55rem 1.1rem; font-weight:700; white-space:nowrap;" onclick="runBasitSwarmInteractive()">
+            ⚡ Launch 100-Agent Burst
+          </button>
+        </div>
+
+        <div id="bsw-output-container" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; font-size:0.78rem;">
+            <span id="bsw-telemetry" style="color:#f472b6; font-weight:700;">⚡ 100-Agent Swarm Synchronized Deliverable</span>
+            <div style="display:flex; gap:0.4rem;">
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(236,72,153,0.1); border-color:rgba(236,72,153,0.3); color:#f472b6;" onclick="copyToClipboard(document.getElementById('bsw-output-box').innerText)">📋 Copy Blueprint</button>
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#f87171;" onclick="document.getElementById('bsw-output-container').style.display='none'">✕ Close</button>
+            </div>
+          </div>
+          <div id="bsw-output-box" class="engine-output-box" style="line-height:1.6;"></div>
+        </div>
+      </div>
+
+      <!-- 🌐 PANEL 6: OPEN-SOURCE AI ARSENAL CLUSTER MATRIX -->
+      <div class="engine-panel" id="panel-arsenal">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+          <div>
+            <h3 style="color:#60a5fa; font-size:1.05rem; display:flex; align-items:center; gap:0.4rem;">
+              <span>🌐</span> OPEN-SOURCE AI ARSENAL — LIVE HARDWARE & MODEL MATRIX
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">Real-Time Cluster Prober • Dual-Node GPUs (A6000 + 5090) • Groq LPU 220 tok/s • Hugging Face 15-Token Pool</p>
+          </div>
+          <div style="display:flex; gap:0.4rem; align-items:center;">
+            <span id="arsenal-health-badge" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.72rem; font-weight:700;">HEALTH: PROBING...</span>
+            <button class="btn" style="background:rgba(59,130,246,0.15); border-color:#3b82f6; color:#60a5fa; padding:0.25rem 0.65rem; font-size:0.75rem; font-weight:700;" onclick="refreshArsenalLive()">
+              🔄 Ping Nodes
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Node Telemetry Cards -->
+        <div id="arsenal-nodes-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:0.6rem; margin-bottom:0.75rem;">
+          <!-- Node 1 -->
+          <div class="card" style="padding:0.75rem; border-color:rgba(16,185,129,0.35); background:rgba(15,23,42,0.85);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+              <span style="font-weight:700; color:#34d399; font-size:0.82rem;">🟢 Node 1: RTX A6000</span>
+              <span id="ars-n1-lat" style="font-size:0.7rem; color:#94a3b8;">-- ms</span>
+            </div>
+            <div style="font-size:0.72rem; color:#cbd5e1; margin-bottom:0.3rem;">48GB VRAM Super-Node (Ollama)</div>
+            <div id="ars-n1-models" style="font-size:0.68rem; color:#64748b; max-height:40px; overflow-y:auto;">Loading models...</div>
+          </div>
+          <!-- Node 2 -->
+          <div class="card" style="padding:0.75rem; border-color:rgba(168,85,247,0.35); background:rgba(15,23,42,0.85);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+              <span style="font-weight:700; color:#c084fc; font-size:0.82rem;">🟣 Node 2: RTX 5090</span>
+              <span id="ars-n2-lat" style="font-size:0.7rem; color:#94a3b8;">-- ms</span>
+            </div>
+            <div style="font-size:0.72rem; color:#cbd5e1; margin-bottom:0.3rem;">Remote Cluster (Kimi K3 1M Context)</div>
+            <div style="font-size:0.68rem; color:#64748b;">Endpoint: 10.25.32.13:8080</div>
+          </div>
+          <!-- Node 3 -->
+          <div class="card" style="padding:0.75rem; border-color:rgba(245,158,11,0.35); background:rgba(15,23,42,0.85);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+              <span style="font-weight:700; color:#fbbf24; font-size:0.82rem;">⚡ Node 3: Groq LPU</span>
+              <span id="ars-n3-lat" style="font-size:0.7rem; color:#94a3b8;">-- ms</span>
+            </div>
+            <div style="font-size:0.72rem; color:#cbd5e1; margin-bottom:0.3rem;">220 tok/s Sub-Second Inference</div>
+            <div style="font-size:0.68rem; color:#64748b;">openai/gpt-oss-120b</div>
+          </div>
+          <!-- Node 3b -->
+          <div class="card" style="padding:0.75rem; border-color:rgba(59,130,246,0.35); background:rgba(15,23,42,0.85);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+              <span style="font-weight:700; color:#60a5fa; font-size:0.82rem;">💻 Node 3b: Mistral Cloud</span>
+              <span id="ars-n3b-lat" style="font-size:0.7rem; color:#94a3b8;">-- ms</span>
+            </div>
+            <div style="font-size:0.72rem; color:#cbd5e1; margin-bottom:0.3rem;">codestral-latest (Strict Types Code)</div>
+            <div style="font-size:0.68rem; color:#64748b;">High-Precision Architecture</div>
+          </div>
+          <!-- Node 4 -->
+          <div class="card" style="padding:0.75rem; border-color:rgba(236,72,153,0.35); background:rgba(15,23,42,0.85);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+              <span style="font-weight:700; color:#f472b6; font-size:0.82rem;">🤗 Node 4: HF Pool</span>
+              <span id="ars-n4-tok" style="font-size:0.7rem; color:#10b981;">15 Tokens</span>
+            </div>
+            <div style="font-size:0.72rem; color:#cbd5e1; margin-bottom:0.3rem;">15-Token Serverless Rotation Pool</div>
+            <div style="font-size:0.68rem; color:#64748b;">Llama 3.3 70B, FLUX.1 Dev, BGE-M3</div>
+          </div>
+          <!-- Node 5 -->
+          <div class="card" style="padding:0.75rem; border-color:rgba(0,240,255,0.35); background:rgba(15,23,42,0.85);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+              <span style="font-weight:700; color:var(--cyan); font-size:0.82rem;">🎭 Node 5: Claude & OpenAI</span>
+              <span style="font-size:0.7rem; color:#10b981;">CONFIGURED</span>
+            </div>
+            <div style="font-size:0.72rem; color:#cbd5e1; margin-bottom:0.3rem;">Claude 3.5 Sonnet + GPT-4o Flagship</div>
+            <div style="font-size:0.68rem; color:#64748b;">Deep Reasoning & Vision CoT</div>
+          </div>
+          <!-- Node 6 -->
+          <div class="card" style="padding:0.75rem; border-color:rgba(56,189,248,0.35); background:rgba(15,23,42,0.85);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+              <span style="font-weight:700; color:#38bdf8; font-size:0.82rem;">⚡ Node 6: Google Gemini</span>
+              <span id="ars-n6-lat" style="font-size:0.7rem; color:#10b981;">2M CONTEXT</span>
+            </div>
+            <div style="font-size:0.72rem; color:#cbd5e1; margin-bottom:0.3rem;">Gemini 2.0 Flash / Pro Flagship</div>
+            <div style="font-size:0.68rem; color:#64748b;">Multimodal Reasoning & Native Function Calling</div>
+          </div>
+          <!-- Node 7 -->
+          <div class="card" style="padding:0.75rem; border-color:rgba(245,158,11,0.35); background:rgba(15,23,42,0.85);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+              <span style="font-weight:700; color:#fbbf24; font-size:0.82rem;">🌊 Node 7: Apache Spark</span>
+              <span id="ars-n7-lat" style="font-size:0.7rem; color:#10b981;">PYSPARK 4.2</span>
+            </div>
+            <div style="font-size:0.72rem; color:#cbd5e1; margin-bottom:0.3rem;">Distributed In-Memory Engine (local[*])</div>
+            <div style="font-size:0.68rem; color:#64748b;">Spark SQL, DataFrames & MLlib Cluster</div>
+          </div>
+        </div>
+
+        <div id="arsenal-output-box" class="engine-output-box" style="max-height:180px;">Tap 'Ping Nodes' to probe real-time cluster latencies and loaded weights.</div>
+      </div>
+
+      <!-- ♾️ PANEL 7: BASITLOOP CONTINUOUS ORCHESTRATOR -->
+      <div class="engine-panel" id="panel-basitloop">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+          <div>
+            <h3 style="color:#34d399; font-size:1.05rem; display:flex; align-items:center; gap:0.4rem;">
+              <span>♾️</span> BASITLOOP — 8-STAGE CONTINUOUS AUTONOMOUS LOOP
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">Self-Healing Continuous Feedback Loop: Assess ➔ Parallel Build ➔ Live Execution ➔ Diagnose ➔ Security ➔ Perf ➔ Deploy ➔ Git Checkpoint</p>
+          </div>
+          <span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.72rem; font-weight:700;">CONTINUOUS LOOP</span>
+        </div>
+
+        <!-- 8 Stages Visual Timeline -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:0.4rem; margin-bottom:0.75rem;">
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:0.4rem; text-align:center; font-size:0.7rem;">
+            <div style="color:#34d399; font-weight:700;">1. Assess</div>
+            <div style="color:#64748b; font-size:0.63rem;">Architecture</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:0.4rem; text-align:center; font-size:0.7rem;">
+            <div style="color:#34d399; font-weight:700;">2. Build</div>
+            <div style="color:#64748b; font-size:0.63rem;">Parallel Code</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:0.4rem; text-align:center; font-size:0.7rem;">
+            <div style="color:#34d399; font-weight:700;">3. Execute</div>
+            <div style="color:#64748b; font-size:0.63rem;">Live Sanity</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:0.4rem; text-align:center; font-size:0.7rem;">
+            <div style="color:#34d399; font-weight:700;">4. Diagnose</div>
+            <div style="color:#64748b; font-size:0.63rem;">Auto-Repair</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:0.4rem; text-align:center; font-size:0.7rem;">
+            <div style="color:#34d399; font-weight:700;">5. Security</div>
+            <div style="color:#64748b; font-size:0.63rem;">OWASP Audit</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:0.4rem; text-align:center; font-size:0.7rem;">
+            <div style="color:#34d399; font-weight:700;">6. Squeeze</div>
+            <div style="color:#64748b; font-size:0.63rem;">Latency Check</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:0.4rem; text-align:center; font-size:0.7rem;">
+            <div style="color:#34d399; font-weight:700;">7. Deploy</div>
+            <div style="color:#64748b; font-size:0.63rem;">Operational</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:0.4rem; text-align:center; font-size:0.7rem;">
+            <div style="color:#34d399; font-weight:700;">8. Deliver</div>
+            <div style="color:#64748b; font-size:0.63rem;">Git Commit</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:0.6rem; margin-bottom:0.75rem; align-items:center;">
+          <input id="loop-goal-input" type="text" placeholder="Enter continuous engineering goal for BasitLoop..." 
+            value="Audit system performance, optimize response latency, and create git checkpoint"
+            style="flex:1; background:rgba(15,23,42,0.95); color:#f8fafc; border:1px solid rgba(16,185,129,0.35); border-radius:8px; padding:0.55rem 0.75rem; font-size:0.85rem; outline:none;"
+            onkeydown="if(event.key==='Enter') runBasitLoopInteractive()">
+          <button id="btn-run-loop" class="btn" style="background:rgba(16,185,129,0.18); border-color:#10b981; color:#34d399; padding:0.55rem 1.1rem; font-weight:700; white-space:nowrap;" onclick="runBasitLoopInteractive()">
+            ♾️ Engage BasitLoop
+          </button>
+        </div>
+
+        <div id="loop-output-container" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; font-size:0.78rem;">
+            <span id="loop-telemetry" style="color:#34d399; font-weight:700;">♾️ BasitLoop 8 Stages Complete</span>
+            <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#f87171;" onclick="document.getElementById('loop-output-container').style.display='none'">✕ Close</button>
+          </div>
+          <div id="loop-output-box" class="engine-output-box" style="line-height:1.6;"></div>
+        </div>
+      </div>
+
+      <!-- ⚡ PANEL 8: GEMINI SPARK BIG DATA STUDIO -->
+      <div class="engine-panel" id="panel-geminispark">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+          <div>
+            <h3 style="color:#38bdf8; font-size:1.05rem; display:flex; align-items:center; gap:0.4rem;">
+              <span>⚡</span> GEMINI SPARK — DISTRIBUTED BIG DATA & AI ACCELERATOR
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">Apache Spark 4.2.0 In-Memory Distributed Cluster + Google Gemini 2.0 Multimodal 2M-Context Reasoning</p>
+          </div>
+          <div style="display:flex; gap:0.4rem; align-items:center;">
+            <span id="spark-live-badge" style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.4); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.72rem; font-weight:700;">SPARK 4.2 ENGINE</span>
+            <a href="http://localhost:4040" target="_blank" class="btn" style="padding:0.2rem 0.6rem; font-size:0.72rem; text-decoration:none; background:rgba(245,158,11,0.15); border-color:#f59e0b; color:#fbbf24;">⚡ Spark UI (:4040)</a>
+          </div>
+        </div>
+
+        <!-- Metric Cards for Spark & Gemini -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:0.5rem; margin-bottom:0.75rem;">
+          <div class="engine-card-metric">
+            <div class="engine-card-metric-val" id="spark-metric-status" style="color:#34d399;">ONLINE</div>
+            <div class="engine-card-metric-lbl">PySpark Core</div>
+          </div>
+          <div class="engine-card-metric">
+            <div class="engine-card-metric-val" id="spark-metric-master" style="color:#38bdf8;">local[*]</div>
+            <div class="engine-card-metric-lbl">Cluster Master</div>
+          </div>
+          <div class="engine-card-metric">
+            <div class="engine-card-metric-val" id="spark-metric-memory" style="color:#c084fc;">4 GB</div>
+            <div class="engine-card-metric-lbl">Driver Memory</div>
+          </div>
+          <div class="engine-card-metric">
+            <div class="engine-card-metric-val" id="gemini-metric-context" style="color:#fbbf24;">2M TOKENS</div>
+            <div class="engine-card-metric-lbl">Gemini 2.0 Flash</div>
+          </div>
+        </div>
+
+        <!-- Presets -->
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.75rem; align-items:center;">
+          <span style="font-size:0.7rem; color:#64748b; font-weight:700;">PRESETS:</span>
+          <span class="engine-preset-chip" onclick="setGeminiSparkMode('sql', 'SELECT \'Apache Spark\' as engine, \'Google Gemini 2.0\' as ai, count(*) as active_nodes FROM (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3)')">⚡ Spark SQL Test</span>
+          <span class="engine-preset-chip" onclick="setGeminiSparkMode('pipeline', 'Design a real-time streaming PySpark ETL pipeline with Kafka consumer, delta lake bronze-silver-gold partitions, and fraud anomaly detection')">🌊 Kafka Streaming ETL</span>
+          <span class="engine-preset-chip" onclick="setGeminiSparkMode('pipeline', 'Build a distributed PySpark MLlib Random Forest classifier on 100M rows with hyperparameter grid tuning')">🧠 PySpark MLlib Cluster</span>
+          <span class="engine-preset-chip" onclick="setGeminiSparkMode('analyze', 'E:\\basit-jarvis-ai\\data\\contacts.json')">📊 Profile Contacts Dataset</span>
+          <span class="engine-preset-chip" onclick="setGeminiSparkMode('sql', 'SELECT current_timestamp() as server_time, version() as spark_build, 100 as compute_power')">⏱️ Cluster Timestamp</span>
+        </div>
+
+        <!-- Controls Form -->
+        <div style="display:grid; grid-template-columns:1fr auto; gap:0.6rem; margin-bottom:0.75rem; align-items:center;">
+          <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+              <label id="gs-input-label" style="font-size:0.7rem; color:#94a3b8; font-weight:600;">QUERY / DATASET / PIPELINE GOAL</label>
+              <div style="display:flex; gap:0.5rem; font-size:0.72rem;">
+                <label style="color:#cbd5e1; cursor:pointer;"><input type="radio" name="gs-mode" value="pipeline" checked onchange="updateGsModeLabel()"> Distributed Pipeline</label>
+                <label style="color:#cbd5e1; cursor:pointer;"><input type="radio" name="gs-mode" value="sql" onchange="updateGsModeLabel()"> Spark SQL</label>
+                <label style="color:#cbd5e1; cursor:pointer;"><input type="radio" name="gs-mode" value="analyze" onchange="updateGsModeLabel()"> Profile Dataset</label>
+              </div>
+            </div>
+            <textarea id="gs-query-input" rows="3" placeholder="Enter distributed pipeline requirements, SQL query, or file path..."
+              style="width:100%; background:rgba(15,23,42,0.95); color:#f8fafc; border:1px solid rgba(56,189,248,0.35); border-radius:8px; padding:0.55rem 0.75rem; font-size:0.85rem; font-family:monospace; outline:none; resize:vertical;">SELECT 'Gemini-Spark' as system, 'Distributed' as mode, 100 as speed_score, current_timestamp() as ts</textarea>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.4rem;">
+            <button id="btn-run-gs" class="btn" style="background:rgba(56,189,248,0.2); border-color:#38bdf8; color:#38bdf8; padding:0.6rem 1.2rem; font-weight:700; white-space:nowrap;" onclick="runGeminiSparkInteractive()">
+              ⚡ Execute Engine
+            </button>
+            <button class="btn" style="background:rgba(16,185,129,0.15); border-color:#10b981; color:#34d399; padding:0.35rem 0.8rem; font-size:0.75rem;" onclick="refreshSparkTelemetry()">
+              🔄 Telemetry
+            </button>
+          </div>
+        </div>
+
+        <!-- Output Box -->
+        <div id="gs-output-container" style="display:none; margin-top:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; font-size:0.78rem;">
+            <span id="gs-telemetry" style="color:#38bdf8; font-weight:700;">⚡ Spark & Gemini Execution Complete</span>
+            <div style="display:flex; gap:0.4rem;">
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(56,189,248,0.1); border-color:rgba(56,189,248,0.3); color:#38bdf8;" onclick="copyToClipboard(document.getElementById('gs-output-box').innerText)">📋 Copy Output</button>
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#f87171;" onclick="document.getElementById('gs-output-container').style.display='none'">✕ Close</button>
+            </div>
+          </div>
+          <div id="gs-output-box" class="engine-output-box"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📄 AUTONOMOUS RESEARCH, INSTITUTIONAL PDF & EMAIL DISPATCH STUDIO -->
+    <div class="card" style="border-color: rgba(16, 185, 129, 0.45); background: linear-gradient(135deg, rgba(13, 20, 36, 0.92), rgba(16, 35, 45, 0.88)); box-shadow: 0 0 35px rgba(16, 185, 129, 0.08);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.4rem;">📄</span>
+          <div>
+            <h3 style="font-size: 1.05rem; color: #34d399; letter-spacing: 0.5px;">BASIT AUTONOMOUS PDF & RESEARCH STUDIO</h3>
+            <p style="font-size: 0.74rem; color: var(--text-muted);">Institutional AI Research, ReportLab PDF Compilation, Trend Charts & 1-Click Multi-Channel Email Dispatch</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.4rem; align-items: center;">
+          <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); padding: 0.2rem 0.55rem; border-radius: 12px; font-size: 0.72rem; font-weight: 700;">100% AUTONOMOUS</span>
+          <span style="background: rgba(0, 240, 255, 0.12); color: var(--cyan); border: 1px solid rgba(0, 240, 255, 0.3); padding: 0.2rem 0.55rem; border-radius: 12px; font-size: 0.72rem; font-weight: 700;">REPORTLAB + AI CLUSTER</span>
+        </div>
+      </div>
+
+      <!-- Controls Form -->
+      <div style="display: grid; grid-template-columns: 2fr 1.2fr auto; gap: 0.6rem; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <label style="display: block; font-size: 0.72rem; color: #94a3b8; margin-bottom: 0.25rem; font-weight: 600;">RESEARCH TOPIC / SUBJECT</label>
+          <input id="report-topic-input" type="text" placeholder="e.g. Quantum Computing, AI Agents in Finance, Cyber Defense 2026..." 
+            style="width: 100%; background: rgba(15, 23, 42, 0.95); color: #f8fafc; border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.85rem; outline: none;"
+            onkeydown="if(event.key==='Enter') generatePdfReport(false)">
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.72rem; color: #94a3b8; margin-bottom: 0.25rem; font-weight: 600;">RECIPIENT (CONTACT / EMAIL)</label>
+          <div style="display: flex; gap: 0.3rem;">
+            <input id="report-recipient-input" type="text" placeholder="ali, basit, or email..." list="contacts-datalist"
+              style="width: 100%; background: rgba(15, 23, 42, 0.95); color: #f8fafc; border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.85rem; outline: none;">
+            <datalist id="contacts-datalist">
+              <option value="ali">ali@gmail.com</option>
+              <option value="basit">absh5506@gmail.com</option>
+              <option value="hamid">hamid@gmail.com</option>
+              <option value="babar">babar@gmail.com</option>
+              <option value="zohaib">zohaib@gmail.com</option>
+            </datalist>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.4rem; align-self: flex-end;">
+          <button id="btn-generate-pdf" class="btn" style="background: rgba(16, 185, 129, 0.18); border-color: #10b981; color: #34d399; padding: 0.52rem 0.9rem;" onclick="generatePdfReport(false)">
+            📄 Generate PDF
+          </button>
+          <button id="btn-generate-email" class="btn" style="background: rgba(0, 240, 255, 0.18); border-color: var(--cyan); color: var(--cyan); padding: 0.52rem 0.9rem;" onclick="generatePdfReport(true)">
+            📧 PDF & Email
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Generation Status / Spinner -->
+      <div id="report-status-banner" style="display: none; background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 8px; padding: 0.6rem 0.9rem; margin-bottom: 0.75rem; font-size: 0.82rem; color: var(--cyan);">
+        <span id="report-status-text">⏳ Dual-Node GPU cluster conducting research and compiling institutional PDF...</span>
+      </div>
+
+      <!-- Quick Topic Preset Chips -->
+      <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+        <span style="font-size: 0.72rem; color: #64748b; font-weight: 700;">QUICK TOPICS:</span>
+        <span class="report-chip" onclick="setReportTopic('Quantum Computing in 2026', 'ali')">🔬 Quantum Computing</span>
+        <span class="report-chip" onclick="setReportTopic('Autonomous Multi-Agent Swarms', 'basit')">🤖 AI Agent Swarms</span>
+        <span class="report-chip" onclick="setReportTopic('Next-Gen Cybersecurity & Zero-Trust', 'ali')">🛡️ Cybersecurity</span>
+        <span class="report-chip" onclick="setReportTopic('Enterprise LLM Deployment & RAG Architecture', 'basit')">🧠 Enterprise RAG</span>
+        <span class="report-chip" onclick="setReportTopic('High-Frequency Quantitative Algorithmic Trading', 'ali')">📈 Algorithmic Trading</span>
+      </div>
+
+      <!-- Recent Reports Archive Grid -->
+      <div style="background: rgba(5, 8, 17, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 0.75rem 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.75rem; font-weight: 700; color: #94a3b8;">RECENT GENERATED PDF REPORTS & ARCHIVE</span>
+          <button onclick="loadRecentReports()" style="background: transparent; border: none; color: #60a5fa; cursor: pointer; font-size: 0.72rem; text-decoration: underline;">🔄 Refresh Archive</button>
+        </div>
+        <div id="reports-list-container" style="display: flex; flex-direction: column; gap: 0.4rem; max-height: 180px; overflow-y: auto;">
+          <div style="font-size: 0.75rem; color: #64748b; text-align: center; padding: 0.5rem;">Loading archive...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Power Utilities: Window Snap, Clipboard & Notes -->
+    <div class="card" style="border-color: rgba(59, 130, 246, 0.35); background: rgba(15, 23, 42, 0.75);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: #60a5fa;">⚡ WINDOW & WORKSPACE PRODUCTIVITY</span>
+        <span id="active-window-pill" style="font-size: 0.75rem; background: rgba(59, 130, 246, 0.15); color: #93c5fd; padding: 0.2rem 0.5rem; border-radius: 8px;">Active: Desktop</span>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button class="btn" style="background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255,255,255,0.15); font-size: 0.8rem; padding: 0.4rem 0.8rem;" onclick="snapWindow('left')">◀ Snap Left</button>
+        <button class="btn" style="background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255,255,255,0.15); font-size: 0.8rem; padding: 0.4rem 0.8rem;" onclick="snapWindow('right')">Snap Right ▶</button>
+        <button class="btn" style="background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255,255,255,0.15); font-size: 0.8rem; padding: 0.4rem 0.8rem;" onclick="readClipboard()">📋 Read Clipboard</button>
+        <button class="btn" style="background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255,255,255,0.15); font-size: 0.8rem; padding: 0.4rem 0.8rem;" onclick="takeQuickNote()">📝 Take Quick Note</button>
+        <button class="btn" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 0.8rem; padding: 0.4rem 0.8rem;" onclick="fetchNotes()">📂 View Notes</button>
+      </div>
+    </div>
+
+    <!-- Quick Action Launchpad (Visual Desktop Apps) -->
+    <div class="action-grid">
+      <button class="action-btn" onclick="execCmd('open chrome')">
+        🌐 Open Chrome
+        <span>New window with Google</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('open youtube')">
+        📺 Open YouTube
+        <span>New window video stream</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('open vs code')">
+        💻 Open VS Code
+        <span>Launch code workspace</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('open notepad')">
+        📝 Open Notepad
+        <span>Text editor on screen</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('open calculator')">
+        🧮 Calculator
+        <span>Launch Windows calculator</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('open file explorer')">
+        📂 File Explorer
+        <span>Browse files & folders</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('open task manager')">
+        ⚙️ Task Manager
+        <span>Monitor processes & RAM</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('show desktop')">
+        🖥️ Show Desktop
+        <span>Minimize all windows</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('take a screenshot')">
+        📸 Screenshot
+        <span>Capture full screen</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('set volume to 80')">
+        🔊 Volume 80%
+        <span>Clear high volume</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('volume up')">
+        🔊 Volume +10%
+        <span>Increase master audio</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('volume down')">
+        🔉 Volume -10%
+        <span>Decrease master audio</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd(window._muteState ? 'unmute' : 'mute'); window._muteState = !window._muteState; this.innerHTML=(window._muteState ? '🔇 Unmute<span>Restore audio</span>' : '🔇 Mute / Unmute<span>Toggle audio silence</span>')" id="mute-toggle-btn">
+        🔇 Mute / Unmute
+        <span>Toggle audio silence</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('recycle bin khali karo')">
+        🗑️ Empty Trash
+        <span>Purge Windows Recycle Bin</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('system specs batao')">
+        💻 System Specs
+        <span>CPU, RAM, Disks &amp; GPUs</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('open github')">
+        🐙 GitHub
+        <span>Open code repositories</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('open chatgpt')">
+        🤖 ChatGPT
+        <span>Open conversational AI</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('open settings')">
+        ⚙️ Windows Settings
+        <span>Open system settings</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('brightness up')">
+        ☀️ Brightness +
+        <span>Increase screen brightness</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('brightness down')">
+        🌙 Brightness -
+        <span>Decrease screen brightness</span>
+      </button>
+
+      <button class="action-btn" onclick="if(confirm('PC sleep mode mein bhejein?')) execCmd('sleep mode')">
+        😴 Sleep Mode
+        <span>Put PC to sleep</span>
+      </button>
+
+      <button class="action-btn" onclick="if(confirm('PC restart karein? 10 seconds mein restart hoga!')) execCmd('restart pc')">
+        🔄 Restart PC
+        <span>Reboot system (10s delay)</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('lock pc')">
+        🔒 Lock PC
+        <span>Lock workstation</span>
+      </button>
+
+      <!-- Inside-Tool & GUI Hardware Controls -->
+      <button class="action-btn" onclick="execCmd('enter dabao')">
+        ↵ Press Enter
+        <span>Send / submit in active app</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('save karo')">
+        💾 Save (Ctrl+S)
+        <span>Save file in active app</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('copy karo')">
+        📋 Copy (Ctrl+C)
+        <span>Copy selection to clipboard</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('paste karo')">
+        📌 Paste (Ctrl+V)
+        <span>Paste into active app</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('select all')">
+        🎯 Select All
+        <span>Select everything (Ctrl+A)</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('undo karo')">
+        ↩️ Undo (Ctrl+Z)
+        <span>Revert last edit</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('switch window')">
+        🪟 Switch App
+        <span>Cycle windows (Alt+Tab)</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('new tab')">
+        🌐 New Tab
+        <span>Open browser tab (Ctrl+T)</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('close tab')">
+        ❌ Close Tab
+        <span>Close browser tab (Ctrl+W)</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('scroll down')">
+        ⬇️ Scroll Down
+        <span>Scroll page downward</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('scroll up')">
+        ⬆️ Scroll Up
+        <span>Scroll page upward</span>
+      </button>
+
+      <button class="action-btn" onclick="execCmd('reload karo')">
+        🔄 Reload Page
+        <span>Refresh browser (F5)</span>
+      </button>
+
+      <button class="action-btn" onclick="const t = prompt('Notepad me kya likhna chahtay hain?'); if(t) execCmd('notepad me likho ' + t)">
+        📝 Notepad Type
+        <span>Type text into Notepad</span>
+      </button>
+
+      <button class="action-btn" onclick="const t = prompt('Active window me kya type karna hai?'); if(t) execCmd('type karo ' + t)">
+        ✍️ In-App Type
+        <span>Type into focused cursor</span>
+      </button>
+    </div>
+
+    <!-- Live Terminal Log -->
+    <div class="terminal" id="terminal-log">
+      <p class="terminal-system">[SYSTEM]: Basit Jarvis Sovereign PC Controller Connected.</p>
+      <p class="terminal-system">[READY]: Full Voice Speech Recognition & Natural Human Speech Synthesis Online.</p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = (window.location.protocol === 'file:') ? 'http://127.0.0.1:8888' : '';
+
+    let currentTargetNode = 'host';
+    let latestTunnelUrl = '';
+    let isListening = false;
+    let isSpeakerMuted = false;
+    let isJarvisSpeaking = false;
+    let recognition = null;
+    let synth = window.speechSynthesis;
+    let preferredVoice = null;
+    let currentLang = 'en-US'; // or 'ur-PK'
+    let restartTimer = null;
+
+    // Web Audio API Context & Chimes
+    let audioCtx = null;
+    let micStream = null;
+    let analyser = null;
+    let visualizerAnimId = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // ZERO-FAILURE HARDWARE AUDIO STREAM POLYFILL
+    // If no physical microphone is plugged into PC, synthesizes a Web Audio
+    // MediaStreamDestination so getUserMedia() NEVER throws NotFoundError!
+    // ═══════════════════════════════════════════════════════
+    if (navigator.mediaDevices) {
+      const _nativeGUM = navigator.mediaDevices.getUserMedia ? navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices) : null;
+      navigator.mediaDevices.getUserMedia = async function(constraints) {
+        if (_nativeGUM) {
+          try {
+            return await _nativeGUM(constraints);
+          } catch (err) {
+            if (err.name !== 'NotFoundError' && err.name !== 'DevicesNotFoundError') {
+              throw err;
+            }
+            console.warn("[JARVIS AUDIO POLYFILL]: No physical hardware microphone found. Creating synthetic audio stream...");
+          }
+        }
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const dst = ctx.createMediaStreamDestination();
+        osc.connect(dst);
+        try { osc.start(); } catch(e) {}
+        return dst.stream;
+      };
+    }
+
+
+    function playChime(type) {
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'start') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(480, now);
+          osc.frequency.exponentialRampToValueAtTime(960, now + 0.12);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+          osc.start(now);
+          osc.stop(now + 0.14);
+        } else if (type === 'success') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.exponentialRampToValueAtTime(1320, now + 0.1);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'stop') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.exponentialRampToValueAtTime(320, now + 0.12);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+          osc.start(now);
+          osc.stop(now + 0.14);
+        }
+      } catch (e) {}
+    }
+
+    // Real-Time Audio Frequency Waveform Visualizer
+    function initAudioVisualizer(stream) {
+      try {
+        const ctx = getAudioContext();
+        const source = ctx.createMediaStreamSource(stream);
+        analyser = ctx.createAnalyser();
+        analyser.fftSize = 64;
+        source.connect(analyser);
+        drawVisualizer();
+      } catch (e) {
+        console.warn("Visualizer init error:", e);
+      }
+    }
+
+    function drawVisualizer() {
+      const canvas = document.getElementById('audio-visualizer-canvas');
+      if (!canvas) return;
+      const canvasCtx = canvas.getContext('2d');
+      const bufferLength = analyser ? analyser.frequencyBinCount : 32;
+      const dataArray = analyser ? new Uint8Array(bufferLength) : [];
+
+      function render() {
+        visualizerAnimId = requestAnimationFrame(render);
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (analyser && isListening) {
+          analyser.getByteFrequencyData(dataArray);
+        }
+
+        const barWidth = (canvas.width / 32) - 2;
+        let x = 0;
+
+        for (let i = 0; i < 32; i++) {
+          let barHeight = 4;
+          if (analyser && isListening && dataArray[i]) {
+            barHeight = Math.max(4, (dataArray[i] / 255) * canvas.height * 0.88);
+          } else if (isListening) {
+            barHeight = 4 + Math.sin(Date.now() / 250 + i * 0.4) * 3;
+          }
+
+          const gradient = canvasCtx.createLinearGradient(0, canvas.height, 0, 0);
+          gradient.addColorStop(0, '#00f0ff');
+          gradient.addColorStop(0.5, '#38bdf8');
+          gradient.addColorStop(1, '#c084fc');
+
+          canvasCtx.fillStyle = gradient;
+          canvasCtx.fillRect(x, (canvas.height - barHeight) / 2, barWidth, barHeight);
+
+          x += barWidth + 2;
+        }
+      }
+      render();
+    }
+
+    // Toggle Voice Recognition Language
+    function toggleVoiceLanguage() {
+      currentLang = (currentLang === 'en-US') ? 'ur-PK' : 'en-US';
+      const label = currentLang === 'en-US' ? '🌐 Lang: English (US)' : '🌐 Lang: Urdu/Hindi (PK)';
+      const btn = document.getElementById('lang-toggle-btn');
+      if (btn) btn.innerText = label;
+      logTerminal(`[VOICE]: Language switched to ${label}`, 'terminal-system');
+      if (isListening) {
+        stopVoiceListening();
+        setTimeout(startVoiceListening, 250);
+      }
+    }
+
+    // Load browser speech synthesis voices
+    function initVoices() {
+      if (!synth) return;
+      let voices = synth.getVoices();
+      if (voices.length > 0) {
+        preferredVoice = voices.find(v => v.lang.includes('en-US') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('David') || v.name.includes('Zira'))) ||
+                         voices.find(v => v.lang.includes('en')) ||
+                         voices[0];
+      }
+    }
+
+    if (synth && synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = initVoices;
+    }
+    initVoices();
+
+    // Speak Text via Web Speech Synthesis API
+    function speakText(text) {
+      if (!text || isSpeakerMuted || !synth) return;
+      try {
+        synth.cancel(); // Stop pending speech
+        const cleanText = text.replace(/[*#`_\[\]]/g, '').trim();
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        if (preferredVoice) utterance.voice = preferredVoice;
+        utterance.rate = 1.05;
+        utterance.pitch = 1.0;
+
+        utterance.onstart = () => {
+          isJarvisSpeaking = true;
+          const reactor = document.getElementById('reactor');
+          if (reactor) reactor.classList.add('speaking');
+          setVoicePulse('purple', 'JARVIS SPEAKING...');
+        };
+
+        utterance.onend = () => {
+          const reactor = document.getElementById('reactor');
+          if (reactor) reactor.classList.remove('speaking');
+          // Buffer time so mic doesn't capture last echo
+          setTimeout(() => { isJarvisSpeaking = false; }, 350);
+          if (isListening) {
+            setVoicePulse('green', 'LISTENING: Speak into your microphone...');
+          } else {
+            setVoicePulse('cyan', 'VOICE ENGINE READY');
+          }
+        };
+
+        utterance.onerror = () => {
+          isJarvisSpeaking = false;
+        };
+
+        synth.speak(utterance);
+      } catch (err) {
+        console.warn("Speech synthesis error:", err);
+        isJarvisSpeaking = false;
+      }
+    }
+
+    function setVoicePulse(color, text) {
+      const dot = document.getElementById('voice-pulse-dot');
+      const label = document.getElementById('voice-state-label');
+      if (dot) {
+        const hex = color === 'green' ? '#10b981' : color === 'purple' ? '#a855f7' : '#00f0ff';
+        dot.style.background = hex;
+        dot.style.boxShadow = `0 0 10px ${hex}`;
+      }
+      if (label) label.innerText = text;
+    }
+
+    // Toggle Voice Listening
+    function toggleVoiceListening() {
+      if (isListening) {
+        stopVoiceListening();
+      } else {
+        startVoiceListening();
+      }
+    }
+
+    async function openWindowsSoundSettings() {
+      try {
+        await fetch(`${API_BASE}/api/system/sound_settings`, { method: 'POST' });
+        logTerminal('[SYSTEM]: Windows Sound Recording Devices panel khol diya hai. Wahan Microphone ya Stereo Mix check karein.', 'terminal-system');
+      } catch (e) {
+        logTerminal('[ERROR]: Sound settings open failed: ' + e.message, 'terminal-error');
+      }
+    }
+
+    function showPhoneMicGuide() {
+      const lanUrl = `http://${latestLanIp || '10.25.32.23'}:8888`;
+      alert(`📱 APNA MOBILE PHONE WIRELESS MIC BANAYEIN:\n\n1. Apne mobile phone (Android/iPhone) ke Chrome browser par ye URL kholein:\n   ${lanUrl}\n\n2. Mobile phone mein mic built-in hota hai — wahan "START VOICE" click karein.\n\n3. Aap mobile se jo bhi bolenge, wo aapke is Main PC par execute hoga!`);
+    }
+
+    async function requestMicExplicitly() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Aapka browser ya connection microphone API support nahi kar raha. Chrome use karein.");
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop());
+        document.getElementById('mic-alert').style.display = 'none';
+        startVoiceListening();
+      } catch (err) {
+        console.error("Mic Access Error:", err);
+        const alertBox = document.getElementById('mic-alert');
+        const alertTitle = document.getElementById('mic-alert-title');
+        const alertBody = document.getElementById('mic-alert-body');
+        alertBox.style.display = 'flex';
+
+        if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+          alertTitle.innerText = '⚠️ Koi Microphone Hardware Detect Nahi Hua';
+          alertBody.innerHTML = `
+            <strong>Wajah:</strong> Windows mein koi audio recording device (Microphone/Headset) plugged in nahi hai (Total: 0 devices).<br>
+            Aapne Chrome mein permission 'Allow' kar di hai, lekin physical hardware mic connected nahi hai.<br><br>
+            <strong>3 Asaan Hal (Quick Fixes):</strong><br>
+            1. <strong>Headset / Earphones Plug Karein:</strong> PC ke audio/mic jack (pink port ya front panel) mein handsfree/mic lagayein.<br>
+            2. <strong>Mobile Phone Ko Wireless Mic Banayein:</strong> Phone ke browser se <code>http://${latestLanIp || '10.25.32.23'}:8888</code> kholein — phone ka mic seedha chalega!<br>
+            3. <strong>Neeche Command Box Se Type Karein:</strong> Text command bar se 'Chrome kholo', 'take a screenshot', ya '/basit1' likhein.
+          `;
+          alert("Windows mein koi Microphone hardware detect nahi hua!\n\nChrome mein permission 'Allow' hai lekin PC ke audio port mein Headset/Earphones plugged in nahi hain.\n\nHal:\n1. PC ke microphone jack mein headset/mic lagayein.\n2. Ya mobile phone se http://" + (latestLanIp || '10.25.32.23') + ":8888 kholein (phone ka mic seedha chalega).\n3. Ya neeche diye gaye Command Box se type karein.");
+        } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          alertTitle.innerText = '🎙️ Chrome Microphone Access Blocked';
+          alertBody.innerHTML = `
+            Chrome address bar mein <strong>🔒 Lock icon</strong> ya <strong>Tune icon</strong> par click karein aur Microphone ko <strong>'Allow'</strong> karein. Phir 'Retry' dabayein.
+          `;
+          alert("Chrome is blocking microphone. Address bar mein Lock / Settings icon click karein aur Microphone ko 'Allow' karein.");
+        } else {
+          alertTitle.innerText = `⚠️ Microphone Error (${err.name})`;
+          alertBody.innerText = err.message;
+          alert(`Microphone Error: ${err.message}`);
+        }
+      }
+    }
+
+
+    async function startVoiceListening() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Web Speech API is not supported in this browser. Please use Google Chrome.");
+        return;
+      }
+
+      // Initialize audio stream for visualizer
+      try {
+        if (!micStream) {
+          micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          initAudioVisualizer(micStream);
+        }
+      } catch (e) {
+        console.warn("Mic visualizer audio stream not accessible:", e);
+      }
+
+      try {
+        if (recognition) {
+          try { recognition.abort(); } catch (e) {}
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = currentLang;
+
+        recognition.onstart = () => {
+          isListening = true;
+          playChime('start');
+          document.getElementById('mic-alert').style.display = 'none';
+          const btn = document.getElementById('mic-toggle-btn');
+          const txt = document.getElementById('mic-text');
+          const reactor = document.getElementById('reactor');
+          const box = document.getElementById('transcript-box');
+
+          if (btn) btn.classList.add('active');
+          if (txt) txt.innerText = 'LISTENING (ON)';
+          if (reactor) reactor.classList.add('listening');
+          if (box) box.classList.add('listening');
+
+          setVoicePulse('green', `MIC ACTIVE (${currentLang}): Listening continuously...`);
+          logTerminal(`[VOICE]: Microphone listening online [${currentLang}].`);
+        };
+
+        recognition.onresult = (event) => {
+          // Acoustic immunity: ignore input if Jarvis himself is speaking
+          if (isJarvisSpeaking) return;
+
+          let interimTranscript = '';
+          let finalTranscript = '';
+
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript;
+            } else {
+              interimTranscript += event.results[i][0].transcript;
+            }
+          }
+
+          const display = finalTranscript || interimTranscript;
+          if (display) {
+            document.getElementById('transcript-text').innerText = `"${display}"`;
+          }
+
+          if (finalTranscript && finalTranscript.trim().length > 1) {
+            const spokenCmd = finalTranscript.trim();
+            playChime('success');
+            logTerminal(`[VOICE INPUT]: "${spokenCmd}"`, 'terminal-voice');
+            execCmd(spokenCmd);
+          }
+        };
+
+        recognition.onerror = (event) => {
+          console.warn("Speech recognition error:", event.error);
+          if (event.error === 'not-allowed' || event.error === 'audio-capture') {
+            isListening = false;
+            clearTimeout(restartTimer);
+            try { recognition.abort(); } catch(e) {}
+            stopVoiceListening();
+            logTerminal(`[VOICE READY]: Physical microphone detect nahi hua. 1-Click Voice Chips ya Mobile Phone (http://${latestLanIp || '10.25.32.23'}:8888) use karein!`, 'terminal-system');
+            setVoicePulse('cyan', 'VOICE READY: Tap chips below or use mobile mic');
+          } else if (event.error === 'no-speech') {
+            // Harmless pause, ignore and allow smooth continuation
+          } else {
+            console.log(`Voice event error: ${event.error}, will auto-recover.`);
+          }
+        };
+
+
+        recognition.onend = () => {
+          // Throttled restart to prevent Chrome InvalidStateError
+          if (isListening) {
+            clearTimeout(restartTimer);
+            restartTimer = setTimeout(() => {
+              if (isListening) {
+                try {
+                  recognition.start();
+                } catch (e) {
+                  // If recognition is still terminating, retry after another brief pause
+                  setTimeout(() => { if (isListening) try { recognition.start(); } catch(err){} }, 300);
+                }
+              }
+            }, 180);
+          }
+        };
+
+        recognition.start();
+      } catch (err) {
+        console.error("Start speech recognition failed:", err);
+      }
+    }
+
+    function stopVoiceListening() {
+      isListening = false;
+      playChime('stop');
+      clearTimeout(restartTimer);
+      if (recognition) {
+        try { recognition.stop(); } catch (e) {}
+      }
+      const btn = document.getElementById('mic-toggle-btn');
+      const txt = document.getElementById('mic-text');
+      const reactor = document.getElementById('reactor');
+      const box = document.getElementById('transcript-box');
+
+      if (btn) btn.classList.remove('active');
+      if (txt) txt.innerText = 'START VOICE';
+      if (reactor) reactor.classList.remove('listening');
+      if (box) box.classList.remove('listening');
+
+      setVoicePulse('cyan', 'VOICE ENGINE STANDBY');
+      document.getElementById('transcript-text').innerText = 'Speak into your mic or click "START VOICE"...';
+      logTerminal('[VOICE]: Microphone listening paused.');
+    }
+
+    // Toggle Speaker Mute/Unmute
+    async function toggleSpeaker() {
+      try {
+        const res = await fetch(`${API_BASE}/api/speaker/toggle`, { method: 'POST' });
+        const data = await res.json();
+        isSpeakerMuted = (data.status === 'MUTED' || data.speaker_muted);
+      } catch (e) {
+        isSpeakerMuted = !isSpeakerMuted;
+      }
+      updateSpeakerUI(isSpeakerMuted);
+    }
+
+    function updateSpeakerUI(muted) {
+      const btn = document.getElementById('speaker-toggle-btn');
+      const icon = document.getElementById('speaker-icon');
+      const txt = document.getElementById('speaker-text');
+
+      if (muted) {
+        if (btn) btn.classList.add('muted');
+        if (icon) icon.innerText = '🔇';
+        if (txt) txt.innerText = 'SPEAKER: OFF';
+        if (synth) synth.cancel();
+        logTerminal('[SPEAKER]: Voice & Audio output MUTED (OFF).');
+      } else {
+        if (btn) btn.classList.remove('muted');
+        if (icon) icon.innerText = '🔊';
+        if (txt) txt.innerText = 'SPEAKER: ON';
+        logTerminal('[SPEAKER]: Voice & Audio output ACTIVE (ON).');
+        speakText("Speaker output active, sir.");
+      }
+    }
+
+    function testVoiceOutput() {
+      logTerminal('[TEST]: Testing natural voice synthesis...');
+      speakText("Basit Jarvis is fully operational and speaking to you, sir. How can I help you today?");
+    }
+
+    // Execute Command Dispatch
+    async function execCmd(commandText, _retryCount = 0) {
+      if (!commandText || !commandText.trim()) return;
+
+      // Clean wake words & polite prefixes
+      let cleanCmd = commandText.trim();
+      cleanCmd = cleanCmd.replace(/^(?:hey\s+)?jarvis[,:\s]*/i, '')
+                         .replace(/^(?:sunno\s+)?jarvis[,:\s]*/i, '')
+                         .replace(/^(?:basit\s+bhai[,:\s]*)/i, '')
+                         .replace(/^(?:please\s+|meherbani\s+karke\s+)/i, '')
+                         .trim();
+      if (!cleanCmd) cleanCmd = commandText.trim();
+
+      if (_retryCount === 0) logTerminal(`[USER]: "${cleanCmd}"`, 'terminal-user');
+
+      // ── Interactive Engine Interception ──
+      const lowerCmd = cleanCmd.toLowerCase();
+      if (lowerCmd.startsWith('/basit1') || lowerCmd.startsWith('basit 1') || lowerCmd.startsWith('basit1')) {
+        const task = cleanCmd.replace(/^\/(?:basit1|basit 1|basit1)\s*/i, '').trim();
+        switchEngineTab('basit1');
+        if (task) {
+          const inp = document.getElementById('b1-task-input');
+          if (inp) inp.value = task;
+          runBasit1Interactive();
+          return;
+        }
+      } else if (lowerCmd.startsWith('/basit2') || lowerCmd.startsWith('basit 2') || lowerCmd.startsWith('basit2')) {
+        const query = cleanCmd.replace(/^\/(?:basit2|basit 2|basit2)\s*/i, '').trim();
+        switchEngineTab('basit2');
+        if (query) {
+          const inp = document.getElementById('b2-query-input');
+          if (inp) inp.value = query;
+          runBasit2Interactive();
+          return;
+        }
+      } else if (lowerCmd.startsWith('/basit3') || lowerCmd.startsWith('basit 3') || lowerCmd.startsWith('basit3')) {
+        const act = cleanCmd.replace(/^\/(?:basit3|basit 3|basit3)\s*/i, '').trim() || 'all';
+        switchEngineTab('basit3');
+        runBasit3Action(act);
+        return;
+      } else if (lowerCmd.startsWith('/basit4') || lowerCmd.startsWith('basit 4') || lowerCmd.startsWith('basit4')) {
+        const tick = cleanCmd.replace(/^\/(?:basit4|basit 4|basit4)\s*/i, '').trim() || 'NVDA';
+        switchEngineTab('basit4');
+        const inp = document.getElementById('b4-ticker-input');
+        if (inp) inp.value = tick;
+        runBasit4Interactive();
+        return;
+      } else if (lowerCmd.startsWith('/basitswarm') || lowerCmd.startsWith('basit swarm') || lowerCmd.startsWith('basitswarm')) {
+        const goal = cleanCmd.replace(/^\/(?:basitswarm|basit swarm|basitswarm)\s*/i, '').trim();
+        switchEngineTab('basitswarm');
+        if (goal) {
+          const inp = document.getElementById('bsw-goal-input');
+          if (inp) inp.value = goal;
+          runBasitSwarmInteractive();
+          return;
+        }
+      } else if (lowerCmd.startsWith('/arsenal') || lowerCmd.startsWith('/opensource') || lowerCmd.includes('opensource ai arsenal') || lowerCmd.includes('cluster matrix')) {
+        switchEngineTab('arsenal');
+        refreshArsenalLive();
+        return;
+      } else if (lowerCmd.startsWith('/basitloop') || lowerCmd.startsWith('basit loop') || lowerCmd.startsWith('basitloop')) {
+        const loopGoal = cleanCmd.replace(/^\/(?:basitloop|basit loop|basitloop)\s*/i, '').trim();
+        switchEngineTab('basitloop');
+        if (loopGoal) {
+          const inp = document.getElementById('loop-goal-input');
+          if (inp) inp.value = loopGoal;
+          runBasitLoopInteractive();
+          return;
+        }
+      } else if (lowerCmd.startsWith('/gemini-spark') || lowerCmd.startsWith('/gemini') || lowerCmd.startsWith('/spark') || lowerCmd.startsWith('gemini spark')) {
+        const gsTask = cleanCmd.replace(/^\/(?:gemini-spark|gemini|spark)\s*/i, '').replace(/^gemini\s*spark\s*/i, '').trim();
+        switchEngineTab('geminispark');
+        if (gsTask) {
+          const inp = document.getElementById('gs-query-input');
+          if (inp) inp.value = gsTask;
+          runGeminiSparkInteractive();
+          return;
+        }
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+        const res = await fetch(`${API_BASE}/api/command`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ command: cleanCmd, targetNode: currentTargetNode }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        const data = await res.json();
+        const responseText = data.response || 'Executed successfully, sir.';
+        logTerminal(`[JARVIS]: ${responseText}`, 'terminal-jarvis');
+
+        // If screenshot was taken — show it inline in terminal
+        if (data.path && (commandText.toLowerCase().includes('screenshot') || commandText.toLowerCase().includes('screen lo'))) {
+          const term = document.getElementById('terminal-log');
+          const imgEl = document.createElement('div');
+          imgEl.style.cssText = 'margin:8px 0; border:1px solid #00f0ff44; border-radius:8px; overflow:hidden; max-width:100%;';
+          imgEl.innerHTML = `<img src="${API_BASE}/screenshots/${data.path.split(/[\\\/]/).pop()}" style="width:100%;max-height:300px;object-fit:contain;display:block;" alt="Screenshot" onerror="this.parentElement.innerHTML='[Screenshot saved at: ${data.path}]'"/>`;
+          term.appendChild(imgEl);
+          term.scrollTop = term.scrollHeight;
+        }
+
+        speakText(responseText);
+
+        // Update status dot to green (connected)
+        const dot = document.getElementById('status-dot');
+        if (dot) { dot.style.color = '#10b981'; dot.title = 'Server Online'; }
+
+      } catch (err) {
+        // Auto-retry once after 2s if it was a network error (server restart)
+        if (_retryCount < 2 && (err.name === 'TypeError' || err.name === 'AbortError')) {
+          logTerminal(`[RETRY ${_retryCount + 1}/2]: Server restarting, dobara try kar raha hoon...`, 'terminal-system');
+          setTimeout(() => execCmd(commandText, _retryCount + 1), 2000);
+          return;
+        }
+        logTerminal(`[ERROR]: Server se connection nahi mili — "${err.message}". Page refresh karo (F5).`, 'terminal-error');
+
+        // Update status dot to red
+        const dot = document.getElementById('status-dot');
+        if (dot) { dot.style.color = '#ef4444'; dot.title = 'Server Offline'; }
+      }
+    }
+
+    function sendCustomCommand() {
+      const input = document.getElementById('cmd-input');
+      const val = input.value.trim();
+      if (!val) return;
+      execCmd(val);
+      input.value = '';
+    }
+
+    document.getElementById('cmd-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendCustomCommand();
+    });
+
+    // Global Hotkey: Ctrl + Space or Ctrl + M to toggle voice
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey && e.code === 'Space') || (e.ctrlKey && e.code === 'KeyM')) {
+        e.preventDefault();
+        toggleVoiceListening();
+      }
+    });
+
+    function logTerminal(msg, className = 'terminal-jarvis') {
+      const term = document.getElementById('terminal-log');
+      const p = document.createElement('p');
+      p.className = className;
+      p.innerText = msg;
+      term.appendChild(p);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    // Productivity Utilities
+    async function snapWindow(direction) {
+      logTerminal(`[ACTION]: Snapping window ${direction}...`);
+      try {
+        await fetch(`${API_BASE}/api/window/snap_${direction}`, { method: 'POST' });
+        logTerminal(`[WINDOW]: Snapped window ${direction}.`);
+        speakText(`Snapped window ${direction}, sir.`);
+      } catch (e) {
+        logTerminal(`[ERROR]: Snap window failed: ${e.message}`, 'terminal-error');
+      }
+    }
+
+    async function readClipboard() {
+      try {
+        const res = await fetch(`${API_BASE}/api/clipboard`);
+        const data = await res.json();
+        const text = data.clipboard || '(Clipboard is empty)';
+        logTerminal(`[CLIPBOARD]: ${text}`);
+        speakText(`Your clipboard says: ${text.substring(0, 120)}`);
+      } catch (e) {
+        logTerminal(`[ERROR]: Read clipboard failed: ${e.message}`, 'terminal-error');
+      }
+    }
+
+    async function takeQuickNote() {
+      const note = prompt("Enter quick note / reminder:", "Meeting with high-ticket AI client at 4 PM");
+      if (!note) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/notes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: note })
+        });
+        const data = await res.json();
+        logTerminal(`[NOTE SAVED]: '${data.note.text}'`);
+        speakText(`Note saved: ${data.note.text}`);
+      } catch (e) {
+        logTerminal(`[ERROR]: Note saving failed: ${e.message}`, 'terminal-error');
+      }
+    }
+
+    async function fetchNotes() {
+      try {
+        const res = await fetch(`${API_BASE}/api/notes`);
+        const data = await res.json();
+        if (data.notes && data.notes.length > 0) {
+          logTerminal(`=== 📂 STORED QUICK NOTES (${data.notes.length}) ===`);
+          data.notes.forEach(n => logTerminal(`  • [${n.created_at}] ${n.text}`));
+          speakText(`You have ${data.notes.length} saved notes, sir.`);
+        } else {
+          logTerminal("[NOTES]: No stored notes found.");
+          speakText("You have no saved notes, sir.");
+        }
+      } catch (e) {
+        logTerminal(`[ERROR]: Fetch notes failed: ${e.message}`, 'terminal-error');
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════
+    // 👑 BASIT AUTONOMOUS SOVEREIGN ENGINE INTERACTIVE WORKSPACE JS
+    // /basit1, /basit2, /basit3, /basit4, /basitswarm, /arsenal, /basitloop
+    // ═════════════════════════════════════════════════════════════════
+    let _activeBasitEngine = 'basit1';
+
+    function switchEngineTab(engine) {
+      _activeBasitEngine = engine;
+      // Update Tab Buttons
+      document.querySelectorAll('.engine-tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-engine') === engine) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      // Update Panels
+      document.querySelectorAll('.engine-panel').forEach(p => p.classList.remove('active'));
+      const activePanel = document.getElementById(`panel-${engine}`);
+      if (activePanel) {
+        activePanel.classList.add('active');
+      }
+      // Auto-fetch arsenal on tab select if empty or placeholder
+      if (engine === 'arsenal') {
+        const outBox = document.getElementById('arsenal-output-box');
+        if (!outBox || outBox.innerText.includes('Tap \'Ping Nodes\'')) {
+          refreshArsenalLive();
+        }
+      }
+      // Auto-fetch spark telemetry on tab select
+      if (engine === 'geminispark') {
+        refreshSparkTelemetry();
+      }
+      // Smooth scroll into view
+      const hub = document.getElementById('engine-hub');
+      if (hub) {
+        hub.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function triggerBasitEngine(engine) {
+      switchEngineTab(engine);
+    }
+
+    // Basit1 Preset & Execution
+    function setBasit1Prompt(promptText) {
+      const el = document.getElementById('b1-task-input');
+      if (el) {
+        el.value = promptText;
+        el.focus();
+      }
+    }
+
+    async function runBasit1Interactive() {
+      const taskInput = document.getElementById('b1-task-input');
+      const dirInput = document.getElementById('b1-dir-input');
+      const btn = document.getElementById('btn-run-b1');
+      const outContainer = document.getElementById('b1-output-container');
+      const codeBox = document.getElementById('b1-code-box');
+      const filesBox = document.getElementById('b1-files-box');
+      const telemetry = document.getElementById('b1-telemetry');
+
+      const task = (taskInput ? taskInput.value.trim() : '') || 'Create a FastAPI health check';
+      const targetDir = (dirInput ? dirInput.value.trim() : '') || 'E:\\basit-jarvis-ai';
+
+      btn.disabled = true;
+      btn.innerText = '⏳ Generating...';
+      outContainer.style.display = 'block';
+      codeBox.innerText = '⚡ Routing to Dual-Node GPU Cluster...\n[1] Groq LPU (openai/gpt-oss-120b)\n[2] Mistral Cloud (codestral-latest)\n[3] Local RTX A6000 (qwen2.5-coder:32b)\n\nGenerating production code with AST validation...';
+      speakText('Generating code with Basit1 engine, sir.');
+      logTerminal(`[BASIT1]: Starting code generation for "${task}"`, 'terminal-system');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/basit1`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task, dir: targetDir })
+        });
+        const data = await res.json();
+        const result = data.result || {};
+        const codeText = result.response || result.summary || JSON.stringify(result, null, 2);
+        codeBox.innerText = codeText;
+        telemetry.innerText = `⚡ Basit1 Generated in ${result.latency_sec || '--'}s | ${result.compute || 'Dual-Node Cluster'}`;
+
+        if (result.created_files && result.created_files.length > 0) {
+          filesBox.style.display = 'flex';
+          filesBox.innerHTML = '<span style="font-size:0.7rem; color:#10b981; font-weight:700;">FILES WRITTEN:</span> ' +
+            result.created_files.map(f => `<span class="engine-preset-chip" style="background:rgba(16,185,129,0.15); border-color:#10b981; color:#34d399;">📁 ${f.split(/[\\\\/]/).pop()}</span>`).join('');
+        } else {
+          filesBox.style.display = 'none';
+        }
+
+        logTerminal(`[✅ BASIT1]: Code generation complete (${result.latency_sec || 0}s).`, 'terminal-voice');
+        speakText('Basit1 code generation complete, Basit bhai.');
+      } catch (err) {
+        codeBox.innerText = `❌ Error: ${err.message}\nEnsure backend server is running at ${API_BASE}.`;
+        logTerminal(`[ERROR]: Basit1 failed: ${err.message}`, 'terminal-error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '⚡ Generate Code';
+      }
+    }
+
+    // Basit2 Preset & Execution
+    function setBasit2Query(queryText) {
+      const el = document.getElementById('b2-query-input');
+      if (el) { el.value = queryText; el.focus(); }
+    }
+
+    async function runBasit2Interactive() {
+      const input = document.getElementById('b2-query-input');
+      const btn = document.getElementById('btn-run-b2');
+      const outContainer = document.getElementById('b2-output-container');
+      const outBox = document.getElementById('b2-output-box');
+      const telemetry = document.getElementById('b2-telemetry');
+
+      const query = (input ? input.value.trim() : '') || 'Autonomous AI Agents 2026';
+      btn.disabled = true;
+      btn.innerText = '⏳ Researching...';
+      outContainer.style.display = 'block';
+      outBox.innerText = '🧠 Engaging Basit2 Deep Research Engine...\n- Multi-hop web & paper indexing (100+ sources)\n- Extended Thinking via Claude 3.5 Sonnet\n- AST & GraphRAG synthesis\n\nPlease wait a moment...';
+      speakText('Synthesizing research across 100 sources with Basit2.');
+      logTerminal(`[BASIT2]: Deep research started for "${query}"`, 'terminal-system');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/basit2`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const data = await res.json();
+        const result = data.result || {};
+        outBox.innerText = result.report || result.summary || JSON.stringify(result, null, 2);
+        telemetry.innerText = `🧠 Basit2 Research Synthesized in ${result.latency_sec || '--'}s | ${result.compute || 'Claude Suite'}`;
+        logTerminal(`[✅ BASIT2]: Research complete (${result.latency_sec || 0}s).`, 'terminal-voice');
+        speakText('Basit2 research synthesis complete, sir.');
+      } catch (err) {
+        outBox.innerText = `❌ Error: ${err.message}`;
+        logTerminal(`[ERROR]: Basit2 failed: ${err.message}`, 'terminal-error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '🧠 Launch Deep Research';
+      }
+    }
+
+    function sendResearchToPdfStudio() {
+      const q = document.getElementById('b2-query-input');
+      const rTopic = document.getElementById('report-topic-input');
+      if (q && rTopic) {
+        rTopic.value = q.value;
+        const studio = document.getElementById('report-topic-input');
+        if (studio) studio.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        logTerminal(`[STUDIO]: Sent research topic to PDF Studio: "${q.value}"`, 'terminal-system');
+        speakText('Topic transferred to PDF Studio.');
+      }
+    }
+
+    // Basit3 Actions
+    async function runBasit3Action(actionType) {
+      const outContainer = document.getElementById('b3-output-container');
+      const outBox = document.getElementById('b3-output-box');
+      const metricsGrid = document.getElementById('b3-metrics-grid');
+      const telemetry = document.getElementById('b3-telemetry');
+
+      outContainer.style.display = 'block';
+      outBox.innerText = `🛡️ Basit3 Sentinel running "${actionType}" operation...\n- OWASP vulnerability scan (12 patterns)\n- Zombie process detector (psutil)\n- Working directory: E:\\basit-jarvis-ai\n\nScanning...`;
+      speakText(`Running ${actionType} defense check, sir.`);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/basit3`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: actionType })
+        });
+        const data = await res.json();
+        const result = data.result || {};
+        const details = result.details || {};
+
+        // Update metrics cards if available
+        if (details.security_audit) {
+          metricsGrid.style.display = 'grid';
+          document.getElementById('b3-m-scanned').innerText = details.security_audit.scanned_files || 0;
+          const sev = details.security_audit.severity_breakdown || {};
+          document.getElementById('b3-m-critical').innerText = sev.CRITICAL || 0;
+          document.getElementById('b3-m-high').innerText = sev.HIGH || 0;
+        }
+        if (details.process_sweep) {
+          metricsGrid.style.display = 'grid';
+          document.getElementById('b3-m-killed').innerText = details.process_sweep.killed_count || 0;
+          document.getElementById('b3-m-ram').innerText = (details.process_sweep.ram_freed_mb || 0) + ' MB';
+        }
+
+        // Render clean formatted output
+        let outText = `=== 🛡️ BASIT3 GUARDIAN REPORT [${actionType.toUpperCase()}] ===\n`;
+        outText += `Summary: ${result.summary || 'Completed'}\nLatency: ${result.latency_sec || 0}s\n\n`;
+
+        if (details.security_audit) {
+          const a = details.security_audit;
+          outText += `📋 OWASP SECURITY AUDIT:\n- Status: [${a.status}]\n- Files Scanned: ${a.scanned_files}\n- Total Findings: ${a.findings_count}\n`;
+          if (a.findings && a.findings.length > 0) {
+            outText += '\nIdentified Issues:\n';
+            a.findings.forEach((f, idx) => {
+              outText += `  ${idx + 1}. [${f.severity}] ${f.issue}\n     File: ${f.file}\n`;
+            });
+          } else {
+            outText += '  ✅ No critical OWASP vulnerabilities detected. Zero secrets leaked.\n';
+          }
+          outText += '\n';
+        }
+
+        if (details.process_sweep) {
+          const s = details.process_sweep;
+          outText += `🧹 ZOMBIE PROCESS SWEEPER:\n- Killed: ${s.killed_count} processes\n- RAM Freed: ${s.ram_freed_mb || 0} MB\n`;
+          if (s.killed_processes && s.killed_processes.length > 0) {
+            s.killed_processes.forEach(p => {
+              outText += `  • Terminated: ${p.name} (PID: ${p.pid}, Memory: ${p.mem_mb}MB)\n`;
+            });
+          }
+          outText += '\n';
+        }
+
+        if (details.auto_git) {
+          outText += `📦 AUTO-GIT CHECKPOINT:\n${details.auto_git.output || 'No changes to commit'}\n`;
+        }
+
+        outBox.innerText = outText;
+        telemetry.innerText = `🛡️ Basit3 Done in ${result.latency_sec || '--'}s | ${result.summary || 'Protected'}`;
+        logTerminal(`[✅ BASIT3]: ${result.summary || 'Completed'}`, 'terminal-voice');
+        speakText('Basit3 security sweep complete, Basit bhai.');
+      } catch (err) {
+        outBox.innerText = `❌ Error: ${err.message}`;
+        logTerminal(`[ERROR]: Basit3 failed: ${err.message}`, 'terminal-error');
+      }
+    }
+
+    // Basit4 Ticker & Consensus
+    function setBasit4Ticker(ticker) {
+      const el = document.getElementById('b4-ticker-input');
+      if (el) { el.value = ticker; }
+      runBasit4Interactive();
+    }
+
+    async function runBasit4Interactive() {
+      const input = document.getElementById('b4-ticker-input');
+      const btn = document.getElementById('btn-run-b4');
+      const outContainer = document.getElementById('b4-output-container');
+      const outBox = document.getElementById('b4-output-box');
+      const telemetry = document.getElementById('b4-telemetry');
+
+      const query = (input ? input.value.trim() : '') || 'NVDA';
+      btn.disabled = true;
+      btn.innerText = '⏳ Analyzing...';
+      outContainer.style.display = 'block';
+      outBox.innerText = `📈 Basit4 Boardroom assembling 5 investor personas for "${query}"...\n- Warren Buffett (Moat, FCF yield)\n- Cathie Wood (Exponential TAM)\n- Charlie Munger (Risk Inversion)\n- Bill Ackman (Valuation & Activist Levers)\n- DeepSeek-R1 Quant (Fibonacci & Technical Execution)\n\nRunning consensus deliberation...`;
+      speakText(`Assembling 5 hedge fund personas for ${query}.`);
+      logTerminal(`[BASIT4]: Hedge fund consensus initiated for "${query}"`, 'terminal-system');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/basit4`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const data = await res.json();
+        const result = data.result || {};
+        outBox.innerText = result.consensus || result.summary || JSON.stringify(result, null, 2);
+        telemetry.innerText = `📈 Basit4 Consensus Ready in ${result.latency_sec || '--'}s | 5 Personas Deliberated`;
+        logTerminal(`[✅ BASIT4]: Consensus complete for ${query}.`, 'terminal-voice');
+        speakText(`Hedge fund consensus complete for ${query}, sir.`);
+      } catch (err) {
+        outBox.innerText = `❌ Error: ${err.message}`;
+        logTerminal(`[ERROR]: Basit4 failed: ${err.message}`, 'terminal-error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '📈 Run 5-Persona Analysis';
+      }
+    }
+
+    // BasitSwarm
+    function setSwarmGoal(goal) {
+      const el = document.getElementById('bsw-goal-input');
+      if (el) { el.value = goal; el.focus(); }
+    }
+
+    async function runBasitSwarmInteractive() {
+      const input = document.getElementById('bsw-goal-input');
+      const btn = document.getElementById('btn-run-bsw');
+      const outContainer = document.getElementById('bsw-output-container');
+      const outBox = document.getElementById('bsw-output-box');
+      const telemetry = document.getElementById('bsw-telemetry');
+
+      const goal = (input ? input.value.trim() : '') || 'Build complete enterprise AI SaaS platform';
+      btn.disabled = true;
+      btn.innerText = '⏳ Swarm Active...';
+      outContainer.style.display = 'block';
+      outBox.innerText = `⚡ BasitSwarm 100X Burst Engaged!\n- Squadron 1 (15 Agents): DeepSeek-R1 & o1\n- Squadron 2 (15 Agents): o3-mini & DeepSeek V4\n- Squadron 3 (15 Agents): Claude 3.7 & Kimi K3\n- Squadron 4 (15 Agents): Gemini 2.0 & MiMo-V2\n- Squadron 5 (15 Agents): Grok-2 & Qwen3.5\n- Squadron 6 (25 Agents): Dual-Node GPU Master\n\nSynchronizing 100 parallel workers...`;
+      speakText('Deploying 100 parallel agents across 6 hardware squadrons.');
+      logTerminal(`[SWARM]: 100-Agent Burst launched for "${goal}"`, 'terminal-system');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/basitswarm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ goal })
+        });
+        const data = await res.json();
+        const result = data.result || {};
+        outBox.innerText = result.output || result.summary || JSON.stringify(result, null, 2);
+        telemetry.innerText = `⚡ BasitSwarm Completed in ${result.latency_sec || '--'}s | 100 Agents Synchronized`;
+        logTerminal(`[✅ SWARM]: 100 agents completed deliverable in ${result.latency_sec || 0}s.`, 'terminal-voice');
+        speakText('BasitSwarm 100 agents completed their mission, Basit bhai.');
+      } catch (err) {
+        outBox.innerText = `❌ Error: ${err.message}`;
+        logTerminal(`[ERROR]: Swarm failed: ${err.message}`, 'terminal-error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '⚡ Launch 100-Agent Burst';
+      }
+    }
+
+    // OpenSource AI Arsenal Live Prober
+    async function refreshArsenalLive() {
+      const outBox = document.getElementById('arsenal-output-box');
+      const badge = document.getElementById('arsenal-health-badge');
+      if (badge) badge.innerText = 'HEALTH: PROBING...';
+      if (outBox) outBox.innerText = 'Probing cluster nodes live (RTX A6000, RTX 5090, Groq, Mistral, HuggingFace)...';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/cluster-status`);
+        const data = await res.json();
+        const result = data.result || {};
+        const nodes = result.nodes || {};
+
+        if (badge) {
+          const health = result.cluster_health || 'OPTIMAL';
+          badge.innerText = `HEALTH: ${health}`;
+          badge.style.color = health === 'OPTIMAL' ? '#34d399' : '#fbbf24';
+          badge.style.borderColor = health === 'OPTIMAL' ? '#10b981' : '#f59e0b';
+        }
+
+        // Node 1: A6000
+        const n1 = nodes.node_1_rtx_a6000;
+        if (n1) {
+          const latEl = document.getElementById('ars-n1-lat');
+          if (latEl) latEl.innerText = n1.online ? `${n1.latency_ms} ms` : 'OFFLINE';
+          const modEl = document.getElementById('ars-n1-models');
+          if (modEl && n1.models) {
+            modEl.innerText = `Models (${n1.models.length}): ` + n1.models.slice(0, 8).join(', ') + (n1.models.length > 8 ? ` +${n1.models.length - 8} more` : '');
+          }
+        }
+
+        // Node 2: 5090
+        const n2 = nodes.node_2_rtx_5090;
+        if (n2) {
+          const latEl = document.getElementById('ars-n2-lat');
+          if (latEl) latEl.innerText = n2.online ? `${n2.latency_ms} ms` : 'LAN STANDBY';
+        }
+
+        // Node 3: Groq
+        const n3 = nodes.node_3_groq;
+        if (n3) {
+          const latEl = document.getElementById('ars-n3-lat');
+          if (latEl) latEl.innerText = n3.online ? `${n3.latency_ms} ms` : 'OFFLINE';
+        }
+
+        // Node 3b: Mistral
+        const n3b = nodes.node_3b_mistral;
+        if (n3b) {
+          const latEl = document.getElementById('ars-n3b-lat');
+          if (latEl) latEl.innerText = n3b.online ? `${n3b.latency_ms} ms` : 'OFFLINE';
+        }
+
+        // Node 4: HF pool
+        const n4 = nodes.node_4_hf_pool;
+        if (n4) {
+          const tokEl = document.getElementById('ars-n4-tok');
+          if (tokEl) tokEl.innerText = `${n4.active_tokens || 15} Active Tokens`;
+        }
+
+        // Node 6: Google Gemini
+        const n6 = nodes.node_6_gemini;
+        if (n6) {
+          const latEl = document.getElementById('ars-n6-lat');
+          if (latEl) latEl.innerText = n6.online ? `${n6.latency_ms} ms` : 'OFFLINE';
+        }
+
+        // Node 7: Apache Spark
+        const n7 = nodes.node_7_spark;
+        if (n7) {
+          const latEl = document.getElementById('ars-n7-lat');
+          if (latEl) latEl.innerText = n7.online ? 'ONLINE' : 'STANDBY';
+        }
+
+        if (outBox) {
+          outBox.innerText = `✅ CLUSTER MATRIX LIVE:\n${result.summary || 'All nodes probed.'}\n\n` + JSON.stringify(nodes, null, 2);
+        }
+        logTerminal(`[ARSENAL]: Cluster probed — ${result.summary || 'Online'}`, 'terminal-system');
+      } catch (err) {
+        if (outBox) outBox.innerText = `❌ Error pinging cluster: ${err.message}`;
+      }
+    }
+
+    // BasitLoop
+    async function runBasitLoopInteractive() {
+      const input = document.getElementById('loop-goal-input');
+      const btn = document.getElementById('btn-run-loop');
+      const outContainer = document.getElementById('loop-output-container');
+      const outBox = document.getElementById('loop-output-box');
+      const telemetry = document.getElementById('loop-telemetry');
+
+      const goal = (input ? input.value.trim() : '') || 'Audit workspace and optimize performance';
+      btn.disabled = true;
+      btn.innerText = '⏳ Looping...';
+      outContainer.style.display = 'block';
+      outBox.innerText = `♾️ BasitLoop continuous 8-stage loop engaged for: "${goal}"\n- Stage 1: Deep Assess (Architecture)\n- Stage 2: Parallel Build (Basit1 Code)\n- Stage 3: Live Execution (Sanity Checks)\n- Stage 4: Auto-Diagnose\n- Stage 5: Security Audit (Basit3 OWASP)\n- Stage 6: Performance Squeeze\n- Stage 7: Deploy & Verify\n- Stage 8: Auto-Git Checkpoint\n\nExecuting stages sequentially...`;
+      speakText('Starting 8-stage autonomous BasitLoop.');
+      logTerminal(`[BASITLOOP]: Loop initiated for "${goal}"`, 'terminal-system');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/basitloop`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ goal })
+        });
+        const data = await res.json();
+        const result = data.result || {};
+        let loopText = `=== ♾️ BASITLOOP 8-STAGE EXECUTION REPORT ===\nGoal: ${result.goal || goal}\nLatency: ${result.latency_sec || 0}s\n\n`;
+        if (result.stages) {
+          loopText += 'STAGES COMPLETED:\n' + result.stages.map(s => `  ${s}`).join('\n') + '\n\n';
+        }
+        loopText += `Architecture Plan:\n${result.plan || 'Generated'}\n\n`;
+        loopText += `Security Audit: [${result.security_status || 'PASS'}]\n`;
+        loopText += `Git Checkpoint: ${result.git || 'Completed'}\n`;
+
+        outBox.innerText = loopText;
+        telemetry.innerText = `♾️ BasitLoop Completed in ${result.latency_sec || '--'}s | 8 Stages Done`;
+        logTerminal(`[✅ BASITLOOP]: Completed 8 stages in ${result.latency_sec || 0}s.`, 'terminal-voice');
+        speakText('BasitLoop finished all 8 stages successfully, sir.');
+      } catch (err) {
+        outBox.innerText = `❌ Error: ${err.message}`;
+        logTerminal(`[ERROR]: BasitLoop failed: ${err.message}`, 'terminal-error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '♾️ Engage BasitLoop';
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════
+    // ⚡ GEMINI SPARK BIG DATA & AI ACCELERATOR JS
+    // ═════════════════════════════════════════════════════════════════
+    function setGeminiSparkMode(mode, val) {
+      const radios = document.getElementsByName('gs-mode');
+      radios.forEach(r => { if (r.value === mode) r.checked = true; });
+      updateGsModeLabel();
+      const inp = document.getElementById('gs-query-input');
+      if (inp) { inp.value = val; inp.focus(); }
+    }
+
+    function updateGsModeLabel() {
+      const mode = document.querySelector('input[name="gs-mode"]:checked')?.value || 'pipeline';
+      const lbl = document.getElementById('gs-input-label');
+      if (lbl) {
+        if (mode === 'sql') lbl.innerText = 'SPARK SQL QUERY (SELECT, JOIN, WINDOW AGGREGATION)';
+        else if (mode === 'analyze') lbl.innerText = 'DATASET FILE PATH (.CSV, .JSON, .PARQUET)';
+        else lbl.innerText = 'DISTRIBUTED PIPELINE OBJECTIVE (GEMINI 2.0 REASONING)';
+      }
+    }
+
+    async function runGeminiSparkInteractive() {
+      const input = document.getElementById('gs-query-input');
+      const btn = document.getElementById('btn-run-gs');
+      const outContainer = document.getElementById('gs-output-container');
+      const outBox = document.getElementById('gs-output-box');
+      const telemetry = document.getElementById('gs-telemetry');
+      const mode = document.querySelector('input[name="gs-mode"]:checked')?.value || 'pipeline';
+
+      const queryOrCode = (input ? input.value.trim() : '') || 'SELECT 1 as test';
+      btn.disabled = true;
+      btn.innerText = '⏳ Executing...';
+      outContainer.style.display = 'block';
+      outBox.innerText = `⚡ Engaging Gemini Spark Master Engine [Mode: ${mode.toUpperCase()}]...\n- Apache Spark 4.2.0 In-Memory Engine (local[*])\n- Google Gemini 2.0 Multimodal 2M-Context Pipeline Synthesizer\n\nProcessing request...`;
+      speakText(`Executing Gemini Spark ${mode} engine.`);
+      logTerminal(`[GEMINI-SPARK]: Initiated ${mode} execution for "${queryOrCode.slice(0,50)}..."`, 'terminal-system');
+
+      try {
+        const taskPayload = `${mode}: ${queryOrCode}`;
+        const res = await fetch(`${API_BASE}/api/gemini-spark`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task: taskPayload })
+        });
+        const data = await res.json();
+        const result = data.result || {};
+
+        let displayText = '';
+        if (result.action === 'sql') {
+          const r = result.result || {};
+          displayText = `=== ⚡ APACHE SPARK SQL DISTRIBUTED EXECUTION ===\n`;
+          displayText += `Query: ${result.query}\nLatency: ${result.latency_sec}s | Engine: ${r.engine || 'Spark SQL'}\n\n`;
+          if (r.preview_rows && r.preview_rows.length > 0) {
+            displayText += `Columns: [${(r.columns || []).join(', ')}]\nTotal Rows: ${r.row_count}\n\nPREVIEW:\n`;
+            displayText += JSON.stringify(r.preview_rows, null, 2);
+          } else {
+            displayText += `Result: ${JSON.stringify(r, null, 2)}`;
+          }
+        } else if (result.action === 'analyze') {
+          const a = result.analysis || {};
+          displayText = `=== 📊 SPARK DATASET SCHEMA & PROFILE ANALYSIS ===\n`;
+          displayText += `File: ${result.target_file}\nFormat: ${a.format} | Rows: ${a.row_count} | Columns: ${a.column_count}\nLatency: ${result.latency_sec}s\n\n`;
+          displayText += `SCHEMA:\n` + JSON.stringify(a.schema || [], null, 2) + `\n\nPREVIEW:\n` + JSON.stringify(a.preview || [], null, 2);
+        } else {
+          displayText = `=== ⚡ GEMINI 2.0 + PYSPARK 4.2 PIPELINE ARCHITECTURE ===\n`;
+          displayText += `Objective: ${result.objective}\nLatency: ${result.latency_sec}s\n\n`;
+          displayText += result.pipeline_design || result.summary || JSON.stringify(result, null, 2);
+        }
+
+        outBox.innerText = displayText;
+        telemetry.innerText = `⚡ Spark & Gemini Finished in ${result.latency_sec || '--'}s | ${result.mode || 'Success'}`;
+        logTerminal(`[✅ GEMINI-SPARK]: Completed in ${result.latency_sec || 0}s.`, 'terminal-voice');
+        speakText('Gemini Spark processing complete, sir.');
+
+        // Update Spark metric cards if telemetry present
+        if (result.telemetry) {
+          const t = result.telemetry;
+          const stEl = document.getElementById('spark-metric-status');
+          if (stEl) stEl.innerText = t.status || (t.pyspark_installed ? 'ONLINE' : 'STANDBY');
+          const mEl = document.getElementById('spark-metric-master');
+          if (mEl) mEl.innerText = t.master || 'local[*]';
+        }
+      } catch (err) {
+        outBox.innerText = `❌ Error: ${err.message}`;
+        logTerminal(`[ERROR]: Gemini Spark failed: ${err.message}`, 'terminal-error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '⚡ Execute Engine';
+      }
+    }
+
+    async function refreshSparkTelemetry() {
+      try {
+        const res = await fetch(`${API_BASE}/api/spark`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task: 'status' })
+        });
+        const data = await res.json();
+        const t = (data.result && data.result.telemetry) ? data.result.telemetry : {};
+        const stEl = document.getElementById('spark-metric-status');
+        if (stEl) {
+          stEl.innerText = t.status || (t.pyspark_installed ? 'ONLINE' : 'STANDBY');
+          stEl.style.color = '#34d399';
+        }
+        logTerminal(`[SPARK]: Telemetry updated — PySpark: ${t.pyspark_installed ? 'Installed' : 'No'}, Status: ${t.status || 'OK'}`, 'terminal-system');
+      } catch (e) {
+        console.warn('Spark telemetry probe error', e);
+      }
+    }
+
+    // Helper: Copy to Clipboard
+    function copyToClipboard(text) {
+      if (!text) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          logTerminal('[CLIPBOARD]: Output copied to clipboard!', 'terminal-system');
+          speakText('Copied to clipboard.');
+        }).catch(() => {
+          _fallbackCopy(text);
+        });
+      } else {
+        _fallbackCopy(text);
+      }
+    }
+
+    function _fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      logTerminal('[CLIPBOARD]: Output copied to clipboard!', 'terminal-system');
+      speakText('Copied to clipboard.');
+    }
+
+
+    // Multi-PC Fleet Management
+
+    function setTargetNode(nodeId) {
+      currentTargetNode = nodeId;
+      const sel = document.getElementById('target-node-select');
+      if (sel) sel.value = nodeId;
+      const label = nodeId === 'all' ? 'All Connected PCs (Broadcast)' : (nodeId === 'host' ? 'Master Rig' : `Remote PC (${nodeId})`);
+      logTerminal(`[FLEET]: Active Target PC set to: ${label}`, 'terminal-system');
+      speakText(`Target PC set to ${label}`);
+    }
+
+    function showAddPCModal() {
+      const modal = document.getElementById('add-pc-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        const cmdEl = document.getElementById('agent-ps-cmd');
+        if (cmdEl) {
+          const connectUrl = latestTunnelUrl || window.location.origin;
+          cmdEl.innerText = `irm ${connectUrl}/agent.ps1 | iex`;
+        }
+      }
+    }
+
+    async function fetchConnectedNodes() {
+      try {
+        const res = await fetch(`${API_BASE}/api/nodes`);
+        const data = await res.json();
+        if (data.success && data.nodes) {
+          const pill = document.getElementById('fleet-count-pill');
+          if (pill) {
+            pill.innerText = `${data.count} PC${data.count > 1 ? 's' : ''} Online`;
+          }
+          const sel = document.getElementById('target-node-select');
+          if (sel) {
+            const savedVal = currentTargetNode;
+            let opts = `
+              <option value="host">● Master Rig (This PC)</option>
+              <option value="all">⚡ ALL Connected PCs (Broadcast)</option>
+            `;
+            data.nodes.forEach(n => {
+              if (!n.isHost) {
+                opts += `<option value="${n.id}">💻 ${n.name} (${n.user} - ${n.secondsAgo}s ago)</option>`;
+              }
+            });
+            sel.innerHTML = opts;
+            const exists = Array.from(sel.options).some(o => o.value === savedVal);
+            if (exists) {
+              sel.value = savedVal;
+            } else {
+              currentTargetNode = 'host';
+              sel.value = 'host';
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
+    setInterval(fetchConnectedNodes, 4000);
+    fetchConnectedNodes();
+
+    // Telemetry update
+    async function updateTelemetry() {
+      try {
+        const res = await fetch(`${API_BASE}/api/status`);
+        const data = await res.json();
+        if (data.tunnelUrl) {
+          latestTunnelUrl = data.tunnelUrl;
+        }
+        if (data.telemetry) {
+          document.getElementById('cpu-val').innerText = data.telemetry.cpu_percent + '%';
+          document.getElementById('ram-val').innerText = data.telemetry.ram_percent + '%';
+          document.getElementById('disk-val').innerText = data.telemetry.disk_percent + '%';
+        }
+      } catch (err) {}
+    }
+
+    setInterval(updateTelemetry, 3000);
+    updateTelemetry();
+
+    // ═══════════════════════════════════════════════════════
+    // AUTONOMOUS REPORTING & PDF STUDIO FRONTEND CONTROLLER
+    // ═══════════════════════════════════════════════════════
+    function setReportTopic(topic, recipient) {
+      const topicInput = document.getElementById('report-topic-input');
+      const recipientInput = document.getElementById('report-recipient-input');
+      if (topicInput) topicInput.value = topic;
+      if (recipientInput && recipient) recipientInput.value = recipient;
+    }
+
+    async function generatePdfReport(sendEmail) {
+      const topicInput = document.getElementById('report-topic-input');
+      const recipientInput = document.getElementById('report-recipient-input');
+      const statusBanner = document.getElementById('report-status-banner');
+      const statusText = document.getElementById('report-status-text');
+      const btnPdf = document.getElementById('btn-generate-pdf');
+      const btnEmail = document.getElementById('btn-generate-email');
+
+      const topic = (topicInput ? topicInput.value : '').trim();
+      const recipient = (recipientInput ? recipientInput.value : '').trim();
+
+      if (!topic) {
+        alert('Please enter a research topic or click one of the quick topic chips!');
+        return;
+      }
+
+      if (statusBanner) {
+        statusBanner.style.display = 'block';
+        statusBanner.style.background = 'rgba(0, 240, 255, 0.08)';
+        statusBanner.style.borderColor = 'rgba(0, 240, 255, 0.3)';
+        statusText.innerHTML = `⏳ <strong>Generating Report:</strong> AI Cluster researching <em>"${topic}"</em>, building trend charts & compiling institutional PDF...`;
+      }
+      if (btnPdf) btnPdf.disabled = true;
+      if (btnEmail) btnEmail.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/report/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: topic,
+            recipient: recipient || 'ali',
+            send_email: sendEmail,
+            open: true
+          })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          playChime('success');
+          const emailNote = data.email_dispatched
+            ? `<span style="color: #34d399;">✓ Email dispatched to ${data.email_details ? data.email_details.recipient : recipient}!</span>`
+            : `<span style="color: #93c5fd;">✓ PDF generated & opened on screen!</span>`;
+
+          statusBanner.style.background = 'rgba(16, 185, 129, 0.15)';
+          statusBanner.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+          statusText.innerHTML = `🎉 <strong>Success (${data.size_kb || 50} KB in ${data.elapsed_sec || 5}s):</strong> ${data.title || topic}. ${emailNote} 
+            <a href="${data.download_url}" target="_blank" style="color: var(--cyan); text-decoration: underline; margin-left: 8px; font-weight: bold;">[Open / Download PDF]</a>`;
+
+          speak(`Basit bhai, "${data.title || topic}" par report tayyar kar di hai. ${data.email_dispatched ? 'Aur email bhi bhej di hai.' : 'Screen par open kar di hai.'}`);
+          loadRecentReports();
+        } else {
+          statusBanner.style.background = 'rgba(239, 68, 68, 0.15)';
+          statusBanner.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+          statusText.innerHTML = `❌ <strong>Error:</strong> ${data.error || 'Failed to generate report'}`;
+        }
+      } catch (err) {
+        statusBanner.style.background = 'rgba(239, 68, 68, 0.15)';
+        statusBanner.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+        statusText.innerHTML = `❌ <strong>Error:</strong> ${err.message}`;
+      } finally {
+        if (btnPdf) btnPdf.disabled = false;
+        if (btnEmail) btnEmail.disabled = false;
+      }
+    }
+
+    async function loadRecentReports() {
+      const container = document.getElementById('reports-list-container');
+      if (!container) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/reports`);
+        const data = await res.json();
+
+        if (data.success && data.reports && data.reports.length > 0) {
+          container.innerHTML = data.reports.map(r => `
+            <div class="report-item">
+              <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
+                <span style="color: #ef4444; font-size: 1rem;">📄</span>
+                <span style="color: #f1f5f9; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 480px;">${r.filename}</span>
+                <span style="color: #64748b; font-size: 0.72rem;">(${r.size_kb} KB • ${r.created_at})</span>
+              </div>
+              <div style="display: flex; gap: 0.35rem; align-items: center;">
+                <a href="${r.url}" target="_blank" class="btn" style="padding: 0.25rem 0.6rem; font-size: 0.72rem; text-decoration: none; border-color: rgba(0, 240, 255, 0.4);">
+                  ⬇️ View / Download
+                </a>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = `<div style="font-size: 0.75rem; color: #64748b; text-align: center; padding: 0.5rem;">No PDF reports generated yet. Enter a topic above to generate!</div>`;
+        }
+      } catch (err) {
+        container.innerHTML = `<div style="font-size: 0.75rem; color: #f87171; text-align: center; padding: 0.5rem;">Could not load reports archive.</div>`;
+      }
+    }
+
+    // Initialize reports list on load
+    setTimeout(loadRecentReports, 1500);
+  </script>
+</body>
+</html>

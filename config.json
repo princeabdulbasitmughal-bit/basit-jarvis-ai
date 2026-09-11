@@ -1,0 +1,91 @@
+{
+  "jarvis": {
+    "name": "Jarvis",
+    "owner": "Basit",
+    "wake_words": ["hey jarvis", "basit", "jarvis"],
+    "hotkey": "ctrl+shift+j",
+    "language": "en"
+  },
+
+  "stt": {
+    "engine": "faster-whisper",
+    "model_size": "base",
+    "device": "cpu",
+    "compute_type": "int8",
+    "language": "en",
+    "silence_threshold": 500,
+    "silence_duration": 1.5
+  },
+
+  "tts": {
+    "engine": "pyttsx3",
+    "voice_index": 0,
+    "rate": 175,
+    "volume": 0.95,
+    "elevenlabs_api_key": "",
+    "elevenlabs_voice_id": "21m00Tcm4TlvDq8ikWAM"
+  },
+
+  "ai_brain": {
+    "provider": "openai",
+    "openai_api_key": "",
+    "anthropic_api_key": "",
+    "model_openai": "gpt-4o",
+    "model_anthropic": "claude-3-5-sonnet-20241022",
+    "max_tokens": 1024,
+    "temperature": 0.7,
+    "system_prompt": "You are Basit Jarvis, a powerful AI assistant. Be concise, helpful, and speak naturally. You control a Windows PC and help Basit with any task. Keep responses short and action-oriented."
+  },
+
+  "cluster": {
+    "rtx_a6000_url": "http://localhost:11434",
+    "rtx_a6000_model": "qwen2.5-coder:32b",
+    "rtx_5090_url": "http://10.25.32.13:8080",
+    "rtx_5090_model": "kimi-k3",
+    "groq_model": "llama-3.3-70b-versatile",
+    "mistral_model": "codestral-latest"
+  },
+
+  "basit_engines": {
+    "auto_git": true,
+    "zombie_sweeper_enabled": true,
+    "default_coding_engine": "groq",
+    "default_research_engine": "claude"
+  },
+
+  "wake_word": {
+    "engine": "openWakeWord",
+    "threshold": 0.7,
+    "chunk_size": 1280,
+    "sample_rate": 16000
+  },
+
+  "security": {
+    "voice_auth_enabled": false,
+    "voice_auth_threshold": 0.75,
+    "sensitive_commands": ["delete", "shutdown", "restart", "format", "remove", "kill"],
+    "require_confirmation": true
+  },
+
+  "system": {
+    "startup_sound": true,
+    "notification_reading": true,
+    "tray_mode": true,
+    "log_level": "INFO",
+    "context_memory_size": 20
+  },
+
+  "apps": {
+    "chrome": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "firefox": "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
+    "vscode": "code",
+    "notepad": "notepad.exe",
+    "calculator": "calc.exe",
+    "explorer": "explorer.exe",
+    "terminal": "wt.exe",
+    "spotify": "spotify",
+    "word": "winword.exe",
+    "excel": "excel.exe",
+    "powerpoint": "powerpnt.exe"
+  }
+}

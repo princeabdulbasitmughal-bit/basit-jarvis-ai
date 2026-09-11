@@ -1,0 +1,96 @@
+[
+  {
+    "id": 1,
+    "text": "test simple note",
+    "created_at": "2026-08-31 17:23:47"
+  },
+  {
+    "id": 2,
+    "text": "Buy groceries for dinner",
+    "created_at": "2026-08-31 17:23:47"
+  },
+  {
+    "id": 3,
+    "text": "test simple note",
+    "created_at": "2026-08-31 22:10:47"
+  },
+  {
+    "id": 4,
+    "text": "Buy groceries for dinner",
+    "created_at": "2026-08-31 22:10:47"
+  },
+  {
+    "id": 5,
+    "text": "test simple note",
+    "created_at": "2026-09-01 15:28:46"
+  },
+  {
+    "id": 6,
+    "text": "Buy groceries for dinner",
+    "created_at": "2026-09-01 15:28:46"
+  },
+  {
+    "id": 7,
+    "text": "test simple note",
+    "created_at": "2026-09-05 13:16:25"
+  },
+  {
+    "id": 8,
+    "text": "Buy groceries for dinner",
+    "created_at": "2026-09-05 13:16:25"
+  },
+  {
+    "id": 9,
+    "text": "test simple note",
+    "created_at": "2026-09-05 13:44:16"
+  },
+  {
+    "id": 10,
+    "text": "Buy groceries for dinner",
+    "created_at": "2026-09-05 13:44:16"
+  },
+  {
+    "id": 11,
+    "text": "test simple note",
+    "created_at": "2026-09-05 14:01:39"
+  },
+  {
+    "id": 12,
+    "text": "Buy groceries for dinner",
+    "created_at": "2026-09-05 14:01:39"
+  },
+  {
+    "id": 13,
+    "text": "Automated test note from BasitLoop",
+    "created_at": "9:07:43 PM"
+  },
+  {
+    "id": 14,
+    "text": "Automated test note from BasitLoop",
+    "created_at": "9:08:45 PM"
+  },
+  {
+    "id": 15,
+    "text": "Automated test note from BasitLoop",
+    "created_at": "9:10:19 PM"
+  },
+  {
+    "id": 16,
+    "text": "Automated test note from BasitLoop",
+    "created_at": "8:23:48 PM"
+  },
+  {
+    "id": 17,
+    "text": "Automated test note from BasitLoop",
+    "created_at": "8:27:43 PM"
+  },
+  {
+    "id": 18,
+    "text": "Automated test note from BasitLoop",
+    "created_at": "8:40:30 AM"
+  },
+  {
+    "text": "🔔 REMINDER ALARM: review pull request",
+    "time": "9/10/2026, 3:10:56 PM"
+  }
+]
