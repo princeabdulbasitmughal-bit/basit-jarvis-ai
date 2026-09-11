@@ -106,6 +106,43 @@ class AutonomousReporter:
     def __init__(self, ai_brain: Optional[AIBrain] = None):
         self.brain = ai_brain or AIBrain()
 
+    def _fetch_github_data(self, topic: str) -> str:
+        """Fetch top GitHub repos and trending data for a topic."""
+        import urllib.request as _ur, urllib.parse as _up
+        results = []
+        try:
+            q = _up.quote(topic[:50])
+            url = f'https://api.github.com/search/repositories?q={q}&sort=stars&per_page=6'
+            req = _ur.Request(url, headers={'User-Agent': 'BasitJarvisAI/2.0', 'Accept': 'application/vnd.github.v3+json'})
+            with _ur.urlopen(req, timeout=5) as r:
+                data = json.loads(r.read().decode())
+            repos = data.get('items', [])
+            if repos:
+                results.append(f'TOP OPEN-SOURCE PROJECTS FOR: {topic.upper()}')
+                for repo in repos[:6]:
+                    desc = (repo.get('description') or 'No description')[:100]
+                    stars = repo.get('stargazers_count', 0)
+                    lang = repo.get('language') or 'N/A'
+                    url2 = repo.get('html_url', '')
+                    results.append(f'  • {repo["full_name"]} (⭐{stars:,} | {lang}) — {desc}')
+                    results.append(f'    URL: {url2}')
+        except Exception as e:
+            results.append(f'GitHub fetch skipped: {e}')
+        try:
+            # Wikipedia extract
+            import urllib.parse as _up2
+            topic_slug = _up2.quote(topic.split()[0] if topic else 'AI')
+            wiki_url = f'https://en.wikipedia.org/api/rest_v1/page/summary/{topic_slug}'
+            wiki_req = _ur.Request(wiki_url, headers={'User-Agent': 'BasitJarvisAI/2.0'})
+            with _ur.urlopen(wiki_req, timeout=4) as wr:
+                wiki_data = json.loads(wr.read().decode())
+                extract = wiki_data.get('extract', '')
+                if extract:
+                    results.append(f'\nWIKIPEDIA OVERVIEW: {extract[:500]}')
+        except Exception:
+            pass
+        return '\n'.join(results)
+
     def research_topic(self, topic: str) -> Dict[str, Any]:
         """
         Queries the multi-model AI cluster to produce deep, structured research.
@@ -174,7 +211,13 @@ class AutonomousReporter:
 
         # 4. Fallback Ask Router
         if not raw_response:
-            raw_response = self.brain.ask(prompt, task_type="code") or ""
+            # Augment with real web data
+            github_data = self._fetch_github_data(topic)
+            if github_data:
+                enhanced_prompt = f'{github_data}\n\n---\nBased on the above real-world data, now generate comprehensive research on: {topic}'
+            else:
+                enhanced_prompt = topic
+            raw_response = self.brain.ask(enhanced_prompt, task_type="code") or ""
 
         # Extract and parse JSON
         data = None

@@ -1970,7 +1970,47 @@ const server = http.createServer((req, res) => {
     });
     return;
   }
-
+  // 11b. Live Dashboard Status (GET /api/dashboard)
+  if (pathname === '/api/dashboard' && req.method === 'GET') {
+    const tele = getTelemetry();
+    const apiKeys = {
+      gemini: !!(env.GEMINI_API_KEY || env.GOOGLE_API_KEY),
+      groq: !!env.GROQ_API_KEY,
+      mistral: !!env.MISTRAL_API_KEY,
+      anthropic: !!env.ANTHROPIC_API_KEY,
+      openai: !!env.OPENAI_API_KEY,
+      huggingface: !!env.HF_TOKEN_1
+    };
+    const activeKeys = Object.values(apiKeys).filter(Boolean).length;
+    return sendJSON(res, {
+      success: true,
+      version: '2.0.0-gemini-spark',
+      status: 'OPERATIONAL',
+      system: {
+        cpu_percent: tele.cpu_percent,
+        ram_percent: tele.ram_percent,
+        ram_used_gb: tele.ram_used_gb,
+        ram_total_gb: tele.ram_total_gb,
+        disk_percent: cachedDiskPercent,
+        uptime_sec: Math.round(process.uptime()),
+        platform: process.platform,
+        node_version: process.version
+      },
+      api_keys: apiKeys,
+      active_api_keys: activeKeys,
+      engines: {
+        basit1: 'Devin/OpenHands Code Gen',
+        basit2: 'Deep Research + Web Intelligence',
+        basit3: 'OWASP Guardian + CVE Scanner',
+        basit4: 'AI Hedge Fund + Live Market Data',
+        basitswarm: '100-Agent Parallel Squadron',
+        arsenal: 'Open-Source AI Cluster (7 Nodes)',
+        basitloop: '8-Stage Autonomous Loop',
+        'gemini-spark': 'Gemini 2.0 + PySpark 4.2 ETL'
+      },
+      timestamp: new Date().toISOString()
+    });
+  }
 
   // 12. Health Ping (GET /api/ping)
   if (pathname === '/api/ping' && req.method === 'GET') {
