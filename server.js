@@ -1986,11 +1986,13 @@ const server = http.createServer((req, res) => {
 
   // 13. Live Metrics (GET /api/metrics)
   if (pathname === '/api/metrics' && req.method === 'GET') {
-    const cpuUsage = getCurrentCpuUsage();
+    const tele = getTelemetry();
     return sendJSON(res, {
       success: true,
-      cpu_percent: Math.round(cpuUsage),
-      ram_percent: Math.round((1 - os.freemem() / os.totalmem()) * 100),
+      cpu_percent: tele.cpu_percent,
+      ram_percent: tele.ram_percent,
+      ram_used_gb: tele.ram_used_gb,
+      ram_total_gb: tele.ram_total_gb,
       disk_percent: cachedDiskPercent,
       uptime_sec: Math.round(process.uptime()),
       node_version: process.version,
