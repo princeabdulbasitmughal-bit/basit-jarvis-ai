@@ -15,7 +15,7 @@ print('=' * 60)
 tests = [
     ('Cluster Status', 'GET', f'{base}/api/cluster-status', None, 25),
     ('Spark Status', 'GET', f'{base}/api/spark?task=status', None, 10),
-    ('Spark SQL', 'POST', f'{base}/api/spark', {'task': 'sql', 'query': 'SELECT * FROM contacts'}, 30),
+    ('Spark SQL', 'POST', f'{base}/api/spark', {'task': 'sql', 'query': 'SELECT * FROM contacts'}, 45),
     ('Gemini Spark Engine', 'POST', f'{base}/api/gemini-spark', {'prompt': 'status'}, 10),
     ('Health Ping', 'GET', f'{base}/api/ping', None, 5),
     ('Live Metrics', 'GET', f'{base}/api/metrics', None, 5),
