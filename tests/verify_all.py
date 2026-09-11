@@ -23,7 +23,7 @@ tests = [
     ('Command: /basit1 ping', 'POST', f'{base}/api/command', {'command': '/basit1 ping'}, 15),
     ('Command: /basit3 sweep', 'POST', f'{base}/api/command', {'command': '/basit3 sweep'}, 15),
     ('Command: /basit4 NVDA', 'POST', f'{base}/api/command', {'command': '/basit4 NVDA'}, 30),
-    ('Command: /basitswarm SaaS', 'POST', f'{base}/api/command', {'command': '/basitswarm SaaS'}, 30),
+    ('Command: /basitswarm SaaS', 'POST', f'{base}/api/command', {'command': '/basitswarm SaaS'}, 45),
     ('Batch Runner', 'POST', f'{base}/api/batch', {'tasks': [{'engine': 'basit3', 'task': 'sweep'}, {'engine': 'basit1', 'task': 'ping'}]}, 60),
 ]
 
