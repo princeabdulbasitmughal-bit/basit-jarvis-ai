@@ -1972,6 +1972,72 @@ const server = http.createServer((req, res) => {
   }
 
 
+  // 12. Health Ping (GET /api/ping)
+  if (pathname === '/api/ping' && req.method === 'GET') {
+    return sendJSON(res, {
+      success: true,
+      status: 'ONLINE',
+      version: '2.0.0-gemini-spark',
+      uptime_sec: Math.round(process.uptime()),
+      engines: ['basit1','basit2','basit3','basit4','basitswarm','arsenal','basitloop','gemini-spark'],
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  // 13. Live Metrics (GET /api/metrics)
+  if (pathname === '/api/metrics' && req.method === 'GET') {
+    const cpuUsage = getCurrentCpuUsage();
+    return sendJSON(res, {
+      success: true,
+      cpu_percent: Math.round(cpuUsage),
+      ram_percent: Math.round((1 - os.freemem() / os.totalmem()) * 100),
+      disk_percent: cachedDiskPercent,
+      uptime_sec: Math.round(process.uptime()),
+      node_version: process.version,
+      platform: process.platform,
+      engines_online: 8,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  // 14. Batch Engine Execution (POST /api/batch)
+  if (pathname === '/api/batch' && req.method === 'POST') {
+    parseBody(data => {
+      const tasks = Array.isArray(data.tasks) ? data.tasks : [];
+      if (!tasks.length) return sendJSON(res, { success: false, error: 'tasks array required' }, 400);
+      const results = [];
+      let idx = 0;
+      const enginesScript = path.join(BASE_DIR, 'modules', 'basit_engines.py');
+      const next = () => {
+        if (idx >= tasks.length) return sendJSON(res, { success: true, count: results.length, results });
+        const t = tasks[idx++];
+        const engine = (t.engine || 'basit1').replace(/^\//,'');
+        const task = (t.task || 'run').replace(/"/g, '\\"');
+        console.log(`[BATCH] Running ${engine}: ${task.slice(0,50)}`);
+        exec(`python "${enginesScript}" --engine ${engine} --task "${task}"`,
+          { timeout: 60000, maxBuffer: 5*1024*1024, env: {...process.env, PYTHONIOENCODING:'utf-8'} },
+          (err, stdout) => {
+            let parsed = null;
+            if (stdout) {
+              const lines = stdout.trim().split('\n');
+              for (let i = lines.length-1; i >= 0; i--) {
+                try { const p = JSON.parse(lines[i]); if (p && typeof p === 'object') { parsed = p; break; } } catch(_) {}
+              }
+            }
+            results.push({
+              engine, task: t.task,
+              success: !err && !!parsed,
+              summary: parsed?.summary || parsed?.response || (err?.message || 'completed').slice(0,200)
+            });
+            next();
+          }
+        );
+      };
+      next();
+    });
+    return;
+  }
+
   // 404 Fallback
   sendJSON(res, { error: 'Not Found', path: pathname }, 404);
 });

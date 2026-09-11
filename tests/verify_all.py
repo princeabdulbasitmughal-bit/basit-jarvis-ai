@@ -17,11 +17,14 @@ tests = [
     ('Spark Status', 'GET', f'{base}/api/spark?task=status', None, 10),
     ('Spark SQL', 'POST', f'{base}/api/spark', {'task': 'sql', 'query': 'SELECT * FROM contacts'}, 30),
     ('Gemini Spark Engine', 'POST', f'{base}/api/gemini-spark', {'prompt': 'status'}, 10),
+    ('Health Ping', 'GET', f'{base}/api/ping', None, 5),
+    ('Live Metrics', 'GET', f'{base}/api/metrics', None, 5),
     ('Command: /gemini-spark status', 'POST', f'{base}/api/command', {'command': '/gemini-spark status'}, 15),
     ('Command: /basit1 ping', 'POST', f'{base}/api/command', {'command': '/basit1 ping'}, 15),
     ('Command: /basit3 sweep', 'POST', f'{base}/api/command', {'command': '/basit3 sweep'}, 15),
-    ('Command: /basit4 NVDA', 'POST', f'{base}/api/command', {'command': '/basit4 NVDA'}, 15),
-    ('Command: /basitswarm SaaS', 'POST', f'{base}/api/command', {'command': '/basitswarm SaaS'}, 15),
+    ('Command: /basit4 NVDA', 'POST', f'{base}/api/command', {'command': '/basit4 NVDA'}, 30),
+    ('Command: /basitswarm SaaS', 'POST', f'{base}/api/command', {'command': '/basitswarm SaaS'}, 30),
+    ('Batch Runner', 'POST', f'{base}/api/batch', {'tasks': [{'engine': 'basit3', 'task': 'sweep'}, {'engine': 'basit1', 'task': 'ping'}]}, 60),
 ]
 
 for name, method, url, payload, timeout in tests:

@@ -262,10 +262,37 @@ class Basit4HedgeFund:
 
     def execute(self, query: str) -> Dict[str, Any]:
         t0 = time.time()
+
+        # Fetch live price data from Yahoo Finance (threaded 3s max, never blocks)
+        live_data = ""
+        import threading as _thr
+        import urllib.request as _ur
+        _price_result = [None]
+        def _fetch_price():
+            try:
+                ticker_clean = query.strip().upper().split()[0]
+                url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker_clean}?interval=1d&range=5d"
+                req = _ur.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                with _ur.urlopen(req, timeout=3) as r:
+                    raw = json.loads(r.read().decode())
+                meta = raw.get('chart', {}).get('result', [{}])[0].get('meta', {})
+                price = meta.get('regularMarketPrice', 'N/A')
+                prev = meta.get('previousClose', 'N/A')
+                change = round(float(price) - float(prev), 2) if price != 'N/A' and prev != 'N/A' else 'N/A'
+                ticker_clean2 = query.strip().upper().split()[0]
+                _price_result[0] = f"\n\n[LIVE DATA] {ticker_clean2}: Price=${price}, PrevClose=${prev}, Change=${change}"
+            except Exception:
+                pass
+        _pt = _thr.Thread(target=_fetch_price, daemon=True)
+        _pt.start()
+        _pt.join(timeout=3.0)  # Hard 3s ceiling — never blocks engine
+        if _price_result[0]:
+            live_data = _price_result[0]
+
         pb = "\n".join(f"{i+1}. {n}: {m}" for i,(n,m) in enumerate(self.PERSONAS))
         prompt = (
             f"You are Basit4 -- Autonomous AI Hedge Fund & HF Agency Engine.\n"
-            f"Target: '{query}'\n\n6-Persona Consensus Analysis:\n{pb}\n\n"
+            f"Target: '{query}'{live_data}\n\n6-Persona Consensus Analysis:\n{pb}\n\n"
             "Structure:\n## 6-Persona Consensus Matrix\n(Each: 2-3 sentence verdict + conviction /10)\n\n"
             "## Consensus Verdict\n(BUY/HOLD/SELL + price target + confidence %)\n\n"
             "## Risk Factors & Stop-Loss\n## Actionable Entry Strategy (immediate + 30-day)\n\n"
@@ -288,6 +315,7 @@ class Basit4HedgeFund:
             "summary": f"Basit4 completed 6-persona hedge fund analysis in {elapsed}s.",
             "banner": self.BANNER
         }
+
 
 
 # ============================================================

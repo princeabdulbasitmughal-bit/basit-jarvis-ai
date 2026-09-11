@@ -17,7 +17,9 @@ import os
 import json
 import time
 import logging
+import threading
 import requests
+from collections import OrderedDict
 from typing import List, Dict, Optional, Any
 
 # Load environment variables from E:\.env
@@ -82,7 +84,12 @@ class AIBrain:
                 self.hf_tokens.append(tok)
         self._hf_index = 0
 
-    # --------------------------------------------------------------------------
+        # Cache setup
+        self._cache = OrderedDict()
+        self._cache_max = 50
+        self._cache_ttl = 300  # 5 minutes
+
+
     # PRIMARY ASK ROUTER
     # --------------------------------------------------------------------------
     def ask(self, query: str, history: Optional[List[Dict[str, str]]] = None, task_type: str = "general") -> str:
@@ -426,7 +433,68 @@ class AIBrain:
         return f"I heard '{query}', sir. All cloud and local models were unreachable at this instant."
 
     # --------------------------------------------------------------------------
-    # CLUSTER TELEMETRY & HEALTH CHECK
+    # RESPONSE CACHE  &  PARALLEL RACING
+    # --------------------------------------------------------------------------
+    def _cache_get(self, key: str) -> Optional[str]:
+        """Retrieve cached response if still valid (TTL: 5 min)."""
+        if key in self._cache:
+            ts, val = self._cache[key]
+            if time.time() - ts < self._cache_ttl:
+                self._cache.move_to_end(key)
+                return val
+            del self._cache[key]
+        return None
+
+    def _cache_put(self, key: str, value: str) -> None:
+        """Store response in LRU cache, evicting oldest when full."""
+        if key in self._cache:
+            self._cache.move_to_end(key)
+        self._cache[key] = (time.time(), value)
+        while len(self._cache) > self._cache_max:
+            self._cache.popitem(last=False)
+
+    def estimate_tokens(self, text: str) -> int:
+        """Rough token estimate (1 token ≈ 4 chars)."""
+        return max(1, len(text) // 4)
+
+    def ask_parallel(self, query: str, timeout: float = 8.0) -> str:
+        """Fire Gemini + Groq simultaneously; return first successful response.
+
+        Falls back to ``_local_rule_fallback`` if both engines time out.
+        """
+        result = [None]
+        lock = threading.Lock()
+        done = threading.Event()
+
+        def try_engine(fn):
+            try:
+                resp = fn(query)
+                if resp:
+                    with lock:
+                        if result[0] is None:
+                            result[0] = resp
+                            done.set()
+            except Exception:
+                pass
+
+        fns = []
+        if self.gemini_api_key:
+            fns.append(lambda q=query: self._ask_gemini(q, max_tokens=2000))
+        if self.groq_api_key:
+            fns.append(lambda q=query: self._ask_groq(q, max_tokens=1500))
+
+        threads = [
+            threading.Thread(target=try_engine, args=(fn,), daemon=True)
+            for fn in fns
+        ]
+        for t in threads:
+            t.start()
+
+        done.wait(timeout=timeout)
+        return result[0] or self._local_rule_fallback(query)
+
+    # --------------------------------------------------------------------------
+
     # --------------------------------------------------------------------------
     def get_cluster_status(self) -> Dict[str, Any]:
         """Probes status and latency of all integrated AI engines."""
