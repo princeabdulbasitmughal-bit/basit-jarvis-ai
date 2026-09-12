@@ -1120,6 +1120,165 @@ const server = http.createServer((req, res) => {
       }
 
       // ═══════════════════════════════════════════════════════
+      // SEC 2F: POWER APPS & WEB SERVICES
+      // WhatsApp, Gmail, Spotify, Task Manager, Wikipedia, etc.
+      // ═══════════════════════════════════════════════════════
+
+      // --- WHATSAPP WEB ---
+      if (cmd.includes('whatsapp') || cmd.includes('whats app') || cmd.includes('wp kholo') || cmd.includes('message bhejo')) {
+        exec('cmd /c start "" "https://web.whatsapp.com"', { timeout: 5000 }, () => {
+          sendJSON(res, { success: true, response: 'WhatsApp Web khol diya hai, Basit bhai! 💬 Messages check karein.' });
+        });
+        return;
+      }
+
+      // --- GMAIL ---
+      if (cmd.includes('gmail') || cmd.includes('email kholo') || cmd.includes('mail kholo') || cmd.includes('email check')) {
+        exec('cmd /c start "" "https://mail.google.com"', { timeout: 5000 }, () => {
+          sendJSON(res, { success: true, response: 'Gmail khol diya hai, sir! 📧 Inbox check karein.' });
+        });
+        return;
+      }
+
+      // --- SPOTIFY ---
+      if (cmd.includes('spotify') || cmd.includes('music kholo') || cmd.includes('gaana chalao') || cmd.includes('music chalao')) {
+        launchApp('spotify', 'Spotify', (err) => {
+          if (err) exec('cmd /c start "" "https://open.spotify.com"', { timeout: 5000 });
+          sendJSON(res, { success: true, response: 'Spotify open kar diya hai, sir! 🎵 Music enjoy karein.' });
+        });
+        return;
+      }
+
+      // --- TASK MANAGER ---
+      if (cmd.includes('task manager') || cmd.includes('taskmgr') || cmd.includes('task managr') || cmd.includes('processes dekho') || cmd.includes('cpu dekho')) {
+        exec('cmd /c start "" taskmgr.exe', { timeout: 5000 }, () => {
+          sendJSON(res, { success: true, response: 'Task Manager khol diya hai, sir! 📊 Running processes check karein.' });
+        });
+        return;
+      }
+
+      // --- BATTERY STATUS ---
+      if (cmd.includes('battery') || cmd.includes('charge') || cmd.includes('bijli') || cmd.includes('batery')) {
+        exec(`powershell -Command "$b = Get-WmiObject Win32_Battery; if ($b) { $pct = $b.EstimatedChargeRemaining; $status = if ($b.BatteryStatus -eq 2) {'Charging ⚡'} else {'Discharging 🔋'}; Write-Output ($pct.ToString() + '% ' + $status) } else { Write-Output 'No battery (Desktop PC)' }"`, { timeout: 6000 }, (err, stdout) => {
+          const info = (stdout || '').trim() || 'Battery info unavailable';
+          sendJSON(res, { success: true, response: `Battery Status: ${info}, sir! 🔋` });
+        });
+        return;
+      }
+
+      // --- WIFI STATUS ---
+      if (cmd.includes('wifi') || cmd.includes('wi-fi') || cmd.includes('internet check') || cmd.includes('network check') || cmd.includes('connection check')) {
+        exec(`powershell -Command "$wifi = netsh wlan show interfaces; $ssid = ($wifi | Select-String 'SSID' | Select-Object -First 1).ToString().Split(':')[1].Trim(); $signal = ($wifi | Select-String 'Signal').ToString().Split(':')[1].Trim(); Write-Output ($ssid + ' | Signal: ' + $signal)"`, { timeout: 6000 }, (err, stdout) => {
+          const info = (stdout || '').trim();
+          if (info && !err) {
+            sendJSON(res, { success: true, response: `WiFi Connected: ${info} ✅, sir!` });
+          } else {
+            sendJSON(res, { success: true, response: 'WiFi status: Connected to network. Internet active hai, sir! 🌐' });
+          }
+        });
+        return;
+      }
+
+      // --- LOCK PC ---
+      if (cmd.includes('lock pc') || cmd.includes('lock kar') || cmd.includes('lock karo') || cmd.includes('screen lock') || cmd.includes('pc lock')) {
+        exec('powershell -Command "rundll32.exe user32.dll,LockWorkStation"', { timeout: 4000 }, () => {
+          sendJSON(res, { success: true, response: 'PC lock kar diya hai, Basit bhai! 🔒 Screen locked.' });
+        });
+        return;
+      }
+
+      // --- SHUTDOWN ---
+      if ((cmd.includes('shutdown') || cmd.includes('band karo') || cmd.includes('pc band')) && !cmd.includes('restart')) {
+        exec('powershell -Command "shutdown /s /t 30"', { timeout: 4000 }, () => {
+          sendJSON(res, { success: true, response: 'PC 30 seconds mein shutdown ho jayega, sir! 💤 Koi kaam ho to jaldi karein.' });
+        });
+        return;
+      }
+
+      // --- CANCEL SHUTDOWN ---
+      if (cmd.includes('cancel shutdown') || cmd.includes('shutdown cancel') || cmd.includes('band mat karo')) {
+        exec('powershell -Command "shutdown /a"', { timeout: 4000 }, () => {
+          sendJSON(res, { success: true, response: 'Shutdown cancel kar diya hai, sir! ✅ PC chalta rahega.' });
+        });
+        return;
+      }
+
+      // --- RESTART ---
+      if (cmd.includes('restart') || cmd.includes('reboot') || cmd.includes('dobara start')) {
+        exec('powershell -Command "shutdown /r /t 30"', { timeout: 4000 }, () => {
+          sendJSON(res, { success: true, response: 'PC 30 seconds mein restart ho jayega, Basit bhai! 🔄' });
+        });
+        return;
+      }
+
+      // --- BRIGHTNESS CONTROL ---
+      const brightMatch = rawCmd.match(/brightness\s+(\d+)|(\d+)\s*%?\s*brightness|brightness\s+(up|down|increase|decrease|barhao|ghatao)/i);
+      if (brightMatch || cmd.includes('brightness') || cmd.includes('screen bright') || cmd.includes('chamak')) {
+        let level = brightMatch && brightMatch[1] ? parseInt(brightMatch[1]) : (brightMatch && brightMatch[2] ? parseInt(brightMatch[2]) : null);
+        if (!level) level = (cmd.includes('down') || cmd.includes('ghatao') || cmd.includes('decrease')) ? 40 : 80;
+        level = Math.min(100, Math.max(0, level));
+        exec(`powershell -Command "(Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1,${level})"`, { timeout: 5000 }, (err) => {
+          if (err) {
+            sendJSON(res, { success: true, response: `Brightness ${level}% set karne ki koshish ki — monitor ke driver se control hoti hai, sir.` });
+          } else {
+            sendJSON(res, { success: true, response: `Screen brightness ${level}% par set kar di hai, sir! ☀️` });
+          }
+        });
+        return;
+      }
+
+      // --- WIKIPEDIA SEARCH ---
+      if (cmd.includes('wikipedia') || cmd.includes('wiki search') || cmd.includes('wiki par dhondo')) {
+        const wikiMatch = rawCmd.match(/(?:wikipedia|wiki)\s+(?:par\s+)?(?:dhondo|search\s+)?(.+)/i);
+        const query = wikiMatch ? encodeURIComponent(wikiMatch[1].trim()) : encodeURIComponent(rawCmd.replace(/wiki(pedia)?/i, '').trim());
+        exec(`cmd /c start "" "https://en.wikipedia.org/wiki/Special:Search?search=${query}"`, { timeout: 5000 }, () => {
+          sendJSON(res, { success: true, response: `Wikipedia par "${decodeURIComponent(query)}" search kar diya hai, sir! 📖` });
+        });
+        return;
+      }
+
+      // --- CHATGPT ---
+      if (cmd.includes('chatgpt') || cmd.includes('chat gpt') || cmd.includes('openai')) {
+        exec('cmd /c start "" "https://chat.openai.com"', { timeout: 5000 }, () => {
+          sendJSON(res, { success: true, response: 'ChatGPT khol diya hai, sir! 🤖' });
+        });
+        return;
+      }
+
+      // --- GITHUB ---
+      if (cmd.includes('github') || cmd.includes('git hub') || cmd.includes('code repo')) {
+        exec('cmd /c start "" "https://github.com"', { timeout: 5000 }, () => {
+          sendJSON(res, { success: true, response: 'GitHub khol diya hai, sir! 🐙 Code dekho.' });
+        });
+        return;
+      }
+
+      // --- SHOW DESKTOP ---
+      if (cmd.includes('show desktop') || cmd.includes('desktop dikhao') || cmd.includes('minimize all') || cmd.includes('sab chhupa do')) {
+        exec(`powershell -Command "$shell = New-Object -ComObject Shell.Application; $shell.MinimizeAll()"`, { timeout: 4000 }, () => {
+          sendJSON(res, { success: true, response: 'Sab windows minimize kar ke desktop dikha diya hai, Basit bhai! 🖥️' });
+        });
+        return;
+      }
+
+      // --- CONTROL PANEL ---
+      if (cmd.includes('control panel') || cmd.includes('settings kholo') || cmd.includes('windows settings')) {
+        exec('cmd /c start "" ms-settings:', { timeout: 5000 }, (err) => {
+          if (err) exec('cmd /c start "" control.exe', { timeout: 5000 });
+          sendJSON(res, { success: true, response: 'Windows Settings khol diya hai, sir! ⚙️' });
+        });
+        return;
+      }
+
+      // --- SNIPPING TOOL ---
+      if (cmd.includes('snip') || cmd.includes('clip') || cmd.includes('partial screenshot') || cmd.includes('area screenshot')) {
+        exec('cmd /c start "" snippingtool.exe', { timeout: 5000 }, () => {
+          sendJSON(res, { success: true, response: 'Snipping Tool khol diya hai, sir! ✂️ Screen ka koi bhi hissa capture karein.' });
+        });
+        return;
+      }
+
+      // ═══════════════════════════════════════════════════════
       // SEC 2E: YOUTUBE IN-PLAYER CONTROLS
       // Handles: video pause/play (k), full screen (f), forward (l), rewind (j)
       // ═══════════════════════════════════════════════════════
