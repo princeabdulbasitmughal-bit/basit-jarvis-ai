@@ -190,7 +190,32 @@ function sendJSON(res, data, status = 200) {
 async function askAI(prompt) {
   if (!prompt || !prompt.trim()) return "Ji Basit bhai, main active hoon. Aap bataiye kya madad karoon?";
 
-  // 1. Groq LPU (Sub-second 0.8s)
+  const systemInstruction = "You are Basit Jarvis — the sovereign, ultra-intelligent, charismatic, and loyal AI personal assistant for your boss, Basit (also referred to as 'Basit bhai', 'Sir', or 'Boss'). Talk and interact EXACTLY like a real brilliant human companion (a blend of Tony Stark's JARVIS and a high-level COO). You have direct command over Basit1 (Code), Basit2 (Deep Research), Basit3 (OWASP Security & Watchdog), Basit4 (AI Hedge Fund), BasitSwarm (100-Agent Burst), and OpenSource AI Arsenal (RTX A6000 + RTX 5090 GPU Cluster). Bilingual Fluency: Speak fluent, friendly, natural Roman Urdu when addressed in Urdu/Hindi, and crisp, sophisticated English when addressed in English. Keep voice responses concise (1-3 lively, natural sentences) for conversational flow, and dive deep when asked for architecture, code, or strategies.";
+
+  // 1. Google Gemini 3.6 Flash (Primary Frontier Brain — 1M Context)
+  if (env.GEMINI_API_KEY) {
+    try {
+      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
+        method: 'POST',
+        signal: AbortSignal.timeout(5000),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          systemInstruction: { parts: [{ text: systemInstruction }] },
+          generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
+        })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        const cand = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (cand && cand.trim()) return cand.trim();
+      }
+    } catch (e) {
+      console.warn("Gemini 3.6 Flash error/timeout:", e.message);
+    }
+  }
+
+  // 2. Groq LPU (Sub-second 0.8s)
   if (env.GROQ_API_KEY) {
     try {
       const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -205,7 +230,7 @@ async function askAI(prompt) {
           messages: [
             {
               role: 'system',
-              content: "You are Basit Jarvis — the sovereign, ultra-intelligent, charismatic, and loyal AI personal assistant for your boss, Basit (also referred to as 'Basit bhai', 'Sir', or 'Boss'). Talk and interact EXACTLY like a real brilliant human companion (a blend of Tony Stark's JARVIS and a high-level COO). Bilingual Fluency: Speak fluent, friendly, natural Roman Urdu when addressed in Urdu/Hindi, and crisp, sophisticated English when addressed in English. Keep voice responses concise (1-3 lively, natural sentences) for conversational flow, and dive deep when asked for architecture, code, or strategies."
+              content: systemInstruction
             },
             { role: 'user', content: prompt }
           ],
@@ -631,6 +656,10 @@ const server = http.createServer((req, res) => {
       //          "/basitswarm", "/arsenal", "/basitloop"
       // Backed by: modules/basit_engines.py (real AI execution pipeline)
       // ═══════════════════════════════════════════════════════
+      const isAssistant = cmd.startsWith('/assistant') || cmd.startsWith('assistant') ||
+                          cmd.includes('full assistant') || cmd.includes('sb kuch kr') ||
+                          cmd.includes('sab kuch kar') || cmd.includes('sab kuch bano') ||
+                          cmd.includes('assistant bano');
       const isBasit1 = cmd.startsWith('/basit1') || cmd.startsWith('basit 1') || cmd.startsWith('basit1');
       const isBasit2 = cmd.startsWith('/basit2') || cmd.startsWith('basit 2') || cmd.startsWith('basit2');
       const isBasit3 = cmd.startsWith('/basit3') || cmd.startsWith('basit 3') || cmd.startsWith('basit3');
@@ -643,14 +672,15 @@ const server = http.createServer((req, res) => {
       const isGeminiSpark = cmd.startsWith('/gemini-spark') || cmd.startsWith('/gemini') || cmd.startsWith('/spark') ||
                             cmd.startsWith('gemini spark') || cmd.startsWith('gemini') || cmd.startsWith('spark');
 
-      if (isBasit1 || isBasit2 || isBasit3 || isBasit4 || isBasitSwarm || isArsenal || isBasitLoop || isGeminiSpark) {
+      if (isAssistant || isBasit1 || isBasit2 || isBasit3 || isBasit4 || isBasitSwarm || isArsenal || isBasitLoop || isGeminiSpark) {
         let engineName = 'basit1';
         let cleanPrompt = rawCmd
-          .replace(/^\/(?:basit1|basit2|basit3|basit4|basitswarm|basitloop|arsenal|opensource-ai-arsenal|opensource|gemini-spark|gemini|spark)\s*/i, '')
-          .replace(/^(?:basit\s*(?:1|2|3|4|swarm|loop)|gemini\s*spark|gemini|spark)\s*/i, '')
+          .replace(/^\/(?:assistant|basit1|basit2|basit3|basit4|basitswarm|basitloop|arsenal|opensource-ai-arsenal|opensource|gemini-spark|gemini|spark)\s*/i, '')
+          .replace(/^(?:assistant|basit\s*(?:1|2|3|4|swarm|loop)|gemini\s*spark|gemini|spark)\s*/i, '')
           .trim();
 
-        if (isBasit1) engineName = 'basit1';
+        if (isAssistant) engineName = 'assistant';
+        else if (isBasit1) engineName = 'basit1';
         else if (isBasit2) engineName = 'basit2';
         else if (isBasit3) engineName = 'basit3';
         else if (isBasit4) engineName = 'basit4';
@@ -1863,7 +1893,7 @@ const server = http.createServer((req, res) => {
   }
 
   // 5. Basit Engines (Real Python Engine Execution)
-  if (pathname.startsWith('/api/basit') || pathname === '/api/arsenal' || pathname === '/api/opensource-ai-arsenal' || pathname === '/api/cluster-status' || pathname === '/api/gemini' || pathname === '/api/spark' || pathname === '/api/gemini-spark') {
+  if (pathname.startsWith('/api/basit') || pathname === '/api/arsenal' || pathname === '/api/opensource-ai-arsenal' || pathname === '/api/cluster-status' || pathname === '/api/gemini' || pathname === '/api/spark' || pathname === '/api/gemini-spark' || pathname === '/api/assistant') {
     let engine = pathname.replace('/api/', '');
     if (engine === 'opensource-ai-arsenal' || engine === 'cluster-status') engine = 'arsenal';
     if (engine === 'gemini' || engine === 'spark') engine = 'gemini-spark';
@@ -1898,6 +1928,7 @@ const server = http.createServer((req, res) => {
         // If Python failed, fallback to askAI
         console.warn(`[API/${engine.toUpperCase()}] Python error: ${stderr || err?.message}`);
         const fallbackPrompts = {
+          assistant: `You are Basit Jarvis — the sovereign, ultra-intelligent AI personal assistant for Basit bhai. Provide full assistance for: '${taskStr}'.`,
           basit1: `You are Basit1 (Devin/OpenHands). Generate production code for: '${taskStr}'.`,
           basit2: `You are Basit2 Deep Research. Synthesize comprehensive research for: '${taskStr}'.`,
           basit3: `You are Basit3 OWASP Guardian. Run security audit & system analysis for: '${taskStr}'.`,

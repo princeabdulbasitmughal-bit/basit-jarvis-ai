@@ -66,7 +66,7 @@ class AIBrain:
 
         # Cluster configuration
         cfg = cluster_cfg or {}
-        self.gemini_model = cfg.get("gemini_model", "gemini-2.0-flash")
+        self.gemini_model = cfg.get("gemini_model", "gemini-3.6-flash")
         self.rtx_a6000_url = cfg.get("rtx_a6000_url", "http://localhost:11434")
         self.rtx_a6000_model = cfg.get("rtx_a6000_model", "qwen2.5-coder:32b")
         self.rtx_5090_url = cfg.get("rtx_5090_url", "http://10.25.32.13:8080")
@@ -180,31 +180,36 @@ class AIBrain:
     # --------------------------------------------------------------------------
     # ENGINE IMPLEMENTATIONS
     # --------------------------------------------------------------------------
-    def _ask_gemini(self, query: str, history: Optional[List[Dict[str, str]]] = None, model: str = "gemini-2.0-flash", system_prompt: Optional[str] = None, max_tokens: int = 2500) -> Optional[str]:
+    def _ask_gemini(self, query: str, history: Optional[List[Dict[str, str]]] = None, model: str = "gemini-3.6-flash", system_prompt: Optional[str] = None, max_tokens: int = 2500) -> Optional[str]:
         """Queries Google Gemini API with automatic fallback between official SDK and REST."""
         if not self.gemini_api_key:
             return None
         t0 = time.time()
         sys_inst = system_prompt or self.system_prompt
 
+        candidate_models = [model, "gemini-3.6-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
+        seen_models = set()
+        candidate_models = [m for m in candidate_models if not (m in seen_models or seen_models.add(m))]
+
         # 1. Try google-genai SDK
-        try:
-            from google import genai
-            client = genai.Client(api_key=self.gemini_api_key)
-            response = client.models.generate_content(
-                model=model,
-                contents=query,
-                config={
-                    "system_instruction": sys_inst,
-                    "max_output_tokens": max_tokens,
-                    "temperature": 0.7
-                }
-            )
-            if response and response.text:
-                logger.info(f"Gemini responded via google-genai in {round(time.time() - t0, 2)}s [{model}]")
-                return response.text.strip()
-        except Exception as e:
-            logger.debug(f"google-genai SDK call error: {e}")
+        for cand_model in candidate_models:
+            try:
+                from google import genai
+                client = genai.Client(api_key=self.gemini_api_key)
+                response = client.models.generate_content(
+                    model=cand_model,
+                    contents=query,
+                    config={
+                        "system_instruction": sys_inst,
+                        "max_output_tokens": max_tokens,
+                        "temperature": 0.7
+                    }
+                )
+                if response and response.text:
+                    logger.info(f"Gemini responded via google-genai in {round(time.time() - t0, 2)}s [{cand_model}]")
+                    return response.text.strip()
+            except Exception as e:
+                logger.debug(f"google-genai SDK call error for {cand_model}: {e}")
 
         # 2. Try direct REST API
         try:

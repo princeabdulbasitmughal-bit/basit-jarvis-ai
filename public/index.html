@@ -691,6 +691,7 @@
 
       <!-- Instant 1-Click Voice Command Chips — Row 1: Apps & System -->
       <div style="display:flex; gap:0.4rem; overflow-x:auto; padding:0.25rem 0; margin-top:0.4rem; scrollbar-width:thin;" id="quick-voice-chips">
+        <button class="btn" style="padding:0.25rem 0.8rem; font-size:0.75rem; white-space:nowrap; background:linear-gradient(135deg, rgba(245,158,11,0.35), rgba(236,72,153,0.35)); border-color:#f59e0b; color:#fff; font-weight:800; box-shadow:0 0 12px rgba(245,158,11,0.4);" onclick="switchEngineTab('assistant'); runAssistantInteractive()">👑 Sovereign Assistant</button>
         <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(251,191,36,0.15); border-color:rgba(251,191,36,0.5); color:#fbbf24; font-weight:700;" onclick="execCmd('open file explorer')">📂 File Explorer</button>
         <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(0,240,255,0.1); border-color:rgba(0,240,255,0.4); color:var(--cyan);" onclick="execCmd('open chrome')">🌐 Chrome</button>
         <button class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; white-space:nowrap; background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.4); color:#f87171;" onclick="execCmd('open youtube')">📺 YouTube</button>
@@ -845,7 +846,10 @@
     <div class="engine-hub-card" id="engine-hub">
       <!-- Tabs Navigation Bar -->
       <div class="engine-tabs-bar">
-        <button class="engine-tab-btn active" data-engine="basit1" onclick="switchEngineTab('basit1')">
+        <button class="engine-tab-btn active" data-engine="assistant" onclick="switchEngineTab('assistant')" style="border-color:rgba(245,158,11,0.6);color:#fbbf24;background:rgba(245,158,11,0.15);">
+          <span>👑</span> <strong>Sovereign Assistant</strong>
+        </button>
+        <button class="engine-tab-btn" data-engine="basit1" onclick="switchEngineTab('basit1')">
           <span>⚡</span> /basit1 (Coder)
         </button>
         <button class="engine-tab-btn" data-engine="basit2" onclick="switchEngineTab('basit2')">
@@ -875,8 +879,76 @@
         </button>
       </div>
 
+      <!-- 👑 PANEL 0: BASIT UNIVERSAL SOVEREIGN ASSISTANT -->
+      <div class="engine-panel active" id="panel-assistant">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+          <div>
+            <h3 style="color:#fbbf24; font-size:1.15rem; display:flex; align-items:center; gap:0.5rem;">
+              <span>👑</span> BASIT JARVIS — SOVEREIGN EXECUTIVE ASSISTANT
+            </h3>
+            <p style="font-size:0.78rem; color:var(--text-muted);">
+              Unified Sovereign AI Orchestrator • Direct Command Over 6 Specialized Autonomous Engines & Dual-Node GPU Cluster
+            </p>
+          </div>
+          <span style="background:linear-gradient(135deg, rgba(245,158,11,0.25), rgba(236,72,153,0.25)); color:#fbbf24; border:1px solid #f59e0b; padding:0.25rem 0.75rem; border-radius:12px; font-size:0.75rem; font-weight:800;">
+            100% AUTONOMOUS OS
+          </span>
+        </div>
+
+        <!-- 6 Quadrant Quick-Launch Command Grid -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:0.6rem; margin-bottom:0.9rem;">
+          <div style="background:rgba(15,23,42,0.9); border:1px solid rgba(0,240,255,0.3); border-radius:10px; padding:0.65rem; cursor:pointer; transition:all 0.2s;" onclick="switchEngineTab('basit1')" onmouseover="this.style.borderColor='var(--cyan)'" onmouseout="this.style.borderColor='rgba(0,240,255,0.3)'">
+            <div style="font-size:0.82rem; font-weight:700; color:var(--cyan); margin-bottom:0.2rem;">⚡ Basit1 Coder</div>
+            <div style="font-size:0.7rem; color:#94a3b8;">Devin/OpenHands code gen (Groq 120B + Qwen 32B)</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.9); border:1px solid rgba(168,85,247,0.3); border-radius:10px; padding:0.65rem; cursor:pointer; transition:all 0.2s;" onclick="switchEngineTab('basit2')" onmouseover="this.style.borderColor='#a855f7'" onmouseout="this.style.borderColor='rgba(168,85,247,0.3)'">
+            <div style="font-size:0.82rem; font-weight:700; color:#c084fc; margin-bottom:0.2rem;">🧠 Basit2 Research</div>
+            <div style="font-size:0.7rem; color:#94a3b8;">Claude 3.7 Extended Thinking, 100+ source web synthesis</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.9); border:1px solid rgba(16,185,129,0.3); border-radius:10px; padding:0.65rem; cursor:pointer; transition:all 0.2s;" onclick="switchEngineTab('basit3')" onmouseover="this.style.borderColor='#10b981'" onmouseout="this.style.borderColor='rgba(16,185,129,0.3)'">
+            <div style="font-size:0.82rem; font-weight:700; color:#34d399; margin-bottom:0.2rem;">🛡️ Basit3 Security</div>
+            <div style="font-size:0.7rem; color:#94a3b8;">OWASP 20 rules, zero-hang watchdog, CVE scanner</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.9); border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:0.65rem; cursor:pointer; transition:all 0.2s;" onclick="switchEngineTab('basit4')" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='rgba(245,158,11,0.3)'">
+            <div style="font-size:0.82rem; font-weight:700; color:#fbbf24; margin-bottom:0.2rem;">📈 Basit4 Hedge Fund</div>
+            <div style="font-size:0.7rem; color:#94a3b8;">6-persona consensus (Buffett/Cathie/Munger/Ackman/Quant)</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.9); border:1px solid rgba(236,72,153,0.3); border-radius:10px; padding:0.65rem; cursor:pointer; transition:all 0.2s;" onclick="switchEngineTab('basitswarm')" onmouseover="this.style.borderColor='#ec4899'" onmouseout="this.style.borderColor='rgba(236,72,153,0.3)'">
+            <div style="font-size:0.82rem; font-weight:700; color:#f472b6; margin-bottom:0.2rem;">🌀 BasitSwarm 100X</div>
+            <div style="font-size:0.7rem; color:#94a3b8;">100 parallel agents across 6 hardware squadrons</div>
+          </div>
+          <div style="background:rgba(15,23,42,0.9); border:1px solid rgba(59,130,246,0.3); border-radius:10px; padding:0.65rem; cursor:pointer; transition:all 0.2s;" onclick="switchEngineTab('arsenal')" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='rgba(59,130,246,0.3)'">
+            <div style="font-size:0.82rem; font-weight:700; color:#60a5fa; margin-bottom:0.2rem;">🌐 AI Arsenal</div>
+            <div style="font-size:0.7rem; color:#94a3b8;">Dual-node GPU cluster (RTX A6000 + RTX 5090 Kimi K3)</div>
+          </div>
+        </div>
+
+        <!-- Assistant Query Input Form -->
+        <div style="display:flex; gap:0.6rem; margin-bottom:0.75rem; align-items:center;">
+          <input id="assistant-task-input" type="text" placeholder="Hukm karein Basit bhai — koi bhi kaam, code, research, security, stock ya swarm task..." 
+            value="Basit bhai ke liye full sovereign assistant briefing aur live system overview do"
+            style="flex:1; background:rgba(15,23,42,0.95); color:#f8fafc; border:1px solid rgba(245,158,11,0.45); border-radius:8px; padding:0.65rem 0.9rem; font-size:0.88rem; outline:none;"
+            onkeydown="if(event.key==='Enter') runAssistantInteractive()">
+          <button id="btn-run-assistant" class="btn" style="background:linear-gradient(135deg, rgba(245,158,11,0.3), rgba(236,72,153,0.3)); border-color:#f59e0b; color:#fbbf24; padding:0.65rem 1.25rem; font-weight:800; white-space:nowrap; box-shadow:0 0 15px rgba(245,158,11,0.3);" onclick="runAssistantInteractive()">
+            👑 Dispatch Assistant
+          </button>
+        </div>
+
+        <!-- Assistant Output Container -->
+        <div id="assistant-output-container" style="display:none; margin-top:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; font-size:0.78rem;">
+            <span id="assistant-telemetry" style="color:#fbbf24; font-weight:700;">👑 Sovereign Assistant Briefing Ready</span>
+            <div style="display:flex; gap:0.4rem;">
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(245,158,11,0.15); border-color:#f59e0b; color:#fbbf24;" onclick="copyToClipboard(document.getElementById('assistant-code-box').innerText)">📋 Copy</button>
+              <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.72rem; background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#f87171;" onclick="document.getElementById('assistant-output-container').style.display='none'">✕ Close</button>
+            </div>
+          </div>
+          <pre id="assistant-code-box" class="engine-output-box" style="white-space:pre-wrap; border-color:rgba(245,158,11,0.4); max-height:450px; overflow-y:auto; line-height:1.5; font-size:0.82rem;"></pre>
+        </div>
+      </div>
+
       <!-- ⚡ PANEL 1: BASIT1 FAST CODE STUDIO -->
-      <div class="engine-panel active" id="panel-basit1">
+      <div class="engine-panel" id="panel-basit1">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
           <div>
             <h3 style="color:var(--cyan); font-size:1.05rem; display:flex; align-items:center; gap:0.4rem;">
@@ -2227,7 +2299,14 @@
 
       // ── Interactive Engine Interception ──
       const lowerCmd = cleanCmd.toLowerCase();
-      if (lowerCmd.startsWith('/basit1') || lowerCmd.startsWith('basit 1') || lowerCmd.startsWith('basit1')) {
+      if (lowerCmd.startsWith('/assistant') || lowerCmd.startsWith('assistant') || lowerCmd.includes('full assistant') || lowerCmd.includes('sb kuch kr') || lowerCmd.includes('sab kuch kar') || lowerCmd.includes('all engines')) {
+        const task = cleanCmd.replace(/^\/(?:assistant|universal)\s*/i, '').trim();
+        switchEngineTab('assistant');
+        const inp = document.getElementById('assistant-task-input');
+        if (inp && task) inp.value = task;
+        runAssistantInteractive();
+        return;
+      } else if (lowerCmd.startsWith('/basit1') || lowerCmd.startsWith('basit 1') || lowerCmd.startsWith('basit1')) {
         const task = cleanCmd.replace(/^\/(?:basit1|basit 1|basit1)\s*/i, '').trim();
         switchEngineTab('basit1');
         if (task) {
@@ -2466,6 +2545,54 @@
 
     function triggerBasitEngine(engine) {
       switchEngineTab(engine);
+    }
+
+    // 👑 Sovereign Assistant Interactive Execution
+    async function runAssistantInteractive() {
+      const taskInput = document.getElementById('assistant-task-input');
+      const btn = document.getElementById('btn-run-assistant');
+      const outContainer = document.getElementById('assistant-output-container');
+      const codeBox = document.getElementById('assistant-code-box');
+      const telemetry = document.getElementById('assistant-telemetry');
+
+      const task = (taskInput ? taskInput.value.trim() : '') || 'Basit bhai ke liye full sovereign assistant briefing aur live system overview do';
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = '⏳ Consulting Engines...';
+      }
+      if (outContainer) outContainer.style.display = 'block';
+      if (codeBox) {
+        codeBox.innerText = '👑 Consulting 6 Autonomous Engines across Dual-Node GPU Cluster...\n• Basit1 (Code) • Basit2 (Research) • Basit3 (Security)\n• Basit4 (Hedge Fund) • BasitSwarm (100X) • AI Arsenal (Dual GPU)\n\nSynthesizing sovereign executive intelligence for Basit bhai...';
+      }
+      speakText('Sovereign Assistant active for you, Basit bhai.');
+      logTerminal(`[ASSISTANT]: Consulting all engines for "${task.slice(0, 50)}"`, 'terminal-system');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/assistant`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task: task })
+        });
+        const data = await res.json();
+        const r = data.result || data;
+        const text = r.response || r.summary || data.summary || 'Assistant execution complete.';
+
+        if (codeBox) codeBox.innerText = text;
+        if (telemetry) {
+          telemetry.innerText = `👑 Executive Intelligence | Latency: ${r.latency_sec || 1.5}s | Mode: ${r.mode || 'Sovereign Assistant'}`;
+        }
+        logTerminal(`[ASSISTANT]: Executive response ready for Basit bhai!`, 'terminal-jarvis');
+        speakText(text.slice(0, 160));
+      } catch (err) {
+        if (codeBox) codeBox.innerText = `Error: ${err.message}`;
+        logTerminal(`[ERROR]: Assistant dispatch error: ${err.message}`, 'terminal-error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = '👑 Dispatch Assistant';
+        }
+      }
     }
 
     // Basit1 Preset & Execution

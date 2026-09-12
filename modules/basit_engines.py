@@ -640,7 +640,7 @@ class OpenSourceArsenalEngine:
                 "active_tokens":hf_active,"models":["Llama-3.3-70B","FLUX.1-dev","BGE-M3"],"icon":"🟢" if hf_active>0 else "🔴"},
             "node_5_claude_openai": {"anthropic":bool(os.getenv("ANTHROPIC_API_KEY")),"openai":bool(os.getenv("OPENAI_API_KEY"))},
             "node_6_gemini": {"hardware":"Google AI Studio Cloud (2M Context)","online":ok_gem or gk_gem,"latency_ms":lat_gem if lat_gem > 0 else 125.0,
-                "models":["gemini-2.0-flash","gemini-2.0-pro-exp","gemini-1.5-pro"],"icon":"🟢" if (ok_gem or gk_gem) else "🔴"},
+                "models":["gemini-3.6-flash","gemini-2.5-flash","gemini-1.5-pro"],"icon":"🟢" if (ok_gem or gk_gem) else "🔴"},
             "node_7_spark": {"hardware":f"Apache Spark ({spark_status.get('mode')})","online":spark_status.get("online",False),"latency_ms":12.0,
                 "models":["Spark-SQL","PySpark-DataFrames","Spark-MLlib","Distributed-RDD"],"spark_ui":spark_status.get("ui_url"),"icon":"🟢" if spark_status.get("online") else "🟡"}
         }
@@ -817,6 +817,100 @@ class GeminiSparkEngine:
 
 
 # ============================================================
+# 8. BASIT UNIVERSAL ASSISTANT -- SOVEREIGN EXECUTIVE ORCHESTRATOR
+# ============================================================
+class BasitUniversalAssistant:
+    BANNER = "BASIT UNIVERSAL ASSISTANT | Sovereign AI Orchestrator | Basit1 + Basit2 + Basit3 + Basit4 + BasitSwarm + Arsenal"
+
+    def __init__(self, brain, b1, b2, b3, b4, sw, ar, gs):
+        self.brain = brain
+        self.b1 = b1
+        self.b2 = b2
+        self.b3 = b3
+        self.b4 = b4
+        self.sw = sw
+        self.ar = ar
+        self.gs = gs
+
+    def execute(self, prompt: str = "") -> Dict[str, Any]:
+        t0 = time.time()
+        p = (prompt or "").strip()
+        plower = p.lower()
+
+        # Dynamic Engine Auto-Routing
+        if any(w in plower for w in ["code", "script", "fastapi", "react", "frontend", "backend", "function", "fix bug", "scaffold"]):
+            res = self.b1.execute(p)
+            res["orchestrated_by"] = "BasitUniversalAssistant -> Basit1 Coder"
+            return res
+
+        if any(w in plower for w in ["research", "explain", "trend", "what is", "survey", "report", "paper", "deep search"]):
+            res = self.b2.execute(p)
+            res["orchestrated_by"] = "BasitUniversalAssistant -> Basit2 Researcher"
+            return res
+
+        if any(w in plower for w in ["security", "owasp", "cve", "vulnerability", "audit", "kill zombie", "sweep", "git checkpoint"]):
+            res = self.b3.execute(p)
+            res["orchestrated_by"] = "BasitUniversalAssistant -> Basit3 Guardian"
+            return res
+
+        if any(w in plower for w in ["stock", "ticker", "invest", "nvda", "btc", "eth", "crypto", "hedge", "buffett", "price"]):
+            res = self.b4.execute(p)
+            res["orchestrated_by"] = "BasitUniversalAssistant -> Basit4 HedgeFund"
+            return res
+
+        if any(w in plower for w in ["swarm", "100 agents", "parallel agents", "multi squadron", "full stack saas"]):
+            res = self.sw.execute(p)
+            res["orchestrated_by"] = "BasitUniversalAssistant -> BasitSwarm 100X"
+            return res
+
+        if any(w in plower for w in ["cluster", "gpu", "a6000", "5090", "hardware", "nodes", "matrix"]):
+            res = self.ar.get_cluster_matrix()
+            res["orchestrated_by"] = "BasitUniversalAssistant -> OpenSource Arsenal"
+            return res
+
+        # Executive Sovereign Assistant Synthesis for Basit bhai
+        sys_prompt = (
+            "You are Basit Jarvis — the Sovereign, Ultra-Intelligent AI Personal Assistant and Executive Operating System for Basit bhai. "
+            "You have direct command over 6 specialized autonomous engines:\n"
+            "1. Basit1: Devin/OpenHands Ultra-Fast Code Gen (Groq 120B, Mistral Codestral, RTX A6000 Qwen 32B)\n"
+            "2. Basit2: Multi-Agent Deep Research, Claude 3.7 Extended Thinking, 100+ Source Synthesis, B2B Leads\n"
+            "3. Basit3: Enterprise OWASP Security, 24/7 Zero-Hang Process Guard, Zombie Sweeper, CVE Scanner\n"
+            "4. Basit4: Autonomous AI Hedge Fund (Warren Buffett, Cathie Wood, Charlie Munger, Bill Ackman, DeepSeek-R1)\n"
+            "5. BasitSwarm: 100-Agent Ultra-Parallel Multi-Model Burst Engine across 6 Hardware Squadrons\n"
+            "6. OpenSource AI Arsenal: Dual-Node GPU Cluster (Local RTX A6000 48GB + Remote RTX 5090 Kimi K3 1M Context)\n\n"
+            "Tone: Charismatic, loyal, sharp, executive, bilingual (fluent natural Roman Urdu + crisp English). "
+            "Address the user as 'Basit bhai'. Give clear, high-impact answers and lay out actionable steps."
+        )
+
+        user_q = p or "Full sovereign assistant briefing do Basit bhai ke liye."
+        ai_resp = (
+            self.brain._ask_gemini(user_q, system_prompt=sys_prompt, max_tokens=2500)
+            or self.brain._ask_groq(user_q, system_prompt=sys_prompt, max_tokens=1500)
+            or self.brain._ask_mistral(user_q, system_prompt=sys_prompt)
+            or self.brain.ask(user_q, task_type="general")
+        )
+
+        elapsed = round(time.time() - t0, 2)
+        return {
+            "engine": "/assistant",
+            "mode": "Sovereign Executive Assistant",
+            "boss": "Basit bhai",
+            "latency_sec": elapsed,
+            "response": ai_resp,
+            "summary": f"Basit Jarvis Sovereign Assistant online — {len(ai_resp.split())} words delivered in {elapsed}s.",
+            "active_quadrants": {
+                "basit1_code": "Devin/OpenHands (Groq 120B + Codestral + Qwen 32B)",
+                "basit2_research": "Claude 3.7 Sonnet + Deep Research + GraphRAG",
+                "basit3_security": "OWASP 20 Rules + Zero-Hang Watchdog + CVE Audit",
+                "basit4_hedgefund": "6-Persona Consensus (Buffett/Cathie/Munger/Ackman/Quant)",
+                "basitswarm_100x": "100-Agent Ultra-Parallel Burst across 6 Squadrons",
+                "opensource_arsenal": "Dual-Node GPU Cluster (RTX A6000 + RTX 5090 Kimi K3)"
+            },
+            "banner": self.BANNER
+        }
+
+
+# ============================================================
 # MASTER DISPATCHER
 # ============================================================
 class BasitEngines:
@@ -831,10 +925,12 @@ class BasitEngines:
         self.ar = OpenSourceArsenalEngine(brain)
         self.bl = BasitLoopEngine(brain, self.b1, self.b3)
         self.gs = GeminiSparkEngine(brain)
+        self.assistant = BasitUniversalAssistant(brain, self.b1, self.b2, self.b3, self.b4, self.sw, self.ar, self.gs)
 
     def dispatch(self, name: str, task: str, target_dir: str = None) -> Dict[str, Any]:
         n = name.lower().replace("/","")
         d = target_dir or self.dir
+        if any(k in n for k in ["assistant", "universal", "sbkuch", "sabkuch"]): return self.assistant.execute(task)
         if "basit1" in n or n == "code":   return self.b1.execute(task, d)
         if "basit2" in n or n == "research": return self.b2.execute(task)
         if "basit3" in n or n in ["security","guard","audit"]: return self.b3.execute(task or "all", d)
@@ -843,7 +939,7 @@ class BasitEngines:
         if "arsenal" in n or "opensource" in n or "cluster" in n: return self.ar.get_cluster_matrix()
         if "basitloop" in n or n == "loop": return self.bl.execute_loop(task, d)
         if any(k in n for k in ["gemini", "spark"]): return self.gs.execute(query_or_code=task)
-        return {"error": f"Unknown engine '{name}'", "available": ["basit1","basit2","basit3","basit4","basitswarm","arsenal","basitloop","gemini-spark"]}
+        return {"error": f"Unknown engine '{name}'", "available": ["assistant","basit1","basit2","basit3","basit4","basitswarm","arsenal","basitloop","gemini-spark"]}
 
 
 # ============================================================
