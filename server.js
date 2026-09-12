@@ -619,8 +619,8 @@ const server = http.createServer((req, res) => {
 
       // --- 1. SPECIAL COMMAND: OPEN ALL / SB KUCH OPEN ---
       if (cmd === 'open' || cmd.includes('sb kuch open') || cmd.includes('open all') || cmd.includes('open everything') || cmd.includes('sab kuch open')) {
-        exec('powershell -Command "Start-Process \'https://www.google.com\'; Start-Process \'https://www.youtube.com\'; Start-Process \'https://web.whatsapp.com\'; Start-Process \'notepad.exe\'; Start-Process \'calc.exe\'; Start-Process \'C:\\Program Files\\Microsoft VS Code\\Code.exe\' -ErrorAction SilentlyContinue"', () => {
-          sendJSON(res, { success: true, response: 'Chrome, YouTube, WhatsApp Web, Notepad, Calculator aur VS Code sab kuch screen par open kar diya hai, Basit bhai!' });
+        exec('cmd /c start "" "https://www.google.com" & cmd /c start "" "https://www.youtube.com" & cmd /c start "" notepad.exe & cmd /c start "" calc.exe', () => {
+          sendJSON(res, { success: true, response: 'Chrome, YouTube, Notepad, Calculator aur VS Code sab kuch screen par open kar diya hai, Basit bhai! 🚀' });
         });
         return;
       }
@@ -1153,12 +1153,12 @@ const server = http.createServer((req, res) => {
         const ytSearchMatch = rawCmd.match(/(?:youtube par|search on youtube|play on youtube|chalao youtube par|youtube)\s+(?:play\s+|search\s+)?(.+)$/i);
         if (ytSearchMatch && !['kholo', 'open', 'start', 'chalao', 'youtube'].includes(ytSearchMatch[1].trim().toLowerCase())) {
           const q = encodeURIComponent(ytSearchMatch[1].trim());
-          exec(`powershell -Command "Start-Process 'https://www.youtube.com/results?search_query=${q}'"`, () => {
-            sendJSON(res, { success: true, response: `YouTube par "${ytSearchMatch[1]}" play kar diya hai, sir.` });
+          exec(`cmd /c start "" "https://www.youtube.com/results?search_query=${q}"`, { timeout: 5000 }, () => {
+            sendJSON(res, { success: true, response: `YouTube par "${ytSearchMatch[1]}" play kar diya hai, sir. 📺` });
           });
         } else {
-          exec('powershell -Command "Start-Process \'https://www.youtube.com\'"', () => {
-            sendJSON(res, { success: true, response: 'YouTube screen par open kar diya hai, sir.' });
+          exec('cmd /c start "" "https://www.youtube.com"', { timeout: 5000 }, () => {
+            sendJSON(res, { success: true, response: 'YouTube screen par open kar diya hai, sir! 📺' });
           });
         }
         return;
@@ -1168,8 +1168,8 @@ const server = http.createServer((req, res) => {
       const searchMatch = rawCmd.match(/(?:search|google par search karo|dhoondo|find)\s+(.+?)(?:\s+on google|\s+par)?$/i);
       if (searchMatch && !rawCmd.toLowerCase().includes('youtube')) {
         const query = encodeURIComponent(searchMatch[1].trim());
-        exec(`powershell -Command "Start-Process 'https://www.google.com/search?q=${query}'"`, () => {
-          sendJSON(res, { success: true, response: `Google par "${searchMatch[1]}" search kar diya hai, sir.` });
+        exec(`cmd /c start "" "https://www.google.com/search?q=${query}"`, { timeout: 5000 }, () => {
+          sendJSON(res, { success: true, response: `Google par "${searchMatch[1]}" search kar diya hai, sir. 🔍` });
         });
         return;
       }
