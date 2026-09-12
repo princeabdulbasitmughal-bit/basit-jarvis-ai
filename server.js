@@ -1243,11 +1243,11 @@ const server = http.createServer((req, res) => {
         });
         return;
       }
-      if (cmd.includes('file explorer') || cmd.includes('explorer') || cmd.includes('my pc') || cmd.includes('this pc') || cmd.includes('open files') || (cmd.includes('files') && cmd.includes('open'))) {
-        exec('powershell -Command "Start-Process explorer.exe"', { timeout: 5000 }, (err) => {
+      if (cmd.includes('file explorer') || cmd.includes('explorer') || cmd.includes('my pc') || cmd.includes('this pc') || cmd.includes('open files') || cmd.includes('file manager') || (cmd.includes('file') && (cmd.includes('open') || cmd.includes('kholo')))) {
+        exec('powershell -Command "Start-Process explorer.exe -ArgumentList \'shell:MyComputerFolder\'"', { timeout: 5000 }, (err) => {
           if (err) {
-            // Fallback: direct call
-            exec('explorer.exe', { timeout: 3000 });
+            // Fallback: direct call with MyComputer
+            exec('explorer.exe shell:MyComputerFolder', { timeout: 3000 });
           }
           sendJSON(res, { success: true, response: 'File Explorer open kar diya hai, sir! 📂' });
         });
