@@ -656,18 +656,20 @@ const server = http.createServer((req, res) => {
       //          "/basitswarm", "/arsenal", "/basitloop"
       // Backed by: modules/basit_engines.py (real AI execution pipeline)
       // ═══════════════════════════════════════════════════════
+      const isMultiEngine = (cmd.includes('/basit1') && (cmd.includes('/basit2') || cmd.includes('/basit3') || cmd.includes('/basitswarm') || cmd.includes('/opensource')));
       const isAssistant = cmd.startsWith('/assistant') || cmd.startsWith('assistant') ||
-                          cmd.includes('full assistant') || cmd.includes('sb kuch kr') ||
-                          cmd.includes('sab kuch kar') || cmd.includes('sab kuch bano') ||
-                          cmd.includes('assistant bano');
-      const isBasit1 = cmd.startsWith('/basit1') || cmd.startsWith('basit 1') || cmd.startsWith('basit1');
-      const isBasit2 = cmd.startsWith('/basit2') || cmd.startsWith('basit 2') || cmd.startsWith('basit2');
-      const isBasit3 = cmd.startsWith('/basit3') || cmd.startsWith('basit 3') || cmd.startsWith('basit3');
-      const isBasit4 = cmd.startsWith('/basit4') || cmd.startsWith('basit 4') || cmd.startsWith('basit4');
-      const isBasitSwarm = cmd.startsWith('/basitswarm') || cmd.startsWith('basit swarm') || cmd.startsWith('basitswarm');
-      const isArsenal = cmd.startsWith('/arsenal') || cmd.startsWith('/opensource') ||
+                          cmd.includes('assitnat') || cmd.includes('assistant') ||
+                          cmd.includes('full assistant') || cmd.includes('sb kuch') ||
+                          cmd.includes('sab kuch') || cmd.includes('all engines') ||
+                          cmd.includes('sbkuch') || cmd.includes('sabkuch') || isMultiEngine;
+      const isBasit1 = !isMultiEngine && (cmd.startsWith('/basit1') || cmd.startsWith('basit 1') || cmd.startsWith('basit1') || cmd.includes('/basit1'));
+      const isBasit2 = !isMultiEngine && (cmd.startsWith('/basit2') || cmd.startsWith('basit 2') || cmd.startsWith('basit2') || cmd.includes('/basit2'));
+      const isBasit3 = !isMultiEngine && (cmd.startsWith('/basit3') || cmd.startsWith('basit 3') || cmd.startsWith('basit3') || cmd.includes('/basit3'));
+      const isBasit4 = !isMultiEngine && (cmd.startsWith('/basit4') || cmd.startsWith('basit 4') || cmd.startsWith('basit4') || cmd.includes('/basit4'));
+      const isBasitSwarm = !isMultiEngine && (cmd.startsWith('/basitswarm') || cmd.startsWith('basit swarm') || cmd.startsWith('basitswarm') || cmd.includes('/basitswarm'));
+      const isArsenal = !isMultiEngine && (cmd.startsWith('/arsenal') || cmd.startsWith('/opensource') ||
                         cmd.includes('opensource ai arsenal') || cmd.includes('cluster matrix') ||
-                        cmd.includes('gpu matrix') || cmd === 'arsenal';
+                        cmd.includes('gpu matrix') || cmd === 'arsenal');
       const isBasitLoop = cmd.startsWith('/basitloop') || cmd.startsWith('basit loop') || cmd.startsWith('basitloop');
       const isGeminiSpark = cmd.startsWith('/gemini-spark') || cmd.startsWith('/gemini') || cmd.startsWith('/spark') ||
                             cmd.startsWith('gemini spark') || cmd.startsWith('gemini') || cmd.startsWith('spark');

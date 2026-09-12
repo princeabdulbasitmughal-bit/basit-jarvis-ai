@@ -2299,14 +2299,19 @@
 
       // ── Interactive Engine Interception ──
       const lowerCmd = cleanCmd.toLowerCase();
-      if (lowerCmd.startsWith('/assistant') || lowerCmd.startsWith('assistant') || lowerCmd.includes('full assistant') || lowerCmd.includes('sb kuch kr') || lowerCmd.includes('sab kuch kar') || lowerCmd.includes('all engines')) {
-        const task = cleanCmd.replace(/^\/(?:assistant|universal)\s*/i, '').trim();
+      const isMultiEngine = (lowerCmd.includes('/basit1') && (lowerCmd.includes('/basit2') || lowerCmd.includes('/basit3') || lowerCmd.includes('/basitswarm') || lowerCmd.includes('/opensource')));
+      if (lowerCmd.startsWith('/assistant') || lowerCmd.startsWith('assistant') ||
+          lowerCmd.includes('assitnat') || lowerCmd.includes('assistant') ||
+          lowerCmd.includes('full assistant') || lowerCmd.includes('sb kuch') ||
+          lowerCmd.includes('sab kuch') || lowerCmd.includes('all engines') ||
+          lowerCmd.includes('sbkuch') || lowerCmd.includes('sabkuch') || isMultiEngine) {
+        const task = cleanCmd.replace(/^\/(?:assistant|universal)\s*/i, '').trim() || cleanCmd;
         switchEngineTab('assistant');
         const inp = document.getElementById('assistant-task-input');
-        if (inp && task) inp.value = task;
+        if (inp) inp.value = task;
         runAssistantInteractive();
         return;
-      } else if (lowerCmd.startsWith('/basit1') || lowerCmd.startsWith('basit 1') || lowerCmd.startsWith('basit1')) {
+      } else if (!isMultiEngine && (lowerCmd.startsWith('/basit1') || lowerCmd.startsWith('basit 1') || lowerCmd.startsWith('basit1') || lowerCmd.includes('/basit1'))) {
         const task = cleanCmd.replace(/^\/(?:basit1|basit 1|basit1)\s*/i, '').trim();
         switchEngineTab('basit1');
         if (task) {
@@ -2576,7 +2581,7 @@
         });
         const data = await res.json();
         const r = data.result || data;
-        const text = r.response || r.summary || data.summary || 'Assistant execution complete.';
+        const text = r.output || r.response || r.report || r.consensus || r.summary || data.summary || 'Assistant execution complete.';
 
         if (codeBox) codeBox.innerText = text;
         if (telemetry) {
