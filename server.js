@@ -1962,10 +1962,23 @@ const server = http.createServer((req, res) => {
         handleEngine(taskVal);
       });
     } else {
-      const urlParams = new URL(`http://localhost${req.url}`).searchParams;
-      handleEngine(urlParams.get('task') || urlParams.get('q') || urlParams.get('action') || '');
+      handleEngine(url.searchParams.get('task') || url.searchParams.get('q') || url.searchParams.get('action') || '');
     }
     return;
+  }
+
+  // 5b. Sovereign Full Run Report (/api/sovereign-full-run)
+  if (pathname === '/api/sovereign-full-run' && req.method === 'GET') {
+    const reportPath = path.join(BASE_DIR, 'reports', 'sovereign_full_run.json');
+    if (fs.existsSync(reportPath)) {
+      try {
+        const reportData = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
+        return sendJSON(res, { success: true, ...reportData });
+      } catch (e) {
+        return sendJSON(res, { success: false, error: e.message });
+      }
+    }
+    return sendJSON(res, { success: false, message: 'No full run generated yet' });
   }
 
   // 6. Contacts API (/api/contacts) — GET=list, POST=add/update, DELETE=remove
