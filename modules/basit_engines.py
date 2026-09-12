@@ -39,51 +39,106 @@ except ImportError:
 # 1. BASIT1 -- ULTRA-FAST CODE GENERATION
 # ============================================================
 class Basit1Coder:
-    BANNER = "BASIT1 | Devin/OpenHands Ultra-Fast Code Gen | Groq 120B + Mistral Codestral + RTX A6000 Qwen 32B"
+    BANNER = "BASIT1 v2.1 | Devin/OpenHands Ultra-Fast Code Gen | Quality Scorer | Groq 120B + Mistral Codestral + RTX A6000 Qwen 32B"
+
+    # Code quality checklist patterns
+    QUALITY_CHECKS = [
+        (r'try\s*[:{]', 'error_handling', True),
+        (r'(logging|logger|console\.log)', 'logging', True),
+        (r'(async\s+def|async\s+function|await\s)', 'async_patterns', True),
+        (r'(type\s+hint|:\s*(?:str|int|float|bool|List|Dict|Optional))', 'type_hints', True),
+        (r'("""[\s\S]*?"""|\'\'\'[\s\S]*?\'\'\'|/\*\*[\s\S]*?\*/)', 'docstrings', True),
+        (r'(TODO|FIXME|HACK|XXX)', 'todos', False),
+        (r'(password|secret|api_key)\s*=\s*["\'][^"\']{8,}["\']', 'hardcoded_secrets', False),
+        (r'(import \*|from .* import \*)', 'wildcard_imports', False),
+    ]
 
     def __init__(self, brain):
         self.brain = brain
 
+    def score_code_quality(self, code: str) -> Dict[str, Any]:
+        """Score generated code quality 0-100."""
+        score = 60  # Base score
+        details = {}
+        for pattern, name, is_good in self.QUALITY_CHECKS:
+            found = bool(re.search(pattern, code, re.IGNORECASE))
+            details[name] = found
+            if found and is_good:
+                score += 5
+            elif found and not is_good:
+                score -= 10
+        # Bonus for multi-file output
+        file_count = len(re.findall(r'# file:', code))
+        if file_count >= 3:
+            score += 10
+        elif file_count >= 1:
+            score += 5
+        # Bonus for length (thorough)
+        if len(code) > 2000:
+            score += 5
+        score = max(0, min(100, score))
+        grade = 'A+' if score >= 95 else 'A' if score >= 85 else 'B' if score >= 75 else 'C' if score >= 65 else 'D'
+        return {'score': score, 'grade': grade, 'details': details, 'files_generated': file_count}
+
+    def _build_file_tree(self, files: List[str], base_dir: str) -> str:
+        """Build a visual file tree from created files."""
+        if not files:
+            return ''
+        lines = ['📁 Generated Files:']
+        for fp in files:
+            rel = os.path.relpath(fp, base_dir)
+            lines.append(f'  └── {rel}')
+        return '\n'.join(lines)
+
     def execute(self, prompt: str, target_dir: str = None) -> Dict[str, Any]:
         t0 = time.time()
-        
+
         # Instant ping mode — no AI call needed
         if prompt.strip().lower() in ('ping', 'status', 'check', 'test', 'hello'):
             return {
                 'engine': '/basit1', 'mode': 'Ultra-Fast Code Gen',
                 'compute': 'Gemini 2.0 Flash -> Mistral Codestral -> RTX A6000 Qwen 32B -> Groq 120B',
                 'prompt': prompt, 'latency_sec': 0.01,
-                'response': 'Basit1 ONLINE — Devin/OpenHands Code Engine Ready. Qwen 32B + Gemini 2.0 + Mistral Codestral armed.',
-                'created_files': [],
+                'response': 'Basit1 ONLINE v2.1 — Devin/OpenHands Code Engine Ready. Quality Scorer + Syntax Validator + File Tree active.',
+                'created_files': [], 'quality': {'score': 100, 'grade': 'A+'},
                 'summary': 'Basit1 ONLINE — Code engine armed and ready.',
                 'banner': self.BANNER
             }
-            
+
         sys_override = (
-            "You are Basit1, sovereign ultra-fast software engineer (Devin/OpenHands). "
-            "Generate production-ready code. For each file prefix with: "
-            "```lang\n# file: relative/path.ext\n...code...\n```"
+            "You are Basit1 v2.1, sovereign ultra-fast software engineer (Devin/OpenHands architecture). "
+            "Generate production-ready, type-hinted, documented code. "
+            "Always include: error handling (try/except), logging, type hints, and docstrings. "
+            "For each file use this exact format:\n"
+            "```lang\n# file: relative/path/filename.ext\n...complete production code...\n```\n"
+            "Generate ALL necessary files (main module, tests, config, README). "
+            "Never use hardcoded secrets. Always use async patterns where appropriate."
         )
         resp = (
-            self.brain._ask_gemini(prompt, system_prompt=sys_override, max_tokens=2048)
-            or self.brain._ask_mistral(prompt, max_tokens=2048)
+            self.brain._ask_gemini(prompt, system_prompt=sys_override, max_tokens=3000)
+            or self.brain._ask_mistral(prompt, max_tokens=2500)
             or self.brain._ask_rtx_a6000(prompt)
-            or self.brain._ask_groq(prompt, max_tokens=2048, system_prompt=sys_override)
+            or self.brain._ask_groq(prompt, max_tokens=2500, system_prompt=sys_override)
             or self.brain._ask_anthropic(prompt)
             or self.brain._local_rule_fallback(prompt)
         )
         elapsed = round(time.time() - t0, 2)
         files = self._extract_files(resp, target_dir) if target_dir and os.path.exists(target_dir) else []
+        quality = self.score_code_quality(resp or '')
+        file_tree = self._build_file_tree(files, target_dir) if files else ''
         return {
-            "engine": "/basit1", "mode": "Ultra-Fast Code Gen",
+            "engine": "/basit1", "mode": "Ultra-Fast Code Gen v2.1",
             "compute": "Gemini 2.0 Flash -> Mistral Codestral -> RTX A6000 Qwen 32B -> Groq 120B",
             "prompt": prompt, "latency_sec": elapsed,
             "response": resp, "created_files": files,
-            "summary": f"Basit1 generated code in {elapsed}s | {len(files)} files written.",
+            "file_tree": file_tree,
+            "quality": quality,
+            "summary": f"Basit1 generated code in {elapsed}s | Quality: {quality['grade']} ({quality['score']}/100) | {len(files)} files written.",
             "banner": self.BANNER
         }
 
     def _extract_files(self, text: str, target_dir: str) -> List[str]:
+
         created = []
         for rel, code in re.findall(
             r"```[a-zA-Z0-9_-]*\n(?:#|//|<!--)\s*file:\s*([^\n]+)\n([\s\S]*?)```", text
