@@ -138,13 +138,21 @@ class Basit1Coder:
         }
 
     def _extract_files(self, text: str, target_dir: str) -> List[str]:
-
         created = []
-        for rel, code in re.findall(
+        target_dir_abs = os.path.abspath(target_dir)
+        for raw_rel, code in re.findall(
             r"```[a-zA-Z0-9_-]*\n(?:#|//|<!--)\s*file:\s*([^\n]+)\n([\s\S]*?)```", text
         ):
-            fp = os.path.join(target_dir, rel.strip())
+            # Clean filename: strip trailing comment tokens like --> or */ and whitespace
+            clean_rel = re.sub(r'(-->|\*/|#).*$', '', raw_rel).strip()
+            clean_rel = clean_rel.strip('\'"` ')
+            if not clean_rel:
+                continue
+            fp = os.path.abspath(os.path.join(target_dir_abs, clean_rel))
+            # Security: Path traversal prevention
             try:
+                if os.path.commonpath([target_dir_abs, fp]) != target_dir_abs:
+                    continue
                 os.makedirs(os.path.dirname(fp), exist_ok=True)
                 open(fp, "w", encoding="utf-8").write(code)
                 created.append(fp)
@@ -447,7 +455,7 @@ class Basit4HedgeFund:
         )
         resp = (
             self.brain._ask_gemini(prompt, max_tokens=3000)
-            or self.brain._ask_anthropic(query)
+            or self.brain._ask_anthropic(prompt)
             or self.brain._ask_groq(prompt, max_tokens=2500)
             or self.brain._ask_rtx_a6000(prompt)
             or self.brain._local_rule_fallback(query)

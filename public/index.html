@@ -1977,16 +1977,23 @@
     }
     initVoices();
 
-    // Speak Text via Web Speech Synthesis API
+    // Speak Text via Web Speech Synthesis API (GC-safe)
+    window._jarvisUtterances = window._jarvisUtterances || [];
     function speakText(text) {
       if (!text || isSpeakerMuted || !synth) return;
       try {
         synth.cancel(); // Stop pending speech
         const cleanText = text.replace(/[*#`_\[\]]/g, '').trim();
         const utterance = new SpeechSynthesisUtterance(cleanText);
+        window._jarvisUtterances.push(utterance);
         if (preferredVoice) utterance.voice = preferredVoice;
         utterance.rate = 1.05;
         utterance.pitch = 1.0;
+
+        const cleanupUtterance = () => {
+          const idx = window._jarvisUtterances.indexOf(utterance);
+          if (idx !== -1) window._jarvisUtterances.splice(idx, 1);
+        };
 
         utterance.onstart = () => {
           isJarvisSpeaking = true;
@@ -1996,6 +2003,7 @@
         };
 
         utterance.onend = () => {
+          cleanupUtterance();
           const reactor = document.getElementById('reactor');
           if (reactor) reactor.classList.remove('speaking');
           // Buffer time so mic doesn't capture last echo
@@ -2008,6 +2016,7 @@
         };
 
         utterance.onerror = () => {
+          cleanupUtterance();
           isJarvisSpeaking = false;
         };
 
@@ -2600,6 +2609,9 @@
           btn.disabled = false;
           btn.innerText = '👑 Dispatch Assistant';
         }
+      }
+    }
+
     // 🚀 SB KUCH KARO — Master 6-Engine Sovereign Burst
     async function runSbKuchKaro() {
       switchEngineTab('assistant');
