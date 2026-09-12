@@ -1970,7 +1970,32 @@ const server = http.createServer((req, res) => {
     });
     return;
   }
+  // 11a. System: Open Windows Sound Settings (POST /api/system/sound_settings)
+  if (pathname === '/api/system/sound_settings' && req.method === 'POST') {
+    const { exec } = require('child_process');
+    // Open Windows Sound -> Recording Devices panel
+    exec('powershell -command "Start-Process mmsys.cpl -ArgumentList \',1\'"', { timeout: 5000 }, (err) => {
+      if (err) {
+        // Fallback: open control panel sound
+        exec('control mmsys.cpl,,1', { timeout: 5000 });
+      }
+    });
+    return sendJSON(res, { success: true, message: 'Windows Sound Recording panel khol diya' });
+  }
+
+  // 11a2. System: Mic Diagnostic Test (GET /api/system/mic_status)
+  if (pathname === '/api/system/mic_status' && req.method === 'GET') {
+    const { exec } = require('child_process');
+    exec('powershell -command "Get-WmiObject Win32_SoundDevice | Select-Object Name,Status | ConvertTo-Json"', { timeout: 5000 }, (err, stdout) => {
+      let devices = [];
+      try { devices = JSON.parse(stdout || '[]'); if (!Array.isArray(devices)) devices = [devices]; } catch(e) {}
+      return sendJSON(res, { success: true, devices, count: devices.length });
+    });
+    return;
+  }
+
   // 11b. Live Dashboard Status (GET /api/dashboard)
+
   if (pathname === '/api/dashboard' && req.method === 'GET') {
     const tele = getTelemetry();
     const apiKeys = {

@@ -578,7 +578,7 @@ class OpenSourceArsenalEngine:
             "node_2_rtx_5090": {"hardware":"NVIDIA RTX 5090 (Remote)","online":ok2,"latency_ms":lat2,
                 "models":["Kimi K3 1M","DeepSeek-V4-Pro","Qwen3.5-397B"],"icon":"🟢" if ok2 else "🔴"},
             "node_3_groq": {"hardware":"Groq LPU 0.8s (220 tok/s)","online":ok3,"latency_ms":lat3,
-                "models":gmodels or ["openai/gpt-oss-120b"],"icon":"🟢" if ok3 else ("🟡" if not gk else "🔴")},
+                "models":gmodels or ["openai/gpt-oss-120b"],"icon":"🟢" if ok3 else ("🟡" if not bool(os.getenv("GROQ_API_KEY")) else "🔴")},
             "node_3b_mistral": {"hardware":"Mistral Cloud","online":ok3b,"latency_ms":lat3b,
                 "models":["codestral-latest","mistral-large-2"],"icon":"🟢" if ok3b else "🔴"},
             "node_4_hf_pool": {"hardware":"HuggingFace 15-Token Pool","online":hf_active>0,

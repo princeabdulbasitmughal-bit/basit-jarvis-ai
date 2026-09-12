@@ -1970,8 +1970,11 @@
         return;
       }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop());
+        // FIX: Don't stop the stream — keep it alive so startVoiceListening visualizer works
+        if (!micStream) {
+          micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          initAudioVisualizer(micStream);
+        }
         document.getElementById('mic-alert').style.display = 'none';
         startVoiceListening();
       } catch (err) {
@@ -1991,20 +1994,24 @@
             2. <strong>Mobile Phone Ko Wireless Mic Banayein:</strong> Phone ke browser se <code>http://${latestLanIp || '10.25.32.23'}:8888</code> kholein — phone ka mic seedha chalega!<br>
             3. <strong>Neeche Command Box Se Type Karein:</strong> Text command bar se 'Chrome kholo', 'take a screenshot', ya '/basit1' likhein.
           `;
-          alert("Windows mein koi Microphone hardware detect nahi hua!\n\nChrome mein permission 'Allow' hai lekin PC ke audio port mein Headset/Earphones plugged in nahi hain.\n\nHal:\n1. PC ke microphone jack mein headset/mic lagayein.\n2. Ya mobile phone se http://" + (latestLanIp || '10.25.32.23') + ":8888 kholein (phone ka mic seedha chalega).\n3. Ya neeche diye gaye Command Box se type karein.");
+          // FIX: Don't use alert() — use in-page banner only (less disruptive)
+          logTerminal('[MIC]: No hardware mic found. Use phone as wireless mic or type commands below.', 'terminal-system');
+          // Still start voice recognition — Chrome's Web Speech API can work without physical mic in some cases
+          startVoiceListening();
         } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
           alertTitle.innerText = '🎙️ Chrome Microphone Access Blocked';
           alertBody.innerHTML = `
             Chrome address bar mein <strong>🔒 Lock icon</strong> ya <strong>Tune icon</strong> par click karein aur Microphone ko <strong>'Allow'</strong> karein. Phir 'Retry' dabayein.
           `;
-          alert("Chrome is blocking microphone. Address bar mein Lock / Settings icon click karein aur Microphone ko 'Allow' karein.");
+          logTerminal('[MIC ERROR]: Chrome microphone permission blocked. Address bar mein lock icon se Allow karein.', 'terminal-error');
         } else {
           alertTitle.innerText = `⚠️ Microphone Error (${err.name})`;
           alertBody.innerText = err.message;
-          alert(`Microphone Error: ${err.message}`);
+          logTerminal(`[MIC ERROR]: ${err.name} — ${err.message}`, 'terminal-error');
         }
       }
     }
+
 
 
     async function startVoiceListening() {
@@ -2082,15 +2089,26 @@
 
         recognition.onerror = (event) => {
           console.warn("Speech recognition error:", event.error);
-          if (event.error === 'not-allowed' || event.error === 'audio-capture') {
+          if (event.error === 'not-allowed') {
             isListening = false;
             clearTimeout(restartTimer);
             try { recognition.abort(); } catch(e) {}
             stopVoiceListening();
-            logTerminal(`[VOICE READY]: Physical microphone detect nahi hua. 1-Click Voice Chips ya Mobile Phone (http://${latestLanIp || '10.25.32.23'}:8888) use karein!`, 'terminal-system');
-            setVoicePulse('cyan', 'VOICE READY: Tap chips below or use mobile mic');
+            logTerminal('[MIC ERROR]: Chrome microphone permission blocked. Address bar mein lock icon se Allow karein.', 'terminal-error');
+            document.getElementById('mic-alert').style.display = 'flex';
+          } else if (event.error === 'audio-capture') {
+            // FIX: Don't stop — show hint and auto-retry after 2s
+            logTerminal(`[VOICE READY]: Physical mic detect nahi hua lekin voice recognition continue kar raha hai. Phone mic use karein: http://${latestLanIp || '10.25.32.23'}:8888`, 'terminal-system');
+            setVoicePulse('cyan', 'VOICE READY: Type commands or use phone mic');
+            // Auto-retry recognition after 2s — Chrome may recover
+            if (isListening) {
+              clearTimeout(restartTimer);
+              restartTimer = setTimeout(() => {
+                if (isListening) try { recognition.start(); } catch(e) {}
+              }, 2000);
+            }
           } else if (event.error === 'no-speech') {
-            // Harmless pause, ignore and allow smooth continuation
+            // Harmless pause — ignore and allow smooth continuation
           } else {
             console.log(`Voice event error: ${event.error}, will auto-recover.`);
           }
