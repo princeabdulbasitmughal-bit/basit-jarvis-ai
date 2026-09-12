@@ -118,6 +118,32 @@ function getTelemetry() {
   };
 }
 
+// ─────────────────────────────────────────────────────────────────
+// launchApp() — Properly opens apps in Windows interactive session
+// Uses cmd /c start so taskbar shows them. AppActivate brings focus.
+// ─────────────────────────────────────────────────────────────────
+function launchApp(exeOrUrl, processName, callback) {
+  const { exec } = require('child_process');
+  // cmd /c start "" ensures the window appears in user's taskbar
+  const isUrl = exeOrUrl.startsWith('http');
+  const startCmd = isUrl
+    ? `cmd /c start "" "${exeOrUrl}"`
+    : `cmd /c start "" "${exeOrUrl}"`;
+
+  exec(startCmd, { timeout: 6000 }, (err) => {
+    // After 1.2s, AppActivate to bring window to front
+    if (processName) {
+      setTimeout(() => {
+        exec(
+          `powershell -Command "$ws = New-Object -ComObject WScript.Shell; $ws.AppActivate('${processName}')"`,
+          { timeout: 3000 }
+        );
+      }, 1200);
+    }
+    if (callback) callback(err);
+  });
+}
+
 function getLanIp() {
   const nets = os.networkInterfaces();
   for (const k of ['Wi-Fi', 'Ethernet 2', 'Ethernet']) {
@@ -1182,73 +1208,70 @@ const server = http.createServer((req, res) => {
       }
 
       if (cmd.includes('chrome') || (cmd.includes('google') && !cmd.includes('search')) || cmd.includes('browser')) {
-        exec('powershell -Command "Start-Process \'https://www.google.com\'"', () => {
-          sendJSON(res, { success: true, response: 'Google Chrome fresh window mein open kar diya hai, Basit bhai!' });
+        launchApp('https://www.google.com', 'Google Chrome', () => {
+          sendJSON(res, { success: true, response: 'Google Chrome screen par aa gaya hai, Basit bhai! 🌐' });
         });
         return;
       }
 
       // --- 5. VS CODE ---
       if (cmd.includes('vscode') || cmd.includes('vs code') || (cmd.includes('code') && (cmd.includes('open') || cmd.includes('kholo') || cmd.includes('start')))) {
-        exec('powershell -Command "Start-Process \'C:\\Program Files\\Microsoft VS Code\\Code.exe\' -ErrorAction SilentlyContinue; if (!$?) { code . }"', () => {
-          sendJSON(res, { success: true, response: 'VS Code editor screen par open ho gaya hai, sir.' });
+        launchApp('C:\\Program Files\\Microsoft VS Code\\Code.exe', 'Code', (err) => {
+          if (err) exec('cmd /c start "" code', { timeout: 4000 });
+          sendJSON(res, { success: true, response: 'VS Code editor screen par open ho gaya hai, sir! 💻' });
         });
         return;
       }
 
       // --- 6. NOTEPAD ---
       if (cmd.includes('notepad') || cmd.includes('text editor')) {
-        exec('powershell -Command "Start-Process \'notepad.exe\'"', () => {
-          sendJSON(res, { success: true, response: 'Notepad screen par open ho gaya hai, sir.' });
+        launchApp('notepad.exe', 'Notepad', () => {
+          sendJSON(res, { success: true, response: 'Notepad screen par open ho gaya hai, sir! 📝' });
         });
         return;
       }
 
       // --- 7. CALCULATOR ---
       if (cmd.includes('calculator') || cmd.includes('calc') || cmd.includes('hisab')) {
-        exec('powershell -Command "Start-Process \'calc.exe\'"', () => {
-          sendJSON(res, { success: true, response: 'Calculator screen par open kar diya hai, sir.' });
+        launchApp('calc.exe', 'Calculator', () => {
+          sendJSON(res, { success: true, response: 'Calculator screen par open kar diya hai, sir! 🧮' });
         });
         return;
       }
 
       // --- 8. SMART FILE EXPLORER & SHELL FOLDERS ---
       if (cmd.includes('downloads') && (cmd.includes('kholo') || cmd.includes('open') || cmd.includes('folder'))) {
-        exec('powershell -Command "Start-Process explorer.exe -ArgumentList \'shell:Downloads\'"', () => {
+        exec('cmd /c start "" explorer.exe shell:Downloads', { timeout: 5000 }, () => {
           sendJSON(res, { success: true, response: 'Downloads folder open kar diya hai, sir! 📂' });
         });
         return;
       }
       if (cmd.includes('desktop') && (cmd.includes('kholo') || cmd.includes('open') || cmd.includes('folder')) && !cmd.includes('show desktop') && !cmd.includes('desktop dikhao')) {
-        exec('powershell -Command "Start-Process explorer.exe -ArgumentList \'shell:Desktop\'"', () => {
+        exec('cmd /c start "" explorer.exe shell:Desktop', { timeout: 5000 }, () => {
           sendJSON(res, { success: true, response: 'Desktop folder open kar diya hai, sir! 🖥️' });
         });
         return;
       }
       if (cmd.includes('documents') && (cmd.includes('kholo') || cmd.includes('open') || cmd.includes('folder'))) {
-        exec('powershell -Command "Start-Process explorer.exe -ArgumentList \'shell:Personal\'"', () => {
+        exec('cmd /c start "" explorer.exe shell:Personal', { timeout: 5000 }, () => {
           sendJSON(res, { success: true, response: 'Documents folder open kar diya hai, sir! 📁' });
         });
         return;
       }
       if ((cmd.includes('project') || cmd.includes('e drive') || cmd.includes('code folder')) && (cmd.includes('kholo') || cmd.includes('open'))) {
-        exec('powershell -Command "Start-Process explorer.exe -ArgumentList \'E:\\\'"', () => {
+        exec('cmd /c start "" explorer.exe "E:\\"', { timeout: 5000 }, () => {
           sendJSON(res, { success: true, response: 'E Drive projects folder open kar diya hai, sir! 🗂️' });
         });
         return;
       }
       if (cmd.includes('screenshot') && (cmd.includes('kholo') || cmd.includes('folder') || cmd.includes('open'))) {
-        exec(`powershell -Command "Start-Process explorer.exe -ArgumentList '${SCREENSHOTS_DIR}'"`, () => {
+        exec(`cmd /c start "" explorer.exe "${SCREENSHOTS_DIR}"`, { timeout: 5000 }, () => {
           sendJSON(res, { success: true, response: 'Screenshots gallery folder open kar diya hai, sir! 📸' });
         });
         return;
       }
       if (cmd.includes('file explorer') || cmd.includes('explorer') || cmd.includes('my pc') || cmd.includes('this pc') || cmd.includes('open files') || cmd.includes('file manager') || (cmd.includes('file') && (cmd.includes('open') || cmd.includes('kholo')))) {
-        exec('powershell -Command "Start-Process explorer.exe -ArgumentList \'shell:MyComputerFolder\'"', { timeout: 5000 }, (err) => {
-          if (err) {
-            // Fallback: direct call with MyComputer
-            exec('explorer.exe shell:MyComputerFolder', { timeout: 3000 });
-          }
+        exec('cmd /c start "" explorer.exe shell:MyComputerFolder', { timeout: 5000 }, () => {
           sendJSON(res, { success: true, response: 'File Explorer open kar diya hai, sir! 📂' });
         });
         return;
