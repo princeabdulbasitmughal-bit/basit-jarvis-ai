@@ -84,8 +84,9 @@ class AIBrain:
                 self.hf_tokens.append(tok)
         self._hf_index = 0
 
-        # Cache setup
+        # Cache setup (thread-safe)
         self._cache = OrderedDict()
+        self._cache_lock = threading.Lock()
         self._cache_max = 50
         self._cache_ttl = 300  # 5 minutes
 
@@ -441,22 +442,24 @@ class AIBrain:
     # RESPONSE CACHE  &  PARALLEL RACING
     # --------------------------------------------------------------------------
     def _cache_get(self, key: str) -> Optional[str]:
-        """Retrieve cached response if still valid (TTL: 5 min)."""
-        if key in self._cache:
-            ts, val = self._cache[key]
-            if time.time() - ts < self._cache_ttl:
-                self._cache.move_to_end(key)
-                return val
-            del self._cache[key]
-        return None
+        """Retrieve cached response if still valid (TTL: 5 min). Thread-safe."""
+        with self._cache_lock:
+            if key in self._cache:
+                ts, val = self._cache[key]
+                if time.time() - ts < self._cache_ttl:
+                    self._cache.move_to_end(key)
+                    return val
+                del self._cache[key]
+            return None
 
     def _cache_put(self, key: str, value: str) -> None:
-        """Store response in LRU cache, evicting oldest when full."""
-        if key in self._cache:
-            self._cache.move_to_end(key)
-        self._cache[key] = (time.time(), value)
-        while len(self._cache) > self._cache_max:
-            self._cache.popitem(last=False)
+        """Store response in LRU cache, evicting oldest when full. Thread-safe."""
+        with self._cache_lock:
+            if key in self._cache:
+                self._cache.move_to_end(key)
+            self._cache[key] = (time.time(), value)
+            while len(self._cache) > self._cache_max:
+                self._cache.popitem(last=False)
 
     def estimate_tokens(self, text: str) -> int:
         """Rough token estimate (1 token ≈ 4 chars)."""

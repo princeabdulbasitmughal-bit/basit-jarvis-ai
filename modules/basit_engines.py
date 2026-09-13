@@ -114,12 +114,18 @@ class Basit1Coder:
             "Generate ALL necessary files (main module, tests, config, README). "
             "Never use hardcoded secrets. Always use async patterns where appropriate."
         )
+        full_code_prompt = (
+            f"{prompt}\n\n"
+            "MANDATORY REQUIREMENT: Output the complete, production-ready code for ALL files using this exact format:\n"
+            "```python\n# file: app/filename.py\n...complete code...\n```\n"
+            "Do not just explain or plan. Write out the actual file implementations now."
+        )
         resp = (
-            self.brain._ask_gemini(prompt, system_prompt=sys_override, max_tokens=3000)
-            or self.brain._ask_mistral(prompt, max_tokens=2500)
-            or self.brain._ask_rtx_a6000(prompt)
-            or self.brain._ask_groq(prompt, max_tokens=2500, system_prompt=sys_override)
-            or self.brain._ask_anthropic(prompt)
+            self.brain._ask_gemini(full_code_prompt, system_prompt=sys_override, max_tokens=3000)
+            or self.brain._ask_mistral(full_code_prompt, max_tokens=2500)
+            or self.brain._ask_rtx_a6000(full_code_prompt)
+            or self.brain._ask_groq(full_code_prompt, max_tokens=2500, system_prompt=sys_override)
+            or self.brain._ask_anthropic(full_code_prompt)
             or self.brain._local_rule_fallback(prompt)
         )
         elapsed = round(time.time() - t0, 2)
@@ -235,7 +241,7 @@ class Basit2Researcher:
 # 3. BASIT3 -- OWASP SECURITY AUDIT, PROCESS GUARD & AUTO-GIT
 # ============================================================
 class Basit3Guardian:
-    BANNER = "BASIT3 | Enterprise Security + Zero-Hang Watchdog + Auto-Git | OWASP 15-Pattern Audit"
+    BANNER = "BASIT3 | Enterprise Security + Zero-Hang Watchdog + Auto-Git | OWASP 20-Pattern Audit"
 
     OWASP = [
         (r"(?:api_key|apikey|api_secret|secret_key|password|passwd)\s*=\s*['\"][A-Za-z0-9_\-\.]{16,}['\"]", "CRITICAL", "OWASP A02 -- Hardcoded Secret"),
@@ -358,13 +364,14 @@ class Basit3Guardian:
             return {"success": False, "error": str(e)}
 
     def dependency_audit(self, directory: str = None) -> Dict[str, Any]:
-        """Scan requirements.txt against OSV.dev for known CVEs."""
+        """Scan requirements.txt against OSV.dev for known CVEs in parallel."""
         target = directory or self.default_dir
         req_file = os.path.join(target, 'requirements.txt')
         if not os.path.exists(req_file):
             return {'status': 'SKIP', 'reason': 'requirements.txt not found', 'vulnerabilities': []}
         try:
-            import urllib.request as _ur, urllib.parse as _up
+            import urllib.request as _ur
+            from concurrent.futures import ThreadPoolExecutor, as_completed
             pkgs = []
             for line in open(req_file, encoding='utf-8').readlines():
                 line = line.strip()
@@ -373,16 +380,18 @@ class Basit3Guardian:
                     if name:
                         pkgs.append(name.lower())
             vulns = []
-            for pkg in pkgs[:20]:  # limit to 20 packages max
+
+            def _check_pkg(pkg):
+                pkg_vulns = []
                 try:
                     payload = json.dumps({'package': {'name': pkg, 'ecosystem': 'PyPI'}}).encode()
                     req = _ur.Request('https://api.osv.dev/v1/query', data=payload,
                                       headers={'Content-Type': 'application/json'}, method='POST')
-                    with _ur.urlopen(req, timeout=3) as r:
+                    with _ur.urlopen(req, timeout=2.5) as r:
                         result = json.loads(r.read().decode())
                         if result.get('vulns'):
                             for v in result['vulns'][:2]:
-                                vulns.append({
+                                pkg_vulns.append({
                                     'package': pkg,
                                     'cve_id': v.get('id', 'N/A'),
                                     'summary': v.get('summary', 'No summary')[:120],
@@ -390,6 +399,13 @@ class Basit3Guardian:
                                 })
                 except Exception:
                     pass
+                return pkg_vulns
+
+            with ThreadPoolExecutor(max_workers=8) as ex:
+                futures = [ex.submit(_check_pkg, p) for p in pkgs[:25]]
+                for f in as_completed(futures):
+                    vulns.extend(f.result())
+
             status = 'VULNERABLE' if vulns else 'CLEAN'
             return {'status': status, 'packages_scanned': len(pkgs), 'vulnerabilities': vulns,
                     'summary': f'Dependency audit: {len(vulns)} CVEs found across {len(pkgs)} packages'}
@@ -425,7 +441,8 @@ class Basit4HedgeFund:
         _price_result = [None]
         def _fetch_price():
             try:
-                ticker_clean = query.strip().upper().split()[0]
+                m = re.search(r'\b(NVDA|TSLA|AAPL|MSFT|AMZN|GOOGL|META|AMD|INTC|BTC|ETH|SOL|[A-Z]{2,5})\b', query.upper())
+                ticker_clean = m.group(1) if m else query.strip().upper().split()[0]
                 url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker_clean}?interval=1d&range=5d"
                 req = _ur.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
                 with _ur.urlopen(req, timeout=3) as r:

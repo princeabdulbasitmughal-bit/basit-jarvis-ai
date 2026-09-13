@@ -27,6 +27,12 @@ if (!fs.existsSync(REPORTS_DIR)) {
 }
 let isSpeakerMuted = false;
 
+// Shell argument sanitization to prevent Windows cmd metacharacter injection
+function sanitizeShellTask(str) {
+  if (!str || typeof str !== 'string') return '';
+  return str.replace(/["`&|;<>%^!$]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 // Autonomous GUI & Inside-Tool Automation Bridge (PyAutoGUI + Win32)
 const GUI_CONTROLLER = path.join(BASE_DIR, 'bin', 'gui_controller.py');
 function runGuiAction(args, callback) {
@@ -695,7 +701,7 @@ const server = http.createServer((req, res) => {
 
         // ── Real Python engine execution ──
         const enginesScript = path.join(BASE_DIR, 'modules', 'basit_engines.py');
-        const safeTask = taskPrompt.replace(/"/g, '\\"');
+        const safeTask = sanitizeShellTask(taskPrompt);
         const pyCmd = `python "${enginesScript}" --engine ${engineName} --task "${safeTask}" --dir "${BASE_DIR}"`;
 
         console.log(`[${engineName.toUpperCase()}] Dispatching: ${engineName} | task="${taskPrompt.slice(0,60)}"`);
@@ -1902,7 +1908,7 @@ const server = http.createServer((req, res) => {
 
     const handleEngine = (taskStr) => {
       const enginesScript = path.join(BASE_DIR, 'modules', 'basit_engines.py');
-      const safeTask = (taskStr || 'all').replace(/"/g, '\\"');
+      const safeTask = sanitizeShellTask(taskStr || 'all');
       const pyCmd = `python "${enginesScript}" --engine ${engine} --task "${safeTask}" --dir "${BASE_DIR}"`;
 
       console.log(`[API/${engine.toUpperCase()}] Dispatching real Python engine | task="${safeTask.slice(0,60)}"`);
@@ -2311,7 +2317,7 @@ const server = http.createServer((req, res) => {
         if (idx >= tasks.length) return sendJSON(res, { success: true, count: results.length, results });
         const t = tasks[idx++];
         const engine = (t.engine || 'basit1').replace(/^\//,'');
-        const task = (t.task || 'run').replace(/"/g, '\\"');
+        const task = sanitizeShellTask(t.task || 'run');
         console.log(`[BATCH] Running ${engine}: ${task.slice(0,50)}`);
         exec(`python "${enginesScript}" --engine ${engine} --task "${task}"`,
           { timeout: 60000, maxBuffer: 5*1024*1024, env: {...process.env, PYTHONIOENCODING:'utf-8'} },
