@@ -575,6 +575,53 @@ const server = http.createServer((req, res) => {
       const cmd = rawCmd.toLowerCase();
       console.log(`[JARVIS DISPATCH]: "${rawCmd}" (Target Node: ${targetNode})`);
 
+      // ═══════════════════════════════════════════════════════════
+      // CONVERSATIONAL BRAIN — First-pass real human-like processing
+      // Handles: WhatsApp sends, PDF→Word, calculator, notes,
+      //          screenshots, git commits, emotional responses, etc.
+      // If it handles the command → return immediately with response
+      // If not → fall through to existing engine routing below
+      // ═══════════════════════════════════════════════════════════
+      if (targetNode === 'host' || targetNode === 'master') {
+        const brainScript = path.join(BASE_DIR, 'modules', 'jarvis_bridge.py');
+        if (fs.existsSync(brainScript)) {
+          const safeCmd = sanitizeShellTask(rawCmd);
+          exec(
+            `python "${brainScript}" "${safeCmd}"`,
+            { timeout: 8000, env: { ...process.env, PYTHONIOENCODING: 'utf-8' } },
+            (brainErr, brainOut) => {
+              if (!brainErr && brainOut && brainOut.trim()) {
+                try {
+                  const brainResult = JSON.parse(brainOut.trim().split('\n').filter(l => l.trim()).pop());
+                  if (brainResult && brainResult.handled) {
+                    // Brain handled it! Return human response immediately.
+                    console.log(`[CONV BRAIN] Handled: ${brainResult.action_taken} → "${String(brainResult.response).slice(0,60)}"`);
+                    return sendJSON(res, {
+                      success: true,
+                      response: brainResult.response,
+                      speak: brainResult.speak || brainResult.response,
+                      action_taken: brainResult.action_taken,
+                      source: 'conv_brain'
+                    });
+                  }
+                  // Brain says route to a specific engine
+                  if (brainResult && brainResult.needs_engine) {
+                    data.command = `/${brainResult.needs_engine} ${rawCmd}`;
+                    // Fall through to engine routing with modified command
+                  }
+                } catch (_) {}
+              }
+              // Brain didn't handle or errored → continue normal flow
+              processCommandNormally();
+            }
+          );
+          return; // Will call processCommandNormally inside callback
+        }
+      }
+
+      processCommandNormally();
+
+      function processCommandNormally() {
       // Smart Voice Detection of Target Machine
       let isBroadcast = false;
       if (data.targetNode && (connectedNodes.has(data.targetNode) || data.targetNode === 'all')) {
@@ -1896,9 +1943,11 @@ const server = http.createServer((req, res) => {
       }).catch(() => {
         sendJSON(res, { success: true, command: rawCmd, response: `Ji Basit bhai, "${rawCmd}" process ho gayi hai.` });
       });
+      } // end processCommandNormally
     });
     return;
   }
+
 
   // 5. Basit Engines (Real Python Engine Execution)
   if (pathname.startsWith('/api/basit') || pathname === '/api/arsenal' || pathname === '/api/opensource-ai-arsenal' || pathname === '/api/cluster-status' || pathname === '/api/gemini' || pathname === '/api/spark' || pathname === '/api/gemini-spark' || pathname === '/api/assistant') {
