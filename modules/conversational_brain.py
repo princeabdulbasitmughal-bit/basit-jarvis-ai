@@ -165,9 +165,11 @@ ACTION_PATTERNS = {
         r"(?P<text>.+)\s+(?:urdu|english|hindi)\s+mein\s+(?:likho|batao|translate\s+karo)",
     ],
     "calculate": [
-        r"(?:calculate|hisab|nikalo|compute)\s+(?P<expr>.+)",
-        r"(?P<expr>\d+\s*[\+\-\*\/\^]\s*\d+(?:\s*[\+\-\*\/\^]\s*\d+)*)",
+        r"(?:calculate|hisab|nikalo|compute)\s+(?:karo\s+)?(?P<expr>[\d\s\+\-\*\/\.\(\)\^]+)",
+        r"(?P<expr>[\d\s\+\-\*\/\.\(\)\^]+)\s+(?:calculate|hisab|compute)(?:\s+karo)?",
+        r"^(?P<expr>\d+\s*[\+\-\*\/\^]\s*[\d\.\s\+\-\*\/\^]+)$",
     ],
+
     "create_note": [
         r"(?:note|naya\s+note|likho)\s+(?:karo\s+)?(?P<content>.+)",
         r"(?:save|sacha\s+karo|store)\s+(?:karo\s+)?(?:yeh|this)?\s*:?\s*(?P<content>.+)",
