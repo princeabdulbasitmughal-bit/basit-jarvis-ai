@@ -1,3 +1,1 @@
-"""Telemetry and Health Monitoring Microservice Package."""
-
-__version__ = "1.0.0"
+"""FastAPI Production REST API Package."""
