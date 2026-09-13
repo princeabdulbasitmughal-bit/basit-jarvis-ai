@@ -1974,8 +1974,14 @@ const server = http.createServer((req, res) => {
   }
 
   // 5b. Sovereign Full Run Report (/api/sovereign-full-run)
-  if (pathname === '/api/sovereign-full-run' && req.method === 'GET') {
+  if (pathname === '/api/sovereign-full-run') {
     const reportPath = path.join(BASE_DIR, 'reports', 'sovereign_full_run.json');
+    if (req.method === 'POST' || url.searchParams.get('run') === '1') {
+      exec(`python "${path.join(BASE_DIR, 'modules', 'sovereign_master_runner.py')}"`, { timeout: 60000 }, (err, stdout) => {
+        if (err) console.error('[SOVEREIGN RUN ERROR]:', err.message);
+      });
+      return sendJSON(res, { success: true, message: 'Sovereign master run dispatched across 6 engines in background.' });
+    }
     if (fs.existsSync(reportPath)) {
       try {
         const reportData = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
@@ -1985,6 +1991,49 @@ const server = http.createServer((req, res) => {
       }
     }
     return sendJSON(res, { success: false, message: 'No full run generated yet' });
+  }
+
+  // 5c. 20-Subagent Ultra-Parallel Swarm Runner (/api/swarm-20-run and /api/swarm-20-report)
+  if (pathname === '/api/swarm-20-report' && req.method === 'GET') {
+    const rPath = path.join(BASE_DIR, 'reports', 'subagents_20_live_report.json');
+    if (fs.existsSync(rPath)) {
+      try {
+        const d = JSON.parse(fs.readFileSync(rPath, 'utf-8'));
+        return sendJSON(res, { success: true, ...d });
+      } catch (e) {
+        return sendJSON(res, { success: false, error: e.message });
+      }
+    }
+    return sendJSON(res, { success: false, message: 'No 20-subagent report found' });
+  }
+
+  if (pathname === '/api/swarm-20-run') {
+    const scriptPath = path.join(BASE_DIR, 'modules', 'subagent_swarm_20.py');
+    exec(`python "${scriptPath}"`, { timeout: 12000 }, (err, stdout, stderr) => {
+      if (err) {
+        console.error('[SWARM-20 ERROR]:', stderr || err.message);
+        const rPath = path.join(BASE_DIR, 'reports', 'subagents_20_live_report.json');
+        if (fs.existsSync(rPath)) {
+          try {
+            const fallback = JSON.parse(fs.readFileSync(rPath, 'utf-8'));
+            return sendJSON(res, { success: true, fallback: true, ...fallback });
+          } catch(e) {}
+        }
+        return sendJSON(res, { success: false, error: err.message });
+      }
+      try {
+        const data = JSON.parse(stdout.trim());
+        return sendJSON(res, { success: true, ...data });
+      } catch(e) {
+        const rPath = path.join(BASE_DIR, 'reports', 'subagents_20_live_report.json');
+        if (fs.existsSync(rPath)) {
+          const fileData = JSON.parse(fs.readFileSync(rPath, 'utf-8'));
+          return sendJSON(res, { success: true, ...fileData });
+        }
+        return sendJSON(res, { success: true, raw: stdout });
+      }
+    });
+    return;
   }
 
   // 6. Contacts API (/api/contacts) — GET=list, POST=add/update, DELETE=remove

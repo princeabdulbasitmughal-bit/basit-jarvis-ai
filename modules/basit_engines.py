@@ -266,7 +266,7 @@ class Basit3Guardian:
         (r"(?i)jwt\.decode\([^)]*verify\s*=\s*False", "CRITICAL", "OWASP A02 — JWT Signature Verification Disabled"),
     ]
 
-    def __init__(self, brain, default_dir: str = None):
+    def __init__(self, brain=None, default_dir: str = None):
         self.brain = brain
         self.default_dir = default_dir or r"E:\basit-jarvis-ai"
 
@@ -306,14 +306,15 @@ class Basit3Guardian:
     def sweep_zombies(self) -> Dict[str, Any]:
         if not PSUTIL_AVAILABLE:
             return {"killed_count": 0, "status": "SKIP", "reason": "psutil not installed"}
-        TARGETS = {"node.exe","python.exe"}
+        TARGETS = {"node.exe", "python.exe", "node", "python", "python3"}
         killed, freed = [], 0.0
         cur = os.getpid()
+        ppid = os.getppid() if hasattr(os, 'getppid') else None
         for p in psutil.process_iter(["pid","name"]):
             try:
                 nm = (p.info.get("name") or "").lower()
                 pid = p.info.get("pid")
-                if not pid or pid == cur or nm not in TARGETS:
+                if not pid or pid == cur or pid == ppid or nm not in TARGETS:
                     continue
                 mem_info = p.memory_info()
                 mem = round(mem_info.rss / 1048576, 1) if mem_info else 0

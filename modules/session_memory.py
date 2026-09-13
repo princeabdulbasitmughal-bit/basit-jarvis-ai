@@ -1,4 +1,4 @@
-﻿"""
+"""
 ================================================================================
 BASIT JARVIS AI -- PERSISTENT SESSION MEMORY ENGINE
 ================================================================================
@@ -48,10 +48,38 @@ class SessionMemory:
                 );
             """)
 
+    def vacuum(self):
+        try:
+            with self._conn() as c:
+                c.execute('VACUUM')
+        except Exception:
+            pass
+
+    def prune_memory(self, max_conversations: int = 1000, max_logs: int = 500):
+        """Auto-prune older conversations and engine logs to prevent database bloat."""
+        try:
+            with self._conn() as c:
+                # Retain only the latest max_conversations
+                c.execute('''
+                    DELETE FROM conversations WHERE id NOT IN (
+                        SELECT id FROM conversations ORDER BY id DESC LIMIT ?
+                    )
+                ''', (max_conversations,))
+                # Retain only the latest max_logs
+                c.execute('''
+                    DELETE FROM engine_log WHERE id NOT IN (
+                        SELECT id FROM engine_log ORDER BY id DESC LIMIT ?
+                    )
+                ''', (max_logs,))
+        except Exception:
+            pass
+
     def save_conversation(self, role: str, content: str, engine: str = None):
         try:
             with self._conn() as c:
                 c.execute('INSERT INTO conversations (role, content, engine) VALUES (?, ?, ?)', (role, content[:4000], engine))
+            # Auto-prune periodically (probabilistically or every save)
+            self.prune_memory(max_conversations=1000, max_logs=500)
         except Exception as e:
             pass
 
