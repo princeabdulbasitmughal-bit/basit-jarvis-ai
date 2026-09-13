@@ -1,45 +1,42 @@
-"""Structured JSON logging configuration for production environments."""
+"""Logging configuration module for application-wide structured logging."""
 
 import logging
 import sys
-from typing import Any, Dict
-import json
-from datetime import datetime, timezone
+from app.config import Settings
 
 
-class JSONFormatter(logging.Formatter):
-    """Custom JSON log formatter for structured logging."""
+def setup_logger(settings: Settings) -> logging.Logger:
+    """Configures and initializes the standard application logger.
 
-    def format(self, record: logging.LogRecord) -> str:
-        log_data: Dict[str, Any] = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "level": record.levelname,
-            "message": record.getMessage(),
-            "module": record.module,
-            "funcName": record.funcName,
-            "lineNo": record.lineno,
-        }
+    Args:
+        settings (Settings): Configured settings instance.
 
-        if record.exc_info:
-            log_data["exception"] = self.formatException(record.exc_info)
+    Returns:
+        logging.Logger: Configured logger instance.
+    """
+    numeric_level = getattr(logging, settings.log_level.upper(), logging.INFO)
+    
+    formatter = logging.Formatter(
+        fmt="[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
 
-        if hasattr(record, "extra_fields"):
-            log_data.update(record.extra_fields)
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(numeric_level)
 
-        return json.dumps(log_data)
+    root_logger = logging.getLogger()
+    root_logger.setLevel(numeric_level)
+    
+    # Avoid duplicate handlers if re-initialized
+    if not root_logger.handlers:
+        root_logger.addHandler(console_handler)
 
+    # Reduce noisy logs from third-party packages
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
+    logging.getLogger("telegram").setLevel(logging.INFO)
 
-def setup_logging() -> logging.Logger:
-    """Configures system-wide structured logging."""
-    logger = logging.getLogger("telemetry_service")
-    logger.setLevel(logging.INFO)
-
-    if not logger.handlers:
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setFormatter(JSONFormatter())
-        logger.addHandler(handler)
-
+    logger = logging.getLogger("telegram_ai_bot")
+    logger.info("Logger initialized with level: %s", settings.log_level)
     return logger
-
-
-logger = setup_logging()

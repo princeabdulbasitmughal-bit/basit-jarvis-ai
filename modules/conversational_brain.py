@@ -118,9 +118,18 @@ ACTION_PATTERNS = {
         r"(?P<time>\d+(?::\d+)?(?:\s*[ap]m)?)\s+(?:ko|baje|at)\s+(?:mujhe\s+)?(?:remind|yaad\s+dilao)\s+(?P<task>.+)",
     ],
     "play_music": [
-        r"(?:music|gaana|song|gana)\s+(?:chala\s+do|chalao|play\s+karo)",
-        r"(?:spotify|youtube\s+music)\s+(?:kholo|chalao)",
+        r"(?:music|gaana|song|gana)\s+(?:chala\s+do|chalao|play\s+karo|play|lagao)",
+        r"(?:spotify|youtube\s+music)\s+(?:kholo|chalao|open\s+karo)",
+        r"(?:chalao|play\s+karo|laga\s+do|lagao)\s+(?P<query>.+?)(?:\s+(?:song|gaana|music))?$",
+        r"(?P<query>.+?)\s+(?:chalao|play\s+karo|laga\s+do|sunao)",
     ],
+    "set_reminder": [
+        r"(?:reminder|alarm|yaad\s+dilao|remind)\s+(?:set\s+karo|lagao|karo)?.*?(?:(\d+)\s*(?:minute|min|second|sec|hour|hr|ghante))?",
+        r"(\d+)\s*(?:minute|min|hour|hr|ghante)\s+(?:mein|baad|after)\s+(?P<content>.+)",
+        r"(?:remind\s+me|yaad\s+dilana)\s+(?:to\s+|ke\s+)?(?P<content>.+)",
+        r"(?:set|lao|lagao)\s+(?:ek\s+)?(?:reminder|alarm)\s+(?:for\s+|ke\s+liye\s+)?(?P<content>.+)",
+    ],
+
     "check_weather": [
         r"(?:weather|mausam)\s+(?:kaisa\s+hai|batao|check\s+karo|kya\s+hai)",
     ],
@@ -299,10 +308,26 @@ class ConversationalBrain:
             msg = entities.get("msg", "Basit bhai ke orders par update")
             return self._git_commit(msg)
 
-        elif action in ("generate_code", "research_topic", "open_app", "search_web",
-                        "play_music", "set_reminder", "translate"):
-            # These go to AI brain / system
-            return None  # Signal: let main handler take over
+        elif action == "open_app":
+            app = (entities.get("app") or "").lower().strip()
+            return self._open_app(app, original_text)
+
+        elif action == "play_music":
+            query = entities.get("query") or entities.get("song") or ""
+            return self._play_music(query)
+
+        elif action == "set_reminder":
+            content = entities.get("content") or entities.get("task") or original_text
+            mins = entities.get("minutes") or entities.get("time") or ""
+            return self._set_reminder(content, str(mins))
+
+        elif action == "search_web":
+            query = entities.get("query") or original_text
+            return self._search_web(query)
+
+        elif action in ("generate_code", "research_topic", "translate"):
+            # These go to AI engine routing
+            return None
 
         return None
 
@@ -572,6 +597,122 @@ class ConversationalBrain:
         except Exception as e:
             return f"Git commit nahi ho saka: {str(e)[:80]}"
 
+
+    def _open_app(self, app: str, raw: str) -> str:
+        """Open an application by name."""
+        import subprocess
+        APP_MAP = {
+            'chrome': 'start chrome',
+            'browser': 'start chrome',
+            'google': 'start chrome',
+            'vscode': 'code',
+            'vs code': 'code',
+            'code': 'code',
+            'notepad': 'notepad',
+            'calculator': 'calc',
+            'calc': 'calc',
+            'spotify': 'start spotify:',
+            'whatsapp': 'start https://web.whatsapp.com',
+            'youtube': 'start https://youtube.com',
+            'telegram': 'start https://web.telegram.org',
+            'gmail': 'start https://mail.google.com',
+            'explorer': 'explorer',
+            'file manager': 'explorer',
+            'task manager': 'taskmgr',
+            'word': 'start winword',
+            'excel': 'start excel',
+            'powerpoint': 'start powerpnt',
+        }
+        # Find best match
+        cmd = None
+        for key, val in APP_MAP.items():
+            if key in app or key in raw.lower():
+                cmd = val
+                app = key
+                break
+        if not cmd:
+            # Try to extract app name from raw text
+            m = re.search(r'(?:kholo|open|launch|start|chalo)\s+(\w+)', raw, re.I)
+            if m:
+                guessed = m.group(1).lower()
+                cmd = f'start {guessed}'
+                app = guessed
+        if cmd:
+            try:
+                subprocess.Popen(cmd, shell=True)
+                return f"{self._pick(JARVIS_CONFIRMATIONS['done'])} {app.title()} khol diya hai! 🚀"
+            except Exception as e:
+                return f"{app.title()} nahi khul saka: {str(e)[:60]}"
+        return f"Kaunsi app kholni hai bhai? Naam batao! 🤔"
+
+    def _play_music(self, query: str) -> str:
+        """Open Spotify or YouTube Music with a song/playlist."""
+        import subprocess, urllib.parse
+        try:
+            if query:
+                yt_url = f"https://www.youtube.com/results?search_query={urllib.parse.quote(query)}"
+                subprocess.Popen(f'start "" "{yt_url}"', shell=True)
+                return f"YouTube par \"{query}\" search kar diya — ab maza karo! 🎵"
+            else:
+                subprocess.Popen('start spotify:', shell=True)
+                return "Spotify khol diya hai Basit bhai! 🎶"
+        except Exception as e:
+            return f"Music player nahi khul saka: {str(e)[:60]}"
+
+    def _set_reminder(self, content: str, time_str: str) -> str:
+        """Set a reminder — saves to reminders.json and fires background alert."""
+        import threading
+        reminders_path = os.path.join(BASE_DIR, 'data', 'reminders.json')
+        os.makedirs(os.path.join(BASE_DIR, 'data'), exist_ok=True)
+        # Parse time
+        delay_sec = 300  # default 5 min
+        m = re.search(r'(\d+)\s*(minute|min|second|sec|ghante|hour|hr)', time_str + ' ' + content, re.I)
+        if m:
+            val = int(m.group(1))
+            unit = m.group(2).lower()
+            if unit.startswith('sec'):
+                delay_sec = val
+            elif unit.startswith('hour') or unit.startswith('ghant') or unit.startswith('hr'):
+                delay_sec = val * 3600
+            else:
+                delay_sec = val * 60
+        try:
+            reminders = []
+            if os.path.exists(reminders_path):
+                with open(reminders_path, encoding='utf-8') as f:
+                    reminders = json.load(f)
+            reminder = {
+                "id": len(reminders) + 1,
+                "task": content[:100],
+                "delay_sec": delay_sec,
+                "set_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "fire_at": (datetime.now() + timedelta(seconds=delay_sec)).strftime("%Y-%m-%d %H:%M:%S")
+            }
+            reminders.append(reminder)
+            with open(reminders_path, 'w', encoding='utf-8') as f:
+                json.dump(reminders, f, indent=2, ensure_ascii=False)
+            # Fire alert in background thread
+            def _alert():
+                time.sleep(delay_sec)
+                print(f"\n🔔 JARVIS REMINDER: {content}\n")
+            threading.Thread(target=_alert, daemon=True).start()
+            mins = delay_sec // 60
+            secs = delay_sec % 60
+            time_msg = f"{mins} minute" if mins else f"{secs} second"
+            return f"⏰ Reminder set! {time_msg} baad main aapko yaad dilaunga: \"{content[:50]}\" 🔔"
+        except Exception as e:
+            return f"Reminder nahi lag saka: {str(e)[:60]}"
+
+    def _search_web(self, query: str) -> str:
+        """Open Google search for a query."""
+        import subprocess, urllib.parse
+        try:
+            url = f"https://www.google.com/search?q={urllib.parse.quote(query)}"
+            subprocess.Popen(f'start "" "{url}"', shell=True)
+            return f"Google par \"{query}\" search kar diya! 🔍"
+        except Exception as e:
+            return f"Search nahi ho saka: {str(e)[:60]}"
+
     # ============================================================
     # MAIN CONVERSATION HANDLER
     # ============================================================
@@ -582,6 +723,7 @@ class ConversationalBrain:
         {
             "response": str,  # Human-like text response
             "action_taken": str,  # What action was executed
+
             "action_result": str,  # Result of action
             "needs_engine": str,  # If should route to basit1/2/3 etc.
             "speak": str,  # What Jarvis should say (short, voice-friendly)

@@ -1,1 +1,3 @@
-"""FastAPI Production REST API Package."""
+"""Telegram AI Bot Application Package."""
+
+__version__ = "2.1.0"
