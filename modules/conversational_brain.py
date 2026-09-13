@@ -135,7 +135,12 @@ ACTION_PATTERNS = {
         r"(?:google|search|dhundo|dhundhao)\s+(?:karo\s+)?(?P<query>.+)",
         r"(?P<query>.+)\s+(?:search\s+karo|google\s+karo|dhundo)",
     ],
+    "download_media": [
+        r"(?:download|save|nikalo)\s+(?:karo\s+)?(?:video|audio|song|gaana|clip|media)?\s*(?P<url>https?://\S+)",
+        r"(?P<url>https?://\S+)\s+(?:ko\s+)?(?:download|save)\s+karo",
+    ],
     "set_reminder": [
+
         r"(?:reminder|yaad|yaad\s+dilao|mujhe\s+yaad\s+dilao)\s+(?:karo\s+)?(?P<task>.+)\s+(?:at|baje|ko)\s+(?P<time>\d+(?::\d+)?(?:\s*[ap]m)?)",
         r"(?P<time>\d+(?::\d+)?(?:\s*[ap]m)?)\s+(?:ko|baje|at)\s+(?:mujhe\s+)?(?:remind|yaad\s+dilao)\s+(?P<task>.+)",
     ],
@@ -346,6 +351,11 @@ class ConversationalBrain:
         elif action == "search_web":
             query = entities.get("query") or original_text
             return self._search_web(query)
+
+        elif action == "download_media":
+            url = (entities.get("url") or "").strip()
+            return self._download_media(url)
+
 
         elif action in ("generate_code", "research_topic", "translate"):
             # These go to AI engine routing
@@ -770,6 +780,34 @@ $bmp.Dispose()
             return f"Google par \"{query}\" search kar diya! 🔍"
         except Exception as e:
             return f"Search nahi ho saka: {str(e)[:60]}"
+
+    def _download_media(self, url: str) -> str:
+        """Download YouTube or web video/audio using yt-dlp in background."""
+        if not url or not url.startswith("http"):
+            return "Bhai media download karne ke liye valid link (URL) do! Jaise: 'download karo https://...'"
+
+        out_dir = os.path.join(BASE_DIR, "downloads")
+        os.makedirs(out_dir, exist_ok=True)
+        send_toast_notification("Download Started 📥", f"Downloading from: {url[:35]}...")
+
+        def _worker():
+            try:
+                import yt_dlp
+                ydl_opts = {
+                    'outtmpl': os.path.join(out_dir, '%(title)s.%(ext)s'),
+                    'quiet': True,
+                    'no_warnings': True,
+                }
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    info = ydl.extract_info(url, download=True)
+                    title = info.get('title', 'Media')
+                    send_toast_notification("Download Finished! ✅", f"Saved: {title[:40]}")
+            except Exception as e:
+                send_toast_notification("Download Failed ❌", str(e)[:45])
+
+        threading.Thread(target=_worker, daemon=True).start()
+        return f"{self._pick(JARVIS_CONFIRMATIONS['working'])} Download shuru kar diya hai! 📥 File 'downloads' folder mein save ho jayegi."
+
 
     # ============================================================
     # MAIN CONVERSATION HANDLER
