@@ -1,42 +1,27 @@
-"""Logging configuration module for application-wide structured logging."""
+"""
+Centralized logging configuration module.
+"""
 
 import logging
 import sys
-from app.config import Settings
+from app.config import settings
 
 
-def setup_logger(settings: Settings) -> logging.Logger:
-    """Configures and initializes the standard application logger.
+def setup_logger() -> logging.Logger:
+    """Configures and returns the application logger."""
+    logger = logging.getLogger("JarvisBot")
+    logger.setLevel(settings.LOG_LEVEL.upper())
 
-    Args:
-        settings (Settings): Configured settings instance.
+    if not logger.handlers:
+        handler = logging.StreamHandler(sys.stdout)
+        formatter = logging.Formatter(
+            fmt="%(asctime)s [%(levelname)s] %(name)s (%(filename)s:%(lineno)d): %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
-    Returns:
-        logging.Logger: Configured logger instance.
-    """
-    numeric_level = getattr(logging, settings.log_level.upper(), logging.INFO)
-    
-    formatter = logging.Formatter(
-        fmt="[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
-
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    console_handler.setLevel(numeric_level)
-
-    root_logger = logging.getLogger()
-    root_logger.setLevel(numeric_level)
-    
-    # Avoid duplicate handlers if re-initialized
-    if not root_logger.handlers:
-        root_logger.addHandler(console_handler)
-
-    # Reduce noisy logs from third-party packages
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    logging.getLogger("httpcore").setLevel(logging.WARNING)
-    logging.getLogger("telegram").setLevel(logging.INFO)
-
-    logger = logging.getLogger("telegram_ai_bot")
-    logger.info("Logger initialized with level: %s", settings.log_level)
     return logger
+
+
+logger = setup_logger()

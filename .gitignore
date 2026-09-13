@@ -8,3 +8,26 @@ tunnel_out.log
 node_modules/
 .vscode/
 .idea/
+
+# ============================================================
+# 🔐 SECRETS — NEVER COMMIT THESE
+# ============================================================
+.env
+.env.local
+.env.production
+*.env
+
+# WhatsApp session (contains auth tokens)
+data/whatsapp_session/
+
+# Screenshots & downloads (large binary files)
+screenshots/
+downloads/
+
+# Jarvis runtime data
+data/reminders.json
+
+# Python virtual envs
+venv/
+.venv/
+env/

@@ -57,46 +57,65 @@ def banner():
 """)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TTS — SPEAK
+# TTS — SPEAK (Kokoro Neural TTS → pyttsx3 fallback)
 # ─────────────────────────────────────────────────────────────────────────────
-_tts_engine = None
-_tts_lock   = threading.Lock()
+_kokoro_speak_fn = None
+_tts_engine      = None
+_tts_lock        = threading.Lock()
 
 def _init_tts():
-    global _tts_engine
+    """Init TTS — Kokoro-82M neural first, pyttsx3 fallback."""
+    global _kokoro_speak_fn, _tts_engine
+
+    # 1) Try Kokoro neural TTS
+    try:
+        from modules.kokoro_tts import speak as _ks, get_status
+        _kokoro_speak_fn = _ks
+        engine = get_status().get("engine", "kokoro")
+        print(f"{GREEN}✅ TTS ({engine}) ready — neural voice ACTIVE{RESET}")
+        return
+    except Exception as e:
+        print(f"{YELLOW}⚠️  Kokoro TTS init failed ({e}) — trying pyttsx3{RESET}")
+
+    # 2) Fallback: pyttsx3
     try:
         import pyttsx3
         _tts_engine = pyttsx3.init()
         _tts_engine.setProperty('rate', 175)
         _tts_engine.setProperty('volume', 0.95)
-        # Try to set a clear English voice
         voices = _tts_engine.getProperty('voices')
         for v in voices:
             if 'english' in v.name.lower() or 'david' in v.name.lower() or 'zira' in v.name.lower():
                 _tts_engine.setProperty('voice', v.id)
                 break
-        print(f"{GREEN}✅ TTS (pyttsx3) ready{RESET}")
+        print(f"{GREEN}✅ TTS (pyttsx3 fallback) ready{RESET}")
     except Exception as e:
         print(f"{YELLOW}⚠️  pyttsx3 not available ({e}) — text-only mode{RESET}")
         _tts_engine = None
 
 def speak(text: str):
-    """Speak text out loud AND print it."""
-    # Clean text for speaking (remove markdown/emoji)
+    """Speak text via Kokoro neural TTS or pyttsx3 fallback. Always prints."""
     import re
     clean = re.sub(r'[*_`#\[\]()🔥✅❌⚡👑📱💻🧠📄🔒]', '', text)
     clean = re.sub(r'https?://\S+', 'link', clean)
-    clean = clean[:400]  # max 400 chars for voice
+    clean = clean[:400]
 
     print(f"\n{BOLD}{GREEN}🤖 JARVIS: {RESET}{text[:200]}")
+
+    if _kokoro_speak_fn:
+        try:
+            _kokoro_speak_fn(clean, blocking=False)
+            return
+        except Exception:
+            pass
 
     if _tts_engine:
         try:
             with _tts_lock:
                 _tts_engine.say(clean)
                 _tts_engine.runAndWait()
-        except Exception as e:
-            pass  # Silent fail — text already printed
+        except Exception:
+            pass
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STT — LISTEN (mic)
