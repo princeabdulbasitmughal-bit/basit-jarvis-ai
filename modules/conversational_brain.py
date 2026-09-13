@@ -74,9 +74,31 @@ JARVIS_CONFIRMATIONS = {
     ],
 }
 
-BOREDOM_TRIGGERS = ["bore", "kuch nahi", "neend", "time pass", "kya karo", "tang", "pagal", "ajeeb", "uff"]
-THANKS_TRIGGERS = ["shukriya", "thanks", "thank you", "jazakallah", "great", "shabash", "badhiya", "zabardast", "maza aaya"]
-GREETING_TRIGGERS = ["salam", "hello", "hi ", "hey", "assalam", "kya ho raha", "kaise ho", "good morning", "good night"]
+BOREDOM_TRIGGERS = ["bore", "kuch nahi", "neend", "time pass", "kya karo", "tang", "pagal", "ajeeb", "uff", "khali baitha"]
+THANKS_TRIGGERS = ["shukriya", "thanks", "thank you", "jazakallah", "great", "shabash", "badhiya", "zabardast", "maza aaya", "bohot khoob", "dhanwad"]
+GREETING_TRIGGERS = [
+    "salam", "assalam", "hello", "hi ", "hey", "kya ho raha", "kaise ho", "kese ho",
+    "kaisa ho", "kesa ho", "kaisa hai", "kesa hai", "kya haal", "kia haal", "kya hal",
+    "kia hal", "hal chal", "haal chaal", "aur sunao", "sab theek", "wassup", "what's up",
+    "how are you", "how are u", "good morning", "good night", "good evening", "good afternoon",
+    "namaste", "adaab"
+]
+
+def send_toast_notification(title: str, message: str):
+    """Fires native Windows toast notification without blocking."""
+    def _fire():
+        try:
+            from win11toast import toast
+            toast(title, message)
+        except Exception:
+            try:
+                from winotify import Notification
+                notif = Notification(app_id="Basit Jarvis AI", title=title, msg=message)
+                notif.show()
+            except Exception:
+                pass
+    threading.Thread(target=_fire, daemon=True).start()
+
 
 # ============================================================
 # SMART ACTION DETECTOR — Natural language → action
@@ -405,9 +427,11 @@ class ConversationalBrain:
 
             self.last_docx = word_path
             word_name = os.path.basename(word_path)
+            send_toast_notification("PDF to Word Converted 📄", f"{pdf_name} converted to {word_name}")
             return (f"{self._pick(JARVIS_CONFIRMATIONS['done'])} "
                     f"'{pdf_name}' → '{word_name}' convert ho gaya! "
                     f"File isi folder mein hai: {os.path.dirname(word_path)} 📄✅")
+
 
         except ImportError:
             return "Bhai pdf2docx install nahi hai! Ek second: `pip install pdf2docx` run karo."
@@ -497,21 +521,52 @@ class ConversationalBrain:
             os.makedirs(out_dir, exist_ok=True)
             out_path = os.path.join(out_dir, f"screenshot_{ts}.png")
 
-            # Try pyautogui
+            # 1. Try pyautogui
             try:
                 import pyautogui
                 pyautogui.screenshot(out_path)
+                send_toast_notification("Screenshot Captured 📸", f"Saved: screenshots/screenshot_{ts}.png")
                 return f"{self._pick(JARVIS_CONFIRMATIONS['done'])} Screenshot le liya! 📸 Saved: screenshots/screenshot_{ts}.png"
-            except ImportError:
+            except Exception:
                 pass
 
-            # Fallback: PowerShell
-            ps_cmd = f'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Screen]::PrimaryScreen | Out-Null; $bitmap = New-Object System.Drawing.Bitmap([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width, [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height); $graphics = [System.Drawing.Graphics]::FromImage($bitmap); $graphics.CopyFromScreen(0, 0, 0, 0, $bitmap.Size); $bitmap.Save("{out_path}"); Write-Host "done"'
-            subprocess.run(['powershell', '-Command', ps_cmd], capture_output=True, timeout=10)
-            return f"Screenshot le liya! 📸 Saved to screenshots folder."
+            # 2. Try mss
+            try:
+                from mss import MSS
+                with MSS() as sct:
+                    sct.shot(output=out_path)
+                    send_toast_notification("Screenshot Captured 📸", f"Saved: screenshots/screenshot_{ts}.png")
+                    return f"{self._pick(JARVIS_CONFIRMATIONS['done'])} Screenshot le liya via MSS! 📸 Saved: screenshots/screenshot_{ts}.png"
+            except Exception:
+                pass
+
+            # 3. Try PowerShell
+            try:
+                ps_file = os.path.join(out_dir, "_grab.ps1")
+                with open(ps_file, "w", encoding="utf-8") as f:
+                    f.write(f'''
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+$b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+$bmp = New-Object System.Drawing.Bitmap($b.Width, $b.Height)
+$g = [System.Drawing.Graphics]::FromImage($bmp)
+$g.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+$bmp.Save("{out_path.replace(os.sep, '/')}")
+$g.Dispose()
+$bmp.Dispose()
+''')
+                subprocess.run(['powershell', '-ExecutionPolicy', 'Bypass', '-File', ps_file], capture_output=True, timeout=10)
+                if os.path.exists(out_path):
+                    send_toast_notification("Screenshot Captured 📸", f"Saved: screenshots/screenshot_{ts}.png")
+                    return f"Screenshot le liya! 📸 Saved: screenshots/screenshot_{ts}.png"
+            except Exception:
+                pass
+
+            return "Bhai screen abhi locked ya remote session mein hai, is liye screenshot nahi ban saka. Jab display active ho tab dobara bolo! 📸"
 
         except Exception as e:
             return f"Screenshot mein masla: {str(e)[:80]}"
+
 
     def _system_status(self) -> str:
         """Get system health status."""
@@ -695,11 +750,14 @@ class ConversationalBrain:
             def _alert():
                 time.sleep(delay_sec)
                 print(f"\n🔔 JARVIS REMINDER: {content}\n")
+                send_toast_notification("Jarvis Reminder 🔔", f"Basit bhai! {content}")
             threading.Thread(target=_alert, daemon=True).start()
             mins = delay_sec // 60
             secs = delay_sec % 60
             time_msg = f"{mins} minute" if mins else f"{secs} second"
+            send_toast_notification("Reminder Set ⏰", f"{time_msg} baad: {content[:40]}")
             return f"⏰ Reminder set! {time_msg} baad main aapko yaad dilaunga: \"{content[:50]}\" 🔔"
+
         except Exception as e:
             return f"Reminder nahi lag saka: {str(e)[:60]}"
 

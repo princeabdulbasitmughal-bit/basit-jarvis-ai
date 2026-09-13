@@ -102,44 +102,61 @@ def speak(text: str):
 # STT — LISTEN (mic)
 # ─────────────────────────────────────────────────────────────────────────────
 _stt_model  = None
-_stt_loaded = False
+_stt_whisper = None
+_stt_sr = None
+
+def toast_notify(title: str, msg: str):
+    """Sends native Windows 11 toast notification."""
+    def _fire():
+        try:
+            from win11toast import toast
+            toast(title, msg)
+        except Exception:
+            try:
+                from winotify import Notification
+                n = Notification(app_id="Basit Jarvis Voice", title=title, msg=msg)
+                n.show()
+            except Exception:
+                pass
+    threading.Thread(target=_fire, daemon=True).start()
 
 def _init_stt():
-    global _stt_model, _stt_loaded
+    global _stt_whisper, _stt_sr
     try:
         from faster_whisper import WhisperModel
-        print(f"{CYAN}⏳ Loading Whisper base model (first time only ~15s)...{RESET}")
-        _stt_model = WhisperModel("base", device="cpu", compute_type="int8")
-        _stt_loaded = True
-        print(f"{GREEN}✅ Whisper STT ready (base, CPU, int8){RESET}")
-    except ImportError:
-        try:
-            import speech_recognition as sr
-            _stt_model = sr.Recognizer()
-            _stt_loaded = True
-            print(f"{GREEN}✅ SpeechRecognition STT ready (Google API){RESET}")
-        except ImportError:
-            print(f"{YELLOW}⚠️  No STT library found — keyboard fallback mode{RESET}")
-            _stt_loaded = False
+        print(f"{CYAN}⏳ Loading faster-whisper base model...{RESET}")
+        _stt_whisper = WhisperModel("base", device="cpu", compute_type="int8")
+        print(f"{GREEN}✅ faster-whisper STT ready (base, CPU, int8){RESET}")
+    except Exception as e:
+        print(f"{YELLOW}⚠️ faster-whisper not available: {e}{RESET}")
+        _stt_whisper = None
+
+    try:
+        import speech_recognition as sr
+        _stt_sr = sr.Recognizer()
+        print(f"{GREEN}✅ SpeechRecognition STT ready (Google API fallback){RESET}")
+    except Exception as e:
+        print(f"{YELLOW}⚠️ SpeechRecognition not available: {e}{RESET}")
+        _stt_sr = None
 
 def listen_mic(timeout: float = 8.0, sample_rate: int = 16000) -> str:
-    """Record from mic and return transcribed text."""
-    # Try faster-whisper
-    if _stt_loaded and hasattr(_stt_model, 'transcribe'):
+    """Record from mic and return transcribed text with robust fallback."""
+    # 1. Try faster-whisper
+    if _stt_whisper is not None:
         try:
             import sounddevice as sd
             import numpy as np
             import io, wave
 
-            print(f"{CYAN}🎤 Listening...{RESET}", end=" ", flush=True)
-            duration   = timeout
+            print(f"{CYAN}🎤 Listening (Whisper)...{RESET}", end=" ", flush=True)
+            duration = timeout
             audio_data = sd.rec(
                 int(duration * sample_rate),
                 samplerate=sample_rate,
                 channels=1,
                 dtype='int16'
             )
-            # Wait with smart silence cutoff
+            # Wait with silence cutoff
             start = time.time()
             silence_count = 0
             chunk = int(sample_rate * 0.3)
@@ -155,52 +172,45 @@ def listen_mic(timeout: float = 8.0, sample_rate: int = 16000) -> str:
                     silence_count += 1
                 else:
                     silence_count = 0
-                if silence_count >= 5 and idx > sample_rate:  # 1.5s silence after speech
+                if silence_count >= 5 and idx > sample_rate:
                     break
 
             sd.stop()
             actual = audio_data[:idx].flatten()
-            if len(actual) < sample_rate * 0.3:
-                return ""
+            if len(actual) >= sample_rate * 0.3:
+                buf = io.BytesIO()
+                with wave.open(buf, 'wb') as wf:
+                    wf.setnchannels(1)
+                    wf.setsampwidth(2)
+                    wf.setframerate(sample_rate)
+                    wf.writeframes(actual.tobytes())
+                buf.seek(0)
 
-            # Convert to wav bytes
-            buf = io.BytesIO()
-            with wave.open(buf, 'wb') as wf:
-                wf.setnchannels(1)
-                wf.setsampwidth(2)
-                wf.setframerate(sample_rate)
-                wf.writeframes(actual.tobytes())
-            buf.seek(0)
-
-            segments, _ = _stt_model.transcribe(buf, language=None, beam_size=3)
-            text = " ".join(s.text.strip() for s in segments).strip()
-            print(f"{YELLOW}📝 Heard: \"{text}\"{RESET}")
-            return text
-
+                segments, _ = _stt_whisper.transcribe(buf, language=None, beam_size=3)
+                text = " ".join(s.text.strip() for s in segments).strip()
+                if text:
+                    print(f"{YELLOW}📝 Heard: \"{text}\"{RESET}")
+                    return text
         except Exception as e:
-            print(f"{RED}⚠️ Whisper error: {e}{RESET}")
-            return ""
+            print(f"{YELLOW}⚠️ Whisper error ({e}), trying Google STT fallback...{RESET}")
 
-    # Try SpeechRecognition (Google)
-    if _stt_loaded and hasattr(_stt_model, 'recognize_google'):
+    # 2. Try SpeechRecognition (Google)
+    if _stt_sr is not None:
         try:
             import speech_recognition as sr
             with sr.Microphone() as source:
-                print(f"{CYAN}🎤 Listening (Google)...{RESET}")
-                _stt_model.adjust_for_ambient_noise(source, duration=0.5)
-                audio = _stt_model.listen(source, timeout=timeout, phrase_time_limit=8)
-            text = _stt_model.recognize_google(audio)
-            print(f"{YELLOW}📝 Heard: \"{text}\"{RESET}")
-            return text
+                print(f"{CYAN}🎤 Listening (Google STT)...{RESET}")
+                _stt_sr.adjust_for_ambient_noise(source, duration=0.4)
+                audio = _stt_sr.listen(source, timeout=timeout, phrase_time_limit=8)
+            text = _stt_sr.recognize_google(audio)
+            if text:
+                print(f"{YELLOW}📝 Heard (Google): \"{text}\"{RESET}")
+                return text
         except Exception:
-            return ""
+            pass
 
-    # Keyboard fallback
-    try:
-        text = input(f"{CYAN}⌨️  Type command (no mic): {RESET}").strip()
-        return text
-    except (EOFError, KeyboardInterrupt):
-        return ""
+    return ""
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # WAKE WORD DETECTION
@@ -261,21 +271,57 @@ def check_quick_response(text: str) -> str:
             return val
     return ""
 
+_force_command_event = threading.Event()
+
+def _trigger_hotkey():
+    print(f"\n{BOLD}{GREEN}🔥 [HOTKEY] Ctrl+Shift+J pressed! Activating command mode...{RESET}")
+    toast_notify("Jarvis Hotkey Activated ⚡", "Sun raha hoon Basit bhai!")
+    _force_command_event.set()
+
+def setup_services():
+    """Starts background global hotkey and dropzone watcher."""
+    try:
+        import keyboard
+        keyboard.add_hotkey("ctrl+shift+j", _trigger_hotkey)
+        print(f"{GREEN}✅ Global Hotkey [Ctrl+Shift+J] active! Press anytime.{RESET}")
+    except Exception as e:
+        print(f"{YELLOW}⚠️ Global Hotkey not hooked ({e}){RESET}")
+
+    try:
+        from modules.dropzone_watcher import start_dropzone_watcher
+        start_dropzone_watcher(block=False)
+        print(f"{GREEN}✅ Auto Dropzone Watcher active (E:\\basit-jarvis-ai\\dropzone){RESET}")
+    except Exception as e:
+        print(f"{YELLOW}⚠️ Dropzone Watcher note: {e}{RESET}")
+
 # ─────────────────────────────────────────────────────────────────────────────
 # MAIN VOICE LOOP
 # ─────────────────────────────────────────────────────────────────────────────
 def voice_loop():
     """Main infinite loop — listens, understands, responds."""
+    setup_services()
+    toast_notify("Basit Jarvis AI 👑", "Voice OS is online & listening for 'Hey Jarvis'!")
     speak("Assalam o Alaikum Basit bhai! Main Jarvis hoon — poora active aur ready. Bas 'Hey Jarvis' kaho aur main sun lunga!")
 
     mode = "wake_word"  # Modes: wake_word, command
 
     while True:
         try:
+            if _force_command_event.is_set():
+                _force_command_event.clear()
+                speak("Haan bhai, batao! Main sun raha hoon.")
+                mode = "command"
+
             if mode == "wake_word":
                 # ── PHASE 1: Listen for wake word ──────────────────────────
-                print(f"\n{CYAN}👂 [{mode.upper()}] Listening for 'Hey Jarvis'...{RESET}")
+                print(f"\n{CYAN}👂 [{mode.upper()}] Listening for 'Hey Jarvis' (or press Ctrl+Shift+J)...{RESET}")
                 heard = listen_mic(timeout=5.0)
+
+                if _force_command_event.is_set():
+                    _force_command_event.clear()
+                    speak("Haan bhai, batao!")
+                    mode = "command"
+                    continue
 
                 if not heard:
                     continue
@@ -283,6 +329,7 @@ def voice_loop():
                 if check_wake_word(heard):
                     # Wake word detected!
                     print(f"{GREEN}🔔 WAKE WORD DETECTED! '{heard}'{RESET}")
+                    toast_notify("Wake Word Detected 🔔", f"Heard: '{heard}'")
                     speak("Haan bhai, batao! Main sun raha hoon.")
                     mode = "command"
                 else:
@@ -323,9 +370,11 @@ def voice_loop():
 
                 response = ask_jarvis(command)
                 speak(response)
+                toast_notify("Task Completed ✅", command[:60])
 
                 # Stay in command mode for follow-up
                 mode = "wake_word"
+
 
         except KeyboardInterrupt:
             speak("Jarvis shut down ho raha hai. Khuda hafiz Basit bhai!")
