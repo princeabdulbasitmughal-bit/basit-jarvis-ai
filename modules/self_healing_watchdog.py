@@ -133,6 +133,28 @@ def restart_node_server():
     return False
 
 
+def ensure_master_suite():
+    """Ensures launch_jarvis_master.py is active for Tray, HUD, and Hotkeys."""
+    try:
+        import psutil
+        for p in psutil.process_iter(['cmdline']):
+            cmd = " ".join(p.info.get('cmdline') or []).lower()
+            if 'launch_jarvis_master.py' in cmd:
+                return True
+        subprocess.Popen(
+            [sys.executable, "launch_jarvis_master.py", "--tray"],
+            cwd=BASE_DIR,
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        logger.info("✅ [WATCHDOG] Spawned launch_jarvis_master.py background suite.")
+        return True
+    except Exception as e:
+        logger.warning(f"[WATCHDOG MASTER SPAWN FAILED]: {e}")
+        return False
+
+
 def watchdog_loop(daemon_mode: bool = False):
     """Main continuous health evaluation loop."""
     logger.info("╔══════════════════════════════════════════════════════════╗")
@@ -141,6 +163,8 @@ def watchdog_loop(daemon_mode: bool = False):
     logger.info("╚══════════════════════════════════════════════════════════╝")
 
     consecutive_failures = 0
+    ensure_master_suite()
+
 
     while True:
         try:
