@@ -1,6 +1,31 @@
 {
+  "name": "basit-jarvis-ai",
+  "version": "2.0.0",
+  "description": "👑 Basit Jarvis AI — Sovereign Voice & Autonomous PC Control OS",
+  "main": "server.js",
+  "scripts": {
+    "start":          "node server.js",
+    "dev":            "node --watch server.js",
+    "pm2:start":      "pm2 start ecosystem.config.js",
+    "pm2:stop":       "pm2 stop all",
+    "pm2:restart":    "pm2 restart all",
+    "pm2:status":     "pm2 status",
+    "pm2:logs":       "pm2 logs",
+    "pm2:save":       "pm2 save",
+    "telegram":       "python -X utf8 modules/telegram_jarvis_bot.py",
+    "voice":          "python -X utf8 jarvis_voice.py",
+    "launcher":       "python -X utf8 launch_jarvis_master.py",
+    "dropzone":       "python -X utf8 -c \"from modules.dropzone_watcher import start_dropzone_watcher; import time; start_dropzone_watcher(block=True)\"",
+    "install:py":     "pip install -r requirements.txt",
+    "install:kokoro": "pip install kokoro-onnx soundfile"
+  },
   "dependencies": {
+    "localtunnel":     "^2.0.2",
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.34.7"
-  }
+  },
+  "devDependencies": {},
+  "keywords": ["jarvis", "ai", "voice", "automation", "telegram"],
+  "author": "Basit (absh5506@gmail.com)",
+  "license": "MIT"
 }
