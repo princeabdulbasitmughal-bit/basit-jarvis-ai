@@ -2464,9 +2464,31 @@ const server = http.createServer((req, res) => {
   sendJSON(res, { error: 'Not Found', path: pathname }, 404);
 });
 
+// Crash-proof immortal server guards
+process.on('uncaughtException', (err) => {
+  console.error('⚠️ [CRASH GUARD] Uncaught Exception intercepted:', err.message);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('⚠️ [CRASH GUARD] Unhandled Rejection intercepted:', reason);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`⚠️ Port ${PORT} already in use. Retrying in 2 seconds...`);
+    setTimeout(() => {
+      server.close();
+      server.listen(PORT, '0.0.0.0');
+    }, 2000);
+  } else {
+    console.error('⚠️ Server error:', err);
+  }
+});
+
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`===============================================================================`);
   console.log(`  👑 BASIT JARVIS AI — SOVEREIGN OS & VOICE CONTROLLER ONLINE`);
   console.log(`  🌐 Dashboard URL: http://localhost:${PORT} (or http://127.0.0.1:${PORT})`);
   console.log(`===============================================================================`);
 });
+
