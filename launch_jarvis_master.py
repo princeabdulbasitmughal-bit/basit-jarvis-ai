@@ -111,15 +111,39 @@ def trigger_screenshot():
         except Exception as e:
             print(f"⚠️ Screenshot error: {e}")
 
+_hud_app = None
+def get_hud_ref():
+    global _hud_app
+    if _hud_app is None:
+        try:
+            from modules.jarvis_hud import get_hud
+            _hud_app = get_hud()
+            _hud_app.create_window()
+        except Exception as e:
+            print(f"⚠️ HUD init note: {e}")
+    return _hud_app
+
+def toggle_hud():
+    hud = get_hud_ref()
+    if hud and hud.root:
+        hud.root.after(0, hud.toggle)
+
+def show_hud():
+    hud = get_hud_ref()
+    if hud and hud.root:
+        hud.root.after(0, hud.show)
+
 def register_hotkeys():
     """Registers OS-wide global shortcuts."""
     try:
         import keyboard
+        # Ctrl+Shift+J -> Toggle Jarvis Floating HUD & Voice
+        keyboard.add_hotkey("ctrl+shift+j", toggle_hud)
         # Ctrl+Shift+S -> Instant Screenshot
         keyboard.add_hotkey("ctrl+shift+s", trigger_screenshot)
         # Ctrl+Shift+D -> Open Dropzone folder
         keyboard.add_hotkey("ctrl+shift+d", lambda: os.startfile(DROPZONE_DIR))
-        print("✅ Hotkeys active: [Ctrl+Shift+J] Voice | [Ctrl+Shift+S] Screenshot | [Ctrl+Shift+D] Dropzone")
+        print("✅ Hotkeys active: [Ctrl+Shift+J] HUD/Voice | [Ctrl+Shift+S] Screenshot | [Ctrl+Shift+D] Dropzone")
     except Exception as e:
         print(f"⚠️ Hotkey hook note: {e}")
 
@@ -141,6 +165,7 @@ def start_system_tray():
             def open_drop(icon, item): os.startfile(DROPZONE_DIR)
             def open_shot(icon, item): os.startfile(SCREENSHOTS_DIR)
             def do_shot(icon, item): trigger_screenshot()
+            def do_hud(icon, item): show_hud()
             def do_exit(icon, item):
                 icon.stop()
                 os._exit(0)
@@ -148,9 +173,10 @@ def start_system_tray():
             menu = pystray.Menu(
                 pystray.MenuItem("👑 Basit Jarvis AI (Online)", lambda i, it: None, enabled=False),
                 pystray.Menu.SEPARATOR,
+                pystray.MenuItem("⚡ Quick Command HUD (Ctrl+Shift+J)", do_hud),
                 pystray.MenuItem("🌐 Open Dashboard (Port 8888)", open_dash),
-                pystray.MenuItem("📸 Instant Screenshot", do_shot),
-                pystray.MenuItem("📂 Open Dropzone Folder", open_drop),
+                pystray.MenuItem("📸 Instant Screenshot (Ctrl+Shift+S)", do_shot),
+                pystray.MenuItem("📂 Open Dropzone Folder (Ctrl+Shift+D)", open_drop),
                 pystray.MenuItem("📁 Open Screenshots Folder", open_shot),
                 pystray.Menu.SEPARATOR,
                 pystray.MenuItem("❌ Exit Jarvis Suite", do_exit)
@@ -182,8 +208,14 @@ def main():
     # 4. Start System Tray
     start_system_tray()
 
-    # 5. Toast Notification
-    send_toast("Basit Jarvis AI 👑", "All systems operational! Press Ctrl+Shift+S for screenshot.")
+    # 5. Open Web Dashboard in browser
+    try:
+        webbrowser.open("http://localhost:8888")
+    except Exception:
+        pass
+
+    # 6. Toast Notification
+    send_toast("Basit Jarvis AI 👑", "All systems operational! Press Ctrl+Shift+J for HUD, Ctrl+Shift+S for screenshot.")
 
     # Check mode
     if "--tray" in sys.argv:
@@ -194,27 +226,38 @@ def main():
         except KeyboardInterrupt:
             print("\nShutting down Jarvis...")
     else:
-        # Launch voice or keyboard loop with intelligent hardware auto-detection
+        # Launch voice or HUD loop with hardware auto-detection
         try:
-            import jarvis_voice
             from modules.audio_health import get_recommended_interaction_mode
-            jarvis_voice.banner()
-            jarvis_voice._init_tts()
-
             mode = get_recommended_interaction_mode()
+
+            from modules.jarvis_hud import speak_out_loud, get_hud
+            hud = get_hud()
+            hud.create_window()
+
             if mode == "voice":
                 print("\n🎤 Microphone hardware verified! Starting full voice interaction assistant...")
+                speak_out_loud("Salam Basit bhai! Main Jarvis hoon. System online hai aur main sun raha hoon.")
+                import jarvis_voice
+                jarvis_voice._init_tts()
                 jarvis_voice._init_stt()
-                jarvis_voice.voice_loop()
+                # Run voice loop in background thread so Tkinter HUD can run on main thread
+                t = threading.Thread(target=jarvis_voice.voice_loop, daemon=True)
+                t.start()
             else:
-                print("\n⌨️ No active microphone detected (or remote session) — starting intelligent keyboard chat mode...")
-                jarvis_voice.keyboard_loop()
+                print("\n⚡ Desktop HUD active! Press [Ctrl+Shift+J] anytime to give commands.")
+                speak_out_loud("Salam Basit bhai! Jarvis online hai. Port 8888 par dashboard ready hai, aur Ctrl+Shift+J daba kar command dein!")
+
+            # Main GUI event loop for HUD
+            hud.root.mainloop()
+
         except KeyboardInterrupt:
             print("\nShutting down Jarvis...")
         except Exception as e:
-            print(f"Voice loop error ({e}), starting keyboard chat mode:")
-            import jarvis_voice
-            jarvis_voice.keyboard_loop()
+            print(f"Launcher error: {e}")
+            while True:
+                time.sleep(1)
 
 if __name__ == "__main__":
     main()
+
