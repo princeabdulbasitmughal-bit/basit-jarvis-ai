@@ -194,14 +194,21 @@ def main():
         except KeyboardInterrupt:
             print("\nShutting down Jarvis...")
     else:
-        # Launch voice or keyboard loop
+        # Launch voice or keyboard loop with intelligent hardware auto-detection
         try:
             import jarvis_voice
-            print("\n🚀 Starting voice interaction assistant...")
+            from modules.audio_health import get_recommended_interaction_mode
             jarvis_voice.banner()
             jarvis_voice._init_tts()
-            jarvis_voice._init_stt()
-            jarvis_voice.voice_loop()
+
+            mode = get_recommended_interaction_mode()
+            if mode == "voice":
+                print("\n🎤 Microphone hardware verified! Starting full voice interaction assistant...")
+                jarvis_voice._init_stt()
+                jarvis_voice.voice_loop()
+            else:
+                print("\n⌨️ No active microphone detected (or remote session) — starting intelligent keyboard chat mode...")
+                jarvis_voice.keyboard_loop()
         except KeyboardInterrupt:
             print("\nShutting down Jarvis...")
         except Exception as e:

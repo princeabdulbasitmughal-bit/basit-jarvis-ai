@@ -325,7 +325,7 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const pathname = url.pathname;
 
-  // 1. Dashboard UI
+  // 1. Dashboard UI & PWA Assets
   if (pathname === '/' || pathname === '/index.html') {
     const indexPath = path.join(PUBLIC_DIR, 'index.html');
     if (fs.existsSync(indexPath)) {
@@ -334,6 +334,25 @@ const server = http.createServer((req, res) => {
     }
     res.writeHead(200, { 'Content-Type': 'text/html' });
     return res.end('<h1>Basit Jarvis AI Online</h1><p>Dashboard located at public/index.html</p>');
+  }
+
+  // 1a. PWA Static Assets (manifest.json, sw.js, icon.svg)
+  const publicFilePath = path.join(PUBLIC_DIR, path.basename(pathname));
+  if (fs.existsSync(publicFilePath) && fs.statSync(publicFilePath).isFile() && (pathname === '/manifest.json' || pathname === '/sw.js' || pathname.endsWith('.svg') || pathname.endsWith('.png') || pathname.endsWith('.ico'))) {
+    const ext = path.extname(publicFilePath).toLowerCase();
+    let contentType = 'application/octet-stream';
+    if (ext === '.json') contentType = 'application/manifest+json; charset=utf-8';
+    else if (ext === '.js') contentType = 'application/javascript; charset=utf-8';
+    else if (ext === '.svg') contentType = 'image/svg+xml';
+    else if (ext === '.png') contentType = 'image/png';
+    else if (ext === '.ico') contentType = 'image/x-icon';
+
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Access-Control-Allow-Origin': '*',
+      'Service-Worker-Allowed': '/'
+    });
+    return fs.createReadStream(publicFilePath).pipe(res);
   }
 
   // 1b. Screenshots static files — serve PNG images for inline preview

@@ -16,6 +16,9 @@
     "voice":          "python -X utf8 jarvis_voice.py",
     "launcher":       "python -X utf8 launch_jarvis_master.py",
     "dropzone":       "python -X utf8 -c \"from modules.dropzone_watcher import start_dropzone_watcher; import time; start_dropzone_watcher(block=True)\"",
+    "watchdog":       "python -X utf8 modules/self_healing_watchdog.py",
+    "audio:check":    "python -X utf8 modules/audio_health.py",
+    "models:cache":   "python -X utf8 modules/download_models.py",
     "install:py":     "pip install -r requirements.txt",
     "install:kokoro": "pip install kokoro-onnx soundfile"
   },
