@@ -2475,15 +2475,16 @@ process.on('unhandledRejection', (reason, promise) => {
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.error(`⚠️ Port ${PORT} already in use. Retrying in 2 seconds...`);
+    console.error(`⚠️ Port ${PORT} already in use. Retrying in 3 seconds...`);
     setTimeout(() => {
-      server.close();
-      server.listen(PORT, '0.0.0.0');
-    }, 2000);
+      try { server.close(); } catch (_) {}
+      try { server.listen(PORT, '0.0.0.0'); } catch (_) {}
+    }, 3000);
   } else {
     console.error('⚠️ Server error:', err);
   }
 });
+
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`===============================================================================`);
