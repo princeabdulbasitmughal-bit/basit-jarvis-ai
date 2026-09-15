@@ -1,3 +1,5 @@
-"""Telegram AI Bot Application Package."""
+"""
+Telemetry Microservice Package.
+"""
 
 __version__ = "2.1.0"
