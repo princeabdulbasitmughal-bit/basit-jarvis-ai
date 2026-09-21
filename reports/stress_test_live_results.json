@@ -1,0 +1,358 @@
+[
+  {
+    "url": "http://localhost:8888/api/command",
+    "method": "POST",
+    "status": 200,
+    "latency_ms": 2169.18,
+    "response": {
+      "success": true,
+      "response": "Hisab: 50 into 4 plus 25 = **225** ✅",
+      "speak": "Hisab: 50 into 4 plus 25 = **225** ✅",
+      "action_taken": "calculate",
+      "source": "conv_brain"
+    },
+    "error": null
+  },
+  {
+    "url": "http://localhost:8888/api/command",
+    "method": "POST",
+    "status": 200,
+    "latency_ms": 2178.98,
+    "response": {
+      "success": true,
+      "response": "Arre koi baat nahi bhai! Yahi toh mera kaam hai! 😊",
+      "speak": "Arre koi baat nahi bhai! Yahi toh mera kaam hai! 😊",
+      "action_taken": "conversation",
+      "source": "conv_brain"
+    },
+    "error": null
+  },
+  {
+    "url": "http://localhost:8888/api/command",
+    "method": "POST",
+    "status": 200,
+    "latency_ms": 2176.17,
+    "response": {
+      "success": true,
+      "response": "Bilkul ho gaya, sir! 🚀 Note save ho gaya: \"likho basit bhai ke business expansion plans\" 📝",
+      "speak": "Bilkul ho gaya, sir! 🚀 Note save ho gaya: \"likho basit bhai ke business expansion plans\" 📝",
+      "action_taken": "create_note",
+      "source": "conv_brain"
+    },
+    "error": null
+  },
+  {
+    "url": "http://localhost:8888/api/cluster",
+    "method": "GET",
+    "status": 200,
+    "latency_ms": 2029.92,
+    "response": {
+      "success": true,
+      "cluster": {
+        "rtx_a6000": {
+          "status": "ONLINE",
+          "latency": "4ms",
+          "model": "Qwen 2.5 Coder 32B"
+        },
+        "rtx_5090": {
+          "status": "ONLINE",
+          "latency": "12ms",
+          "model": "Kimi K3 (1M-Context)"
+        },
+        "groq": {
+          "status": "ONLINE",
+          "latency": "0.8s",
+          "model": "LLaMA 3.3 70B"
+        },
+        "mistral": {
+          "status": "ONLINE",
+          "latency": "1.4s",
+          "model": "Codestral Latest"
+        },
+        "hf_pool": {
+          "status": "ONLINE",
+          "pool_size": 15,
+          "active_tokens": 15
+        }
+      }
+    },
+    "error": null
+  },
+  {
+    "url": "http://localhost:8888/api/engine/basit1?task=ping",
+    "method": "GET",
+    "status": 200,
+    "latency_ms": 2493.41,
+    "response": {
+      "success": true,
+      "engine": "/basit1",
+      "result": {
+        "engine": "/basit1",
+        "mode": "Ultra-Fast Code Gen",
+        "compute": "Gemini 2.0 Flash -> Mistral Codestral -> RTX A6000 Qwen 32B -> Groq 120B",
+        "prompt": "ping",
+        "latency_sec": 0.01,
+        "response": "Basit1 ONLINE v2.1 — Devin/OpenHands Code Engine Ready. Quality Scorer + Syntax Validator + File Tree active.",
+        "created_files": [],
+        "quality": {
+          "score": 100,
+          "grade": "A+"
+        },
+        "summary": "Basit1 ONLINE — Code engine armed and ready.",
+        "banner": "BASIT1 v2.1 | Devin/OpenHands Ultra-Fast Code Gen | Quality Scorer | Groq 120B + Mistral Codestral + RTX A6000 Qwen 32B"
+      },
+      "summary": "Basit1 ONLINE — Code engine armed and ready."
+    },
+    "error": null
+  },
+  {
+    "url": "http://localhost:8888/api/engine/basit2?task=ping",
+    "method": "GET",
+    "status": 200,
+    "latency_ms": 2459.18,
+    "response": {
+      "success": true,
+      "engine": "/basit2",
+      "result": {
+        "engine": "/basit2",
+        "mode": "Health Check / Ping",
+        "latency_sec": 0.001,
+        "response": "Basit2 Deep Research Engine is ONLINE and operational.",
+        "summary": "Basit2 Deep Research armed and ready.",
+        "sources_used": [
+          "Wikipedia API",
+          "GitHub Search API",
+          "Local Knowledge Base"
+        ],
+        "banner": "BASIT2 | Deep Research Engine | Claude 3.5 Extended Thinking -> Kimi K3 1M -> Groq 120B"
+      },
+      "summary": "Basit2 Deep Research armed and ready."
+    },
+    "error": null
+  },
+  {
+    "url": "http://localhost:8888/api/engine/basit3?task=ping",
+    "method": "GET",
+    "status": 200,
+    "latency_ms": 2538.44,
+    "response": {
+      "success": true,
+      "engine": "/basit3",
+      "result": {
+        "engine": "/basit3",
+        "mode": "OWASP Audit + Process Guard + Auto-Git",
+        "action": "ping",
+        "latency_sec": 0,
+        "details": {},
+        "summary": "Basit3 inspection complete.",
+        "banner": "BASIT3 | Enterprise Security + Zero-Hang Watchdog + Auto-Git | OWASP 20-Pattern Audit"
+      },
+      "summary": "Basit3 inspection complete."
+    },
+    "error": null
+  },
+  {
+    "url": "http://localhost:8888/api/engine/basit4?task=ping",
+    "method": "GET",
+    "status": 200,
+    "latency_ms": 2420.29,
+    "response": {
+      "success": true,
+      "engine": "/basit4",
+      "result": {
+        "engine": "/basit4",
+        "mode": "Health Check / Ping",
+        "ticker": "GLOBAL",
+        "consensus": "BUY",
+        "confidence_pct": 98,
+        "latency_sec": 0.001,
+        "response": "Basit4 AI Hedge Fund Engine is ONLINE and operational.",
+        "summary": "Basit4 AI Hedge Fund armed and ready.",
+        "banner": "BASIT4 | AI Hedge Fund Engine | 6-Persona Consensus: Buffett + Cathie Wood + Munger + Ackman + DeepSeek-R1 Quant + Gemini Spark Quant"
+      },
+      "summary": "Basit4 AI Hedge Fund armed and ready."
+    },
+    "error": null
+  },
+  {
+    "url": "http://localhost:8888/api/engine/gemini-spark?task=ping",
+    "method": "GET",
+    "status": 200,
+    "latency_ms": 3337.27,
+    "response": {
+      "success": true,
+      "engine": "/gemini-spark",
+      "result": {
+        "engine": "/gemini-spark",
+        "mode": "Spark Engine Telemetry",
+        "action": "status",
+        "latency_sec": 0.799,
+        "telemetry": {
+          "pyspark_installed": true,
+          "pandas_installed": true,
+          "session_active": false,
+          "master": "local[*]",
+          "app_name": "BasitJarvisSpark",
+          "init_error": null,
+          "status": "STANDBY"
+        },
+        "summary": "Spark status: STANDBY | PySpark 4.2.0",
+        "banner": "GEMINI SPARK | Apache Spark 4.2.0 Distributed Engine + Google Gemini 2.0 Multimodal AI"
+      },
+      "summary": "Spark status: STANDBY | PySpark 4.2.0"
+    },
+    "error": null
+  },
+  {
+    "url": "http://localhost:8888/api/engine/arsenal",
+    "method": "GET",
+    "status": 200,
+    "latency_ms": 6374.53,
+    "response": {
+      "success": true,
+      "engine": "/arsenal",
+      "result": {
+        "engine": "/arsenal",
+        "mode": "Open-Source AI Arsenal Live Status",
+        "online_nodes": 6,
+        "total_nodes": 7,
+        "cluster_health": "OPTIMAL",
+        "nodes": {
+          "node_1_rtx_a6000": {
+            "hardware": "NVIDIA RTX A6000 (48GB VRAM)",
+            "online": true,
+            "latency_ms": 1549.4,
+            "models": [
+              "basit-interviewer-pro-32b:latest",
+              "basit-interviewer-pro:latest",
+              "codestral:latest",
+              "phi4:latest",
+              "opus5-killer:latest",
+              "pika-2.0:latest",
+              "gemini-2.0-pro:latest",
+              "runway-gen3:latest",
+              "cogvideox:latest",
+              "nemotron-3-ultra:latest",
+              "hunyuan-video:latest",
+              "qwen-3.8-max:latest",
+              "glm-5.3-max:latest",
+              "whisperx:latest",
+              "glm-4.7:latest",
+              "llama-3.3-70b:latest",
+              "o3-mini:latest",
+              "claude-mythos-5.1:latest",
+              "claude-3.7-sonnet:latest",
+              "gpt-6-astra:latest",
+              "o1:latest",
+              "qwen2.5-vl:latest",
+              "deepseek-r1:latest",
+              "deepseek-r1-finance:latest",
+              "grok-2:latest",
+              "llama-guard3:8b",
+              "moondream:latest",
+              "smollm2:1.7b",
+              "kimi-k3:cloud",
+              "deepseek-v4-pro:cloud",
+              "deepseek-v4-flash:cloud",
+              "qwen2.5-coder:32b",
+              "deepseek-coder-v2:16b",
+              "qwen2.5-coder:7b",
+              "qwen3:latest",
+              "muse-glimmer:latest",
+              "hermes3:8b",
+              "nomic-embed-text:latest",
+              "qwen2.5:7b"
+            ],
+            "icon": "🟢"
+          },
+          "node_2_rtx_5090": {
+            "hardware": "NVIDIA RTX 5090 (Remote)",
+            "online": false,
+            "latency_ms": -1,
+            "models": [
+              "Kimi K3 1M",
+              "DeepSeek-V4-Pro",
+              "Qwen3.5-397B"
+            ],
+            "icon": "🔴"
+          },
+          "node_3_groq": {
+            "hardware": "Groq LPU 0.8s (220 tok/s)",
+            "online": true,
+            "latency_ms": 837.2,
+            "models": [
+              "openai/gpt-oss-safeguard-20b",
+              "openai/gpt-oss-120b",
+              "meta-llama/llama-prompt-guard-2-86m",
+              "whisper-large-v3",
+              "groq/compound-mini",
+              "qwen/qwen3.8-27b",
+              "canopylabs/orpheus-v1-english",
+              "canopylabs/orpheus-arabic-saudi",
+              "groq/compound",
+              "allam-2-7b",
+              "meta-llama/llama-prompt-guard-2-22m",
+              "openai/gpt-oss-20b",
+              "whisper-large-v3-turbo"
+            ],
+            "icon": "🟢"
+          },
+          "node_3b_mistral": {
+            "hardware": "Mistral Cloud",
+            "online": true,
+            "latency_ms": 864.3,
+            "models": [
+              "codestral-latest",
+              "mistral-large-2"
+            ],
+            "icon": "🟢"
+          },
+          "node_4_hf_pool": {
+            "hardware": "HuggingFace 15-Token Pool",
+            "online": true,
+            "active_tokens": 15,
+            "models": [
+              "Llama-3.3-70B",
+              "FLUX.1-dev",
+              "BGE-M3"
+            ],
+            "icon": "🟢"
+          },
+          "node_5_claude_openai": {
+            "anthropic": true,
+            "openai": true
+          },
+          "node_6_gemini": {
+            "hardware": "Google AI Studio Cloud (2M Context)",
+            "online": true,
+            "latency_ms": 1490.6,
+            "models": [
+              "gemini-3.6-flash",
+              "gemini-2.5-flash",
+              "gemini-1.5-pro"
+            ],
+            "icon": "🟢"
+          },
+          "node_7_spark": {
+            "hardware": "Apache Spark (PySpark Native)",
+            "online": true,
+            "latency_ms": 12,
+            "models": [
+              "Spark-SQL",
+              "PySpark-DataFrames",
+              "Spark-MLlib",
+              "Distributed-RDD"
+            ],
+            "spark_ui": "http://localhost:4040",
+            "icon": "🟢"
+          }
+        },
+        "timestamp": "2026-09-21 19:29:40",
+        "summary": "Arsenal: 6/7 nodes online (including Gemini 2.0 & Apache Spark) | Health: OPTIMAL",
+        "banner": "OPEN-SOURCE AI ARSENAL | 6-Node Distributed Cluster | 18+ Models | Gemini + PySpark Matrix"
+      },
+      "summary": "Arsenal: 6/7 nodes online (including Gemini 2.0 & Apache Spark) | Health: OPTIMAL"
+    },
+    "error": null
+  }
+]
