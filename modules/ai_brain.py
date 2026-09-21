@@ -181,14 +181,14 @@ class AIBrain:
     # --------------------------------------------------------------------------
     # ENGINE IMPLEMENTATIONS
     # --------------------------------------------------------------------------
-    def _ask_gemini(self, query: str, history: Optional[List[Dict[str, str]]] = None, model: str = "gemini-3.6-flash", system_prompt: Optional[str] = None, max_tokens: int = 2500) -> Optional[str]:
+    def _ask_gemini(self, query: str, history: Optional[List[Dict[str, str]]] = None, model: str = "gemini-2.0-flash", system_prompt: Optional[str] = None, max_tokens: int = 2500) -> Optional[str]:
         """Queries Google Gemini API with automatic fallback between official SDK and REST."""
         if not self.gemini_api_key:
             return None
         t0 = time.time()
         sys_inst = system_prompt or self.system_prompt
 
-        candidate_models = [model, "gemini-3.6-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
+        candidate_models = [model, "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
         seen_models = set()
         candidate_models = [m for m in candidate_models if not (m in seen_models or seen_models.add(m))]
 

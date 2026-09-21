@@ -198,10 +198,10 @@ async function askAI(prompt) {
 
   const systemInstruction = "You are Basit Jarvis — the sovereign, ultra-intelligent, charismatic, and loyal AI personal assistant for your boss, Basit (also referred to as 'Basit bhai', 'Sir', or 'Boss'). Talk and interact EXACTLY like a real brilliant human companion (a blend of Tony Stark's JARVIS and a high-level COO). You have direct command over Basit1 (Code), Basit2 (Deep Research), Basit3 (OWASP Security & Watchdog), Basit4 (AI Hedge Fund), BasitSwarm (100-Agent Burst), and OpenSource AI Arsenal (RTX A6000 + RTX 5090 GPU Cluster). Bilingual Fluency: Speak fluent, friendly, natural Roman Urdu when addressed in Urdu/Hindi, and crisp, sophisticated English when addressed in English. Keep voice responses concise (1-3 lively, natural sentences) for conversational flow, and dive deep when asked for architecture, code, or strategies.";
 
-  // 1. Google Gemini 3.6 Flash (Primary Frontier Brain — 1M Context)
+  // 1. Google Gemini 2.0 Flash (Primary Frontier Brain — 1M Context)
   if (env.GEMINI_API_KEY) {
     try {
-      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
+      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
         method: 'POST',
         signal: AbortSignal.timeout(5000),
         headers: { 'Content-Type': 'application/json' },
@@ -217,7 +217,7 @@ async function askAI(prompt) {
         if (cand && cand.trim()) return cand.trim();
       }
     } catch (e) {
-      console.warn("Gemini 3.6 Flash error/timeout:", e.message);
+      console.warn("Gemini 2.0 Flash error/timeout:", e.message);
     }
   }
 
@@ -390,7 +390,7 @@ const server = http.createServer((req, res) => {
   }
 
   // 2. Status & Telemetry
-  if (pathname === '/api/status') {
+  if (pathname === '/api/status' || pathname === '/api/health' || pathname === '/api/system' || pathname === '/api/system-status') {
     let tunnelUrl = '';
     const tunnelFile = path.join(BASE_DIR, 'logs', 'tunnel-url.txt');
     if (fs.existsSync(tunnelFile)) {
@@ -586,8 +586,8 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 4. Command Execution (/api/command)
-  if (pathname === '/api/command' && req.method === 'POST') {
+  // 4. Command Execution (/api/command, /api/conversational-command, /api/execute)
+  if ((pathname === '/api/command' || pathname === '/api/conversational-command' || pathname === '/api/execute') && req.method === 'POST') {
     parseBody(data => {
       const rawCmd = (data.command || '').trim();
       let targetNode = (data.targetNode || 'host').toLowerCase().trim();
