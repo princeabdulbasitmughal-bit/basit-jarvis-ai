@@ -1,0 +1,80 @@
+{
+  "system_controls": {
+    "system_status": {
+      "status": "Working",
+      "latency_ms": 102.8,
+      "details": {
+        "cpu_percent": 27.3,
+        "ram_percent": 36.7,
+        "ram_used_gb": 93.7,
+        "ram_total_gb": 255.2,
+        "disk_percent": 77.9,
+        "battery_percent": null,
+        "battery_charging": null
+      }
+    },
+    "active_window": {
+      "status": "Working",
+      "latency_ms": 0.04,
+      "details": {
+        "title": "Desktop / None"
+      }
+    },
+    "process_management": {
+      "status": "Working",
+      "latency_ms": 7255.91,
+      "zombies_killed": 0
+    },
+    "screenshot": {
+      "status": "Not Working",
+      "latency_ms": 1.19,
+      "file_path": null,
+      "file_size_bytes": 0
+    },
+    "shell_execution": {
+      "status": "Working",
+      "latency_ms": 392.17
+    }
+  },
+  "whatsapp_and_contacts": {
+    "contact_book": {
+      "status": "Working",
+      "count": 5,
+      "latency_ms": 0.61,
+      "contacts": {
+        "ali": {
+          "email": "ali@gmail.com",
+          "phone": "923001234567"
+        },
+        "basit": {
+          "email": "absh5506@gmail.com",
+          "phone": "923007654321"
+        },
+        "hamid": {
+          "email": "hamid@gmail.com",
+          "phone": "923001111222"
+        },
+        "babar": {
+          "email": "babar@gmail.com",
+          "phone": "923112233445"
+        },
+        "zohaib": {
+          "email": "zohaib@gmail.com",
+          "phone": "923445566778"
+        }
+      }
+    },
+    "contacts_api": {
+      "status": "Working",
+      "count": 2,
+      "latency_ms": 2065.39
+    },
+    "whatsapp_integration": {
+      "status": "Working",
+      "latency_ms": 3040.11,
+      "script_exists": true,
+      "exit_code": 1,
+      "notes": "Headless WhatsApp module present; QR scan needed for first auth"
+    }
+  }
+}

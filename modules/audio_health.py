@@ -93,11 +93,14 @@ def get_recommended_interaction_mode() -> str:
 
 
 if __name__ == "__main__":
+    def _safe(s):
+        return str(s).encode('ascii', 'replace').decode('ascii') if s else "None"
+
     print("👑 [JARVIS AUDIO HEALTH DIAGNOSTIC]")
     devs = get_audio_devices()
-    print(f"Inputs found:  {len(devs['inputs'])} (Default: {devs['default_input']})")
-    print(f"Outputs found: {len(devs['outputs'])} (Default: {devs['default_output']})")
+    print(f"Inputs found:  {len(devs['inputs'])} (Default: {_safe(devs['default_input'])})")
+    print(f"Outputs found: {len(devs['outputs'])} (Default: {_safe(devs['default_output'])})")
     mic_test = test_microphone()
-    print(f"Mic Hardware Buffer Test: {'PASSED ✅' if mic_test else 'NO HARDWARE MIC / BUSY ⚠️'}")
+    print(f"Mic Hardware Buffer Test: {'PASSED [OK]' if mic_test else 'NO HARDWARE MIC / BUSY [WARN]'}")
     recommended = get_recommended_interaction_mode()
     print(f"Recommended Voice Mode:   {recommended.upper()} MODE")

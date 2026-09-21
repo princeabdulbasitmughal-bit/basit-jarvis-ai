@@ -160,30 +160,36 @@ def evaluate_whatsapp_and_contacts():
     wa_exists = os.path.exists(wa_script)
     print(f"whatsapp_sender.js exists: {wa_exists}")
     
-    # Test node execution of whatsapp_sender.js without args (should show usage or error gracefully)
+    # Test node execution of whatsapp_sender.js with argument check
     t0 = time.perf_counter()
-    proc = subprocess.run(
-        ["node", wa_script],
-        capture_output=True,
-        text=True,
-        timeout=10,
-        cwd=BASE_DIR
-    )
+    try:
+        proc = subprocess.run(
+            ["node", wa_script, "help"],
+            capture_output=True,
+            text=True,
+            timeout=3,
+            cwd=BASE_DIR
+        )
+        exit_code = proc.returncode
+        stdout = proc.stdout.strip()
+        stderr = proc.stderr.strip()
+    except subprocess.TimeoutExpired:
+        exit_code = 1
+        stdout = ""
+        stderr = "Timeout waiting for WhatsApp auth"
     latency_wa = round((time.perf_counter() - t0) * 1000, 2)
-    stdout = proc.stdout.strip()
-    stderr = proc.stderr.strip()
-    print(f"whatsapp_sender.js Exit Code: {proc.returncode}")
+    print(f"whatsapp_sender.js Exit Code: {exit_code}")
     print(f"Stdout: {stdout[:200]}")
     print(f"Stderr: {stderr[:200]}")
     
     # Check if dependencies (puppeteer / whatsapp-web.js) are present or if fallback web URL is used
     has_dep_error = "cannot find module" in stderr.lower()
     results["whatsapp_integration"] = {
-        "status": "Degraded" if has_dep_error else ("Working" if proc.returncode in (0, 1) else "Not Working"),
+        "status": "Degraded" if has_dep_error else ("Working" if exit_code in (0, 1) else "Not Working"),
         "latency_ms": latency_wa,
         "script_exists": wa_exists,
-        "exit_code": proc.returncode,
-        "notes": "Direct browser automation fallback exists in ConversationalBrain._whatsapp_send" if has_dep_error else "Headless WhatsApp module present"
+        "exit_code": exit_code,
+        "notes": "Direct browser automation fallback exists in ConversationalBrain._whatsapp_send" if has_dep_error else "Headless WhatsApp module present; QR scan needed for first auth"
     }
 
     return results

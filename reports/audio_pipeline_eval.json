@@ -1,0 +1,32 @@
+{
+  "audio_hardware": {
+    "status": "Working",
+    "latency_ms": 266.61,
+    "speaker_available": true,
+    "mic_available": true,
+    "recommended_mode": "keyboard"
+  },
+  "tts_pyttsx3": {
+    "status": "Working",
+    "latency_ms": 203.06,
+    "voices_count": 2
+  },
+  "tts_kokoro_neural": {
+    "status": "Degraded",
+    "latency_ms": 269.93,
+    "package_installed": true,
+    "model_cached": false,
+    "fallback_active": true
+  },
+  "stt_whisper": {
+    "status": "Working",
+    "latency_ms": 36505.98,
+    "package_installed": true
+  },
+  "wake_word_openwakeword": {
+    "status": "Degraded",
+    "latency_ms": 0.7,
+    "package_installed": false,
+    "lightweight_fallback": true
+  }
+}

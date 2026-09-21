@@ -2184,14 +2184,14 @@ const server = http.createServer((req, res) => {
   // 8. Window Snapping
   if (pathname === '/api/window/snap_left' || pathname === '/api/window/snap_right') {
     const key = pathname.includes('left') ? 'left' : 'right';
-    exec(`powershell -Command "$ws = New-Object -ComObject WScript.Shell; $ws.SendKeys('^{ESC}'); $ws.SendKeys('#{${key}}')"`, () => {
+    runGuiAction(['--action', 'hotkey', '--keys', 'win', key], () => {
       sendJSON(res, { success: true, action: `snap_${key}` });
     });
     return;
   }
 
   // 8b. Open Windows Sound & Recording Settings
-  if (pathname === '/api/system/sound_settings') {
+  if (pathname === '/api/system/sound_settings' && req.method === 'GET') {
     exec('powershell -Command "Start-Process mmsys.cpl -ArgumentList \',1\'"', () => {
       sendJSON(res, { success: true, message: 'Windows Sound Recording Devices panel opened.' });
     });

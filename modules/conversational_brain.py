@@ -19,6 +19,12 @@ import threading
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional, Tuple
 
+# Force UTF-8 stdout/stderr for Windows console
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
@@ -144,6 +150,11 @@ ACTION_PATTERNS = {
         r"(?:reminder|yaad|yaad\s+dilao|mujhe\s+yaad\s+dilao)\s+(?:karo\s+)?(?P<task>.+)\s+(?:at|baje|ko)\s+(?P<time>\d+(?::\d+)?(?:\s*[ap]m)?)",
         r"(?P<time>\d+(?::\d+)?(?:\s*[ap]m)?)\s+(?:ko|baje|at)\s+(?:mujhe\s+)?(?:remind|yaad\s+dilao)\s+(?P<task>.+)",
     ],
+    "tell_joke": [
+        r"(?:koi\s+)?(?:joke|latifa|chutkula)\s+(?:sunao|batao|kaho)",
+        r"(?:hanso|hansi|mazah)\s+(?:wali\s+baat|kuch\s+sunao)",
+        r"(?:tell\s+me\s+a\s+joke|make\s+me\s+laugh)",
+    ],
     "play_music": [
         r"(?:music|gaana|song|gana)\s+(?:chala\s+do|chalao|play\s+karo|play|lagao)",
         r"(?:spotify|youtube\s+music)\s+(?:kholo|chalao|open\s+karo)",
@@ -165,9 +176,11 @@ ACTION_PATTERNS = {
         r"(?P<text>.+)\s+(?:urdu|english|hindi)\s+mein\s+(?:likho|batao|translate\s+karo)",
     ],
     "calculate": [
-        r"(?:calculate|hisab|nikalo|compute)\s+(?:karo\s+)?(?P<expr>[\d\s\+\-\*\/\.\(\)\^]+)",
-        r"(?P<expr>[\d\s\+\-\*\/\.\(\)\^]+)\s+(?:calculate|hisab|compute)(?:\s+karo)?",
+        r"(?:calculate|hisab|nikalo|compute)\s+(?:karo\s+)?(?P<expr>.+)",
+        r"(?P<expr>.+?)\s+(?:calculate|hisab|compute)(?:\s+karo)?$",
+        r"(?P<expr>[\d\s\+\-\*\/\.\(\)\^\w]+)\s+(?:kitna\s+hota\s+hai|kitne\s+hote\s+hain|equals\s+what|\=)",
         r"^(?P<expr>\d+\s*[\+\-\*\/\^]\s*[\d\.\s\+\-\*\/\^]+)$",
+        r"^(?P<expr>\d+\s*(?:plus|minus|times|into|taqseem|zarab|divided\s+by)\s*[\d\.\s\w]+)$",
     ],
 
     "create_note": [
@@ -340,6 +353,9 @@ class ConversationalBrain:
         elif action == "open_app":
             app = (entities.get("app") or "").lower().strip()
             return self._open_app(app, original_text)
+
+        elif action == "tell_joke":
+            return self._tell_joke()
 
         elif action == "play_music":
             query = entities.get("query") or entities.get("song") or ""
@@ -603,13 +619,56 @@ $bmp.Dispose()
         except Exception:
             return "System status check nahi ho saka. psutil install hai?"
 
+    def _tell_joke(self) -> str:
+        """Tell a witty and humorous bilingual joke."""
+        import random
+        jokes = [
+            "Aik programmer ne apni biwi se pucha: 'Main market ja raha hoon, kuch lana hai?' Biwi boli: '1 darjan anday le aao, aur agar seb milein to 5 le aana.' Programmer 5 anday le aaya! Biwi ne pucha: 'Yeh kya hai?' Programmer bola: 'Seb mil gaye thay!' 😂",
+            "Teacher: 'Agar tumhare paas 10 amrood hon aur tum 3 Ali ko de do, to kya bachega?' Pappu: 'Sir, bachega to kuch nahi, bas Ali ki pitayi hogi kyunki usne zabardasti cheene thay!' 🤣",
+            "Doctor: 'Aapka wazan bohat barh gaya hai, roz 5 kilometer dauda karein.' Patient 1 maheene baad call karta hai: 'Doctor sahab, main 150 km door aa gaya hoon, ab wapas kaise aaun?' 😆",
+            "Why do programmers prefer dark mode? Because light attracts bugs! 🐛💻",
+            "There are 10 types of people in the world: those who understand binary, and those who don't! 😉"
+        ]
+        return random.choice(jokes)
+
     def _calculate(self, expr: str) -> str:
-        """Safely evaluate math expression."""
+        """Safely evaluate math expression with natural language support."""
         try:
-            expr_clean = re.sub(r'[^0-9\+\-\*\/\.\(\)\s\^]', '', expr)
-            expr_clean = expr_clean.replace('^', '**')
+            expr_proc = expr.lower().strip()
+            word_map = {
+                'divided by': '/',
+                'divide by': '/',
+                'taqseem': '/',
+                'multiplied by': '*',
+                'multiply by': '*',
+                'into': '*',
+                'times': '*',
+                'zarab': '*',
+                'plus': '+',
+                'jama': '+',
+                'add': '+',
+                'minus': '-',
+                'tafriq': '-',
+                'sub': '-',
+                'power': '**',
+                'ghaat': '**'
+            }
+            for word, op in word_map.items():
+                expr_proc = re.sub(rf'\b{re.escape(word)}\b', op, expr_proc)
+
+            strip_phrases = [
+                r'kitna\s+hota\s+hai', r'kitne\s+hote\s+hain', r'kitna\s+hai',
+                r'batao', r'equals', r'what\s+is', r'ka\s+jawab', r'\='
+            ]
+            for phrase in strip_phrases:
+                expr_proc = re.sub(phrase, '', expr_proc)
+
+            expr_clean = re.sub(r'[^0-9\+\-\*\/\.\(\)\s\^]', '', expr_proc)
+            expr_clean = expr_clean.replace('^', '**').strip()
+            if not expr_clean:
+                return f"Bhai yeh expression samajh nahi aaya: '{expr}'. Seedha likho jaise '25 * 4 + 10'."
             result = eval(expr_clean, {"__builtins__": {}}, {})
-            return f"Hisab: {expr_clean} = **{result}** ✅"
+            return f"Hisab: {expr.strip()} = **{result}** ✅"
         except Exception:
             return f"Bhai yeh expression samajh nahi aaya: '{expr}'. Seedha likho jaise '25 * 4 + 10'."
 

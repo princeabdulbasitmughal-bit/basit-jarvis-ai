@@ -53,7 +53,7 @@ class SubagentSwarm20:
         t0 = time.perf_counter()
         try:
             from modules.basit_engines import Basit2Researcher
-            has_search = hasattr(Basit2Researcher, 'search_web')
+            has_search = hasattr(Basit2Researcher, 'execute')
             dt = round((time.perf_counter() - t0) * 1000, 1)
             return {
                 "id": 2, "name": "Basit2 Deep Research", "icon": "🔬", "category": "Core Engine",

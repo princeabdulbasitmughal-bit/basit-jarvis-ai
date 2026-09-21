@@ -653,7 +653,8 @@ if __name__ == '__main__':
     parser.add_argument('--topic', required=True, help="Topic for research and PDF generation")
     parser.add_argument('--recipient', default=None, help="Contact name or email address")
     parser.add_argument('--email', action='store_true', help="Send report via email")
-    parser.add_argument('--open', action='store_true', help="Open generated PDF on screen")
+    parser.add_argument('--open', action='store_true', default=False, help="Open generated PDF on screen")
+    parser.add_argument('--no-open', action='store_false', dest='open', help="Do not open PDF")
 
     args = parser.parse_args()
 
