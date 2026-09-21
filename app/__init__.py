@@ -1,5 +1,7 @@
 """
-Telemetry Microservice Package.
+app package initialization.
+
+Exports the primary public API of the package.
 """
 
-__version__ = "2.1.0"
+from .core import say_hello  # noqa: F401

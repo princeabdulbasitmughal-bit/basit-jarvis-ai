@@ -1969,8 +1969,8 @@ const server = http.createServer((req, res) => {
 
 
   // 5. Basit Engines (Real Python Engine Execution)
-  if (pathname.startsWith('/api/basit') || pathname === '/api/arsenal' || pathname === '/api/opensource-ai-arsenal' || pathname === '/api/cluster-status' || pathname === '/api/gemini' || pathname === '/api/spark' || pathname === '/api/gemini-spark' || pathname === '/api/assistant') {
-    let engine = pathname.replace('/api/', '');
+  if (pathname.startsWith('/api/engine/') || pathname.startsWith('/api/basit') || pathname === '/api/arsenal' || pathname === '/api/opensource-ai-arsenal' || pathname === '/api/cluster-status' || pathname === '/api/gemini' || pathname === '/api/spark' || pathname === '/api/gemini-spark' || pathname === '/api/assistant') {
+    let engine = pathname.replace('/api/engine/', '').replace('/api/', '');
     if (engine === 'opensource-ai-arsenal' || engine === 'cluster-status') engine = 'arsenal';
     if (engine === 'gemini' || engine === 'spark') engine = 'gemini-spark';
 

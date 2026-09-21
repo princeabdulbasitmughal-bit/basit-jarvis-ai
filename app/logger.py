@@ -1,27 +1,25 @@
 """
-Centralized logging configuration module.
+Centralised logger configuration.
+
+The logger is configured once and imported wherever logging is required.
 """
 
 import logging
-import sys
-from app.config import settings
+from .config import LOG_LEVEL
 
+_logger = logging.getLogger("hello_app")
+if not _logger.handlers:
+    # Configure only once (idempotent)
+    _logger.setLevel(LOG_LEVEL)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    handler.setFormatter(formatter)
+    _logger.addHandler(handler)
+    _logger.propagate = False
 
-def setup_logger() -> logging.Logger:
-    """Configures and returns the application logger."""
-    logger = logging.getLogger("JarvisBot")
-    logger.setLevel(settings.LOG_LEVEL.upper())
-
-    if not logger.handlers:
-        handler = logging.StreamHandler(sys.stdout)
-        formatter = logging.Formatter(
-            fmt="%(asctime)s [%(levelname)s] %(name)s (%(filename)s:%(lineno)d): %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S"
-        )
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-
-    return logger
-
-
-logger = setup_logger()
+def get_logger() -> logging.Logger:
+    """Return the configured application logger."""
+    return _logger

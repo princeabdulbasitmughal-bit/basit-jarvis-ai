@@ -1,0 +1,62 @@
+{
+  "/api/engine/arsenal": {
+    "engine": "/api/engine/arsenal",
+    "name": "Open-Source AI Arsenal / GPU Cluster",
+    "status_code": 200,
+    "success": true,
+    "latency_ms": 17334.25,
+    "status": "Working",
+    "error": null,
+    "preview": "Arsenal: 5/7 nodes online (including Gemini 2.0 & Apache Spark) | Health: OPTIMAL"
+  },
+  "/api/engine/basit3": {
+    "engine": "/api/engine/basit3",
+    "name": "Basit3 Guardian / Security & Process Guard",
+    "status_code": 200,
+    "success": true,
+    "latency_ms": 4245.25,
+    "status": "Working",
+    "error": null,
+    "preview": "Zombie Sweep: 0 killed (0.0MB freed)"
+  },
+  "/api/engine/basit1": {
+    "engine": "/api/engine/basit1",
+    "name": "Basit1 Coder / Devin OpenHands",
+    "status_code": 200,
+    "success": true,
+    "latency_ms": 35785.56,
+    "status": "Working",
+    "error": null,
+    "preview": "Basit1 generated code in 32.54s | Quality: C (65/100) | 1 files written."
+  },
+  "/api/engine/basit2": {
+    "engine": "/api/engine/basit2",
+    "name": "Basit2 Deep Research",
+    "status_code": 200,
+    "success": true,
+    "latency_ms": 42486.23,
+    "status": "Working",
+    "error": null,
+    "preview": "Basit2 synthesized research in 39.56s."
+  },
+  "/api/engine/basit4": {
+    "engine": "/api/engine/basit4",
+    "name": "Basit4 AI Hedge Fund Consensus",
+    "status_code": 200,
+    "success": true,
+    "latency_ms": 18199.31,
+    "status": "Working",
+    "error": null,
+    "preview": "Basit4 completed 6-persona hedge fund analysis in 15.18s."
+  },
+  "/api/engine/gemini-spark": {
+    "engine": "/api/engine/gemini-spark",
+    "name": "Gemini-Spark Master Engine",
+    "status_code": 200,
+    "success": true,
+    "latency_ms": 23456.94,
+    "status": "Working",
+    "error": null,
+    "preview": "Gemini Spark synthesized distributed pipeline in 20.08s."
+  }
+}
