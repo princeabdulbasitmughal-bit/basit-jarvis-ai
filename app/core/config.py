@@ -1,40 +1,39 @@
 """
-Application Configuration Module using Pydantic Settings.
+Configuration handling for the FastAPI application.
 """
 
-from typing import List
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from __future__ import annotations
 
+import os
+from pathlib import Path
+from typing import Final
+
+from pydantic import BaseSettings, Field, validator
 
 class Settings(BaseSettings):
-    """System configuration parameters."""
+    """
+    Settings for the application, loaded from environment variables
+    or a `.env` file located at the project root.
+    """
 
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=True
-    )
+    APP_NAME: str = Field("Status Ping Service", env="APP_NAME")
+    LOG_LEVEL: str = Field("INFO", env="LOG_LEVEL")
+    DEBUG: bool = Field(False, env="DEBUG")
+    HOST: str = Field("0.0.0.0", env="HOST")
+    PORT: int = Field(8000, env="PORT")
+    RELOAD: bool = Field(False, env="RELOAD")
 
-    # API Metadata
-    PROJECT_NAME: str = "Telemetry Microservice"
-    VERSION: str = "2.1.0"
-    API_V1_STR: str = "/api/v1"
-    DEBUG: bool = False
-    LOG_LEVEL: str = "INFO"
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
-    # CORS
-    ALLOWED_ORIGINS: List[str] = ["*"]
+    @validator("LOG_LEVEL")
+    def _validate_log_level(cls, v: str) -> str:
+        allowed = {"CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"}
+        upper_v = v.upper()
+        if upper_v not in allowed:
+            raise ValueError(f"Invalid LOG_LEVEL: {v}. Choose from {allowed}")
+        return upper_v
 
-    # Security & JWT Settings
-    JWT_SECRET_KEY: str = Field(
-        default="09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7",
-        description="Must be overridden in production via environment variable.",
-    )
-    JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
-
-    # Service Credentials for Demo Authentication
-    ADMIN_USERNAME: str = "admin"
-    ADMIN_PASSWORD: str = "SuperSecretPassword123!"
-
-
-settings = Settings()
+# Create a module‑level singleton that can be imported elsewhere.
+settings: Final[Settings] = Settings()

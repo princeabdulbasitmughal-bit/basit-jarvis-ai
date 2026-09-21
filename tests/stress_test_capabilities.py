@@ -147,8 +147,17 @@ else:
     print(f" -> Failed: {res_scalper}")
 
 # 12. Cloudflare Public Tunnel
-print("\n[12/12] Testing Cloudflare Public Tunnel (https://levitra-gently-forever-occurred.trycloudflare.com/status)...")
-res_cf = test_endpoint("Cloudflare Tunnel", "https://levitra-gently-forever-occurred.trycloudflare.com/status", timeout=15)
+cf_url = "https://nikon-produce-ruled-generated.trycloudflare.com"
+try:
+    with open(r"E:\omnitrade-ai-matrix\tunnel_status.json", "r", encoding="utf-8") as f:
+        t_data = json.load(f)
+        if t_data.get("url"):
+            cf_url = t_data.get("url")
+except Exception:
+    pass
+
+print(f"\n[12/12] Testing Cloudflare Public Tunnel ({cf_url}/status)...")
+res_cf = test_endpoint("Cloudflare Tunnel", f"{cf_url}/status", timeout=15)
 results["cloudflare_tunnel"] = res_cf
 print(f" -> Status: {res_cf['status']} | Latency: {res_cf['latency_ms']}ms")
 

@@ -2,7 +2,7 @@
   "math_query": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 2246.84,
+    "latency_ms": 2262.56,
     "data": {
       "success": true,
       "response": "Hisab: 50 into 4 plus 25 = **225** ✅",
@@ -14,11 +14,11 @@
   "joke_query": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 2192.56,
+    "latency_ms": 2233.42,
     "data": {
       "success": true,
-      "response": "Arre koi baat nahi bhai! Yahi toh mera kaam hai! 😊",
-      "speak": "Arre koi baat nahi bhai! Yahi toh mera kaam hai! 😊",
+      "response": "Khushi hua bhai! Kuch aur ho toh batao!",
+      "speak": "Khushi hua bhai! Kuch aur ho toh batao!",
       "action_taken": "conversation",
       "source": "conv_brain"
     }
@@ -26,11 +26,11 @@
   "note_query": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 2245.79,
+    "latency_ms": 2279.97,
     "data": {
       "success": true,
-      "response": "Bilkul ho gaya, sir! 🚀 Note save ho gaya: \"likho basit bhai ke business expansion plans\" 📝",
-      "speak": "Bilkul ho gaya, sir! 🚀 Note save ho gaya: \"likho basit bhai ke business expansion plans\" 📝",
+      "response": "Sorted! Kuch aur chahiye? 😊 Note save ho gaya: \"likho basit bhai ke business expansion plans\" 📝",
+      "speak": "Sorted! Kuch aur chahiye? 😊 Note save ho gaya: \"likho basit bhai ke business expansion plans\" 📝",
       "action_taken": "create_note",
       "source": "conv_brain"
     }
@@ -38,7 +38,7 @@
   "gpu_cluster": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 2056.28,
+    "latency_ms": 2049.77,
     "data": {
       "success": true,
       "cluster": {
@@ -73,7 +73,7 @@
   "engine_basit1": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 2509.55,
+    "latency_ms": 2602.23,
     "data": {
       "success": true,
       "engine": "/basit1",
@@ -98,7 +98,7 @@
   "engine_basit2": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 2558.42,
+    "latency_ms": 2526.58,
     "data": {
       "success": true,
       "engine": "/basit2",
@@ -121,7 +121,7 @@
   "engine_basit3": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 2504.13,
+    "latency_ms": 2533.97,
     "data": {
       "success": true,
       "engine": "/basit3",
@@ -140,7 +140,7 @@
   "engine_basit4": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 2535.11,
+    "latency_ms": 2603.57,
     "data": {
       "success": true,
       "engine": "/basit4",
@@ -161,7 +161,7 @@
   "engine_gemini_spark": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 3577.44,
+    "latency_ms": 3475.12,
     "data": {
       "success": true,
       "engine": "/gemini-spark",
@@ -169,7 +169,7 @@
         "engine": "/gemini-spark",
         "mode": "Spark Engine Telemetry",
         "action": "status",
-        "latency_sec": 0.89,
+        "latency_sec": 0.901,
         "telemetry": {
           "pyspark_installed": true,
           "pandas_installed": true,
@@ -188,7 +188,7 @@
   "engine_arsenal": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 6436.79,
+    "latency_ms": 6364.84,
     "data": {
       "success": true,
       "engine": "/arsenal",
@@ -202,7 +202,7 @@
           "node_1_rtx_a6000": {
             "hardware": "NVIDIA RTX A6000 (48GB VRAM)",
             "online": true,
-            "latency_ms": 1563.1,
+            "latency_ms": 1546.3,
             "models": [
               "basit-interviewer-pro-32b:latest",
               "basit-interviewer-pro:latest",
@@ -215,19 +215,19 @@
               "cogvideox:latest",
               "nemotron-3-ultra:latest",
               "hunyuan-video:latest",
-              "qwen-3.8-max:latest",
               "glm-5.3-max:latest",
               "whisperx:latest",
               "glm-4.7:latest",
               "llama-3.3-70b:latest",
+              "qwen-3.8-max:latest",
+              "o3-mini:latest",
+              "claude-mythos-5.1:latest",
               "claude-3.7-sonnet:latest",
               "gpt-6-astra:latest",
               "o1:latest",
-              "o3-mini:latest",
-              "claude-mythos-5.1:latest",
-              "qwen2.5-vl:latest",
               "deepseek-r1:latest",
               "deepseek-r1-finance:latest",
+              "qwen2.5-vl:latest",
               "grok-2:latest",
               "llama-guard3:8b",
               "moondream:latest",
@@ -260,28 +260,28 @@
           "node_3_groq": {
             "hardware": "Groq LPU 0.8s (220 tok/s)",
             "online": true,
-            "latency_ms": 911.7,
+            "latency_ms": 882.9,
             "models": [
-              "canopylabs/orpheus-v1-english",
-              "meta-llama/llama-prompt-guard-2-86m",
-              "canopylabs/orpheus-arabic-saudi",
-              "whisper-large-v3",
-              "openai/gpt-oss-120b",
-              "meta-llama/llama-prompt-guard-2-22m",
-              "openai/gpt-oss-20b",
-              "groq/compound-mini",
               "allam-2-7b",
-              "qwen/qwen3.8-27b",
+              "openai/gpt-oss-20b",
+              "canopylabs/orpheus-arabic-saudi",
               "whisper-large-v3-turbo",
+              "groq/compound",
+              "canopylabs/orpheus-v1-english",
+              "whisper-large-v3",
+              "groq/compound-mini",
               "openai/gpt-oss-safeguard-20b",
-              "groq/compound"
+              "meta-llama/llama-prompt-guard-2-86m",
+              "meta-llama/llama-prompt-guard-2-22m",
+              "openai/gpt-oss-120b",
+              "qwen/qwen3.8-27b"
             ],
             "icon": "🟢"
           },
           "node_3b_mistral": {
             "hardware": "Mistral Cloud",
             "online": true,
-            "latency_ms": 948.3,
+            "latency_ms": 927.5,
             "models": [
               "codestral-latest",
               "mistral-large-2"
@@ -306,7 +306,7 @@
           "node_6_gemini": {
             "hardware": "Google AI Studio Cloud (2M Context)",
             "online": true,
-            "latency_ms": 1513.3,
+            "latency_ms": 942.2,
             "models": [
               "gemini-3.6-flash",
               "gemini-2.5-flash",
@@ -328,7 +328,7 @@
             "icon": "🟢"
           }
         },
-        "timestamp": "2026-09-21 19:50:50",
+        "timestamp": "2026-09-22 01:30:03",
         "summary": "Arsenal: 6/7 nodes online (including Gemini 2.0 & Apache Spark) | Health: OPTIMAL",
         "banner": "OPEN-SOURCE AI ARSENAL | 6-Node Distributed Cluster | 18+ Models | Gemini + PySpark Matrix"
       },
@@ -338,7 +338,7 @@
   "omnitrade_scalper": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 28.0,
+    "latency_ms": 28.42,
     "data": {
       "status": "ACTIVE_SCALPING",
       "account_mode": "DEMO_ACCOUNT",
@@ -347,39 +347,52 @@
       "leverage": "1:500",
       "currency": "USD",
       "symbol": "XAUUSD",
-      "current_price": 2431.07,
-      "balance": 10017.5,
-      "equity": 10017.5,
-      "margin_free": 10017.5,
-      "daily_pnl": 17.5,
-      "open_positions": [],
-      "total_trades": 32,
-      "win_rate_pct": 87.5,
-      "last_signal": "HOLD",
-      "spread_pips": 1.8,
-      "rolling_spread_ema": 1.61,
-      "dynamic_slippage_points": 15,
+      "current_price": 2424.25,
+      "balance": 10058.6,
+      "equity": 10057.74,
+      "margin_free": 10057.74,
+      "daily_pnl": 58.6,
+      "open_positions": [
+        {
+          "id": "trade-1790022542688",
+          "symbol": "XAUUSD",
+          "type": "SELL",
+          "lots": 0.01,
+          "entry": 2423.39,
+          "sl": 2427.89,
+          "tp": 2420.89,
+          "open_time": "2026-09-21T20:29:02.688309Z",
+          "spread_pips": 1.7,
+          "dynamic_deviation": 16
+        }
+      ],
+      "total_trades": 208,
+      "win_rate_pct": 82.2,
+      "last_signal": "SELL",
+      "spread_pips": 1.5,
+      "rolling_spread_ema": 1.66,
+      "dynamic_slippage_points": 16,
       "mt5_connected": false,
       "broker_login": "DEMO-889901-MT5",
       "broker_server": "MetaQuotes-Demo",
       "latency_metrics": {
-        "tick_to_signal_us": 42.2,
-        "signal_to_dispatch_us": 69.8,
+        "tick_to_signal_us": 17.2,
+        "signal_to_dispatch_us": 53.3,
         "order_execution_ms": 0.0,
         "total_fill_latency_ms": 0.0,
-        "avg_tick_loop_us": 578.05,
-        "ticks_processed": 4288,
+        "avg_tick_loop_us": 1015.64,
+        "ticks_processed": 24606,
         "last_slippage_pips": 0.0,
         "avg_slippage_pips": 0.0,
-        "dynamic_slippage_points": 15
+        "dynamic_slippage_points": 16
       },
-      "updated_at": "2026-09-21T14:50:50.637717Z"
+      "updated_at": "2026-09-21T20:30:03.777330Z"
     }
   },
   "cloudflare_tunnel": {
     "status": "PASS",
     "http_code": 200,
-    "latency_ms": 15620.47,
+    "latency_ms": 15356.96,
     "data": {
       "status": "ACTIVE_SCALPING",
       "account_mode": "DEMO_ACCOUNT",
@@ -388,33 +401,46 @@
       "leverage": "1:500",
       "currency": "USD",
       "symbol": "XAUUSD",
-      "current_price": 2429.77,
-      "balance": 10017.5,
-      "equity": 10017.5,
-      "margin_free": 10017.5,
-      "daily_pnl": 17.5,
-      "open_positions": [],
-      "total_trades": 32,
-      "win_rate_pct": 87.5,
-      "last_signal": "HOLD",
-      "spread_pips": 2.0,
-      "rolling_spread_ema": 1.68,
-      "dynamic_slippage_points": 15,
+      "current_price": 2425.2,
+      "balance": 10058.6,
+      "equity": 10056.79,
+      "margin_free": 10056.79,
+      "daily_pnl": 58.6,
+      "open_positions": [
+        {
+          "id": "trade-1790022542688",
+          "symbol": "XAUUSD",
+          "type": "SELL",
+          "lots": 0.01,
+          "entry": 2423.39,
+          "sl": 2427.89,
+          "tp": 2420.89,
+          "open_time": "2026-09-21T20:29:02.688309Z",
+          "spread_pips": 1.7,
+          "dynamic_deviation": 16
+        }
+      ],
+      "total_trades": 208,
+      "win_rate_pct": 82.2,
+      "last_signal": "SELL",
+      "spread_pips": 1.6,
+      "rolling_spread_ema": 1.65,
+      "dynamic_slippage_points": 16,
       "mt5_connected": false,
       "broker_login": "DEMO-889901-MT5",
       "broker_server": "MetaQuotes-Demo",
       "latency_metrics": {
-        "tick_to_signal_us": 17.6,
-        "signal_to_dispatch_us": 69.8,
+        "tick_to_signal_us": 17.2,
+        "signal_to_dispatch_us": 53.3,
         "order_execution_ms": 0.0,
         "total_fill_latency_ms": 0.0,
-        "avg_tick_loop_us": 595.4,
-        "ticks_processed": 4303,
+        "avg_tick_loop_us": 1022.72,
+        "ticks_processed": 24621,
         "last_slippage_pips": 0.0,
         "avg_slippage_pips": 0.0,
-        "dynamic_slippage_points": 15
+        "dynamic_slippage_points": 16
       },
-      "updated_at": "2026-09-21T14:51:05.652452Z"
+      "updated_at": "2026-09-21T20:30:18.798561Z"
     }
   }
 }
