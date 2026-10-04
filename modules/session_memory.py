@@ -45,11 +45,15 @@ class SessionMemory:
             return False
 
     def backup(self, backup_path: str = None) -> bool:
-        """Physical live snapshot using SQLite online backup API."""
+        """Physical live snapshot using SQLite online backup API with WAL checkpoint."""
         try:
             dst_path = backup_path or (self.db_path + ".bak")
             os.makedirs(os.path.dirname(dst_path), exist_ok=True)
             with sqlite3.connect(self.db_path, timeout=10) as src:
+                try:
+                    src.execute("PRAGMA wal_checkpoint(TRUNCATE);")
+                except Exception:
+                    pass
                 dst = sqlite3.connect(dst_path)
                 src.backup(dst)
                 dst.close()
@@ -64,6 +68,15 @@ class SessionMemory:
         """
         if self.verify_integrity():
             return True
+
+        # Clean up stale WAL / SHM files if corrupt
+        for ext in ["-wal", "-shm"]:
+            wal_file = self.db_path + ext
+            if os.path.exists(wal_file):
+                try:
+                    os.remove(wal_file)
+                except Exception:
+                    pass
 
         bak_path = self.db_path + ".bak"
         # Check if backup exists and is healthy
@@ -156,6 +169,7 @@ class SessionMemory:
                 c.execute('INSERT INTO conversations (role, content, engine) VALUES (?, ?, ?)', (role, content[:4000], engine))
             # Auto-prune periodically (probabilistically or every save)
             self.prune_memory(max_conversations=1000, max_logs=500)
+            self.backup()
         except Exception as e:
             pass
 
@@ -171,6 +185,7 @@ class SessionMemory:
         try:
             with self._conn() as c:
                 c.execute('INSERT OR REPLACE INTO preferences (key, value) VALUES (?, ?)', (key, str(value)))
+            self.backup()
         except Exception:
             pass
 
