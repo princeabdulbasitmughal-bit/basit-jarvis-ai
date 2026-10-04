@@ -139,10 +139,20 @@ def check_memory_db() -> bool:
         cur.execute("PRAGMA integrity_check;")
         res = cur.fetchone()
         conn.close()
-        return res and res[0] == "ok"
+        if res and res[0] == "ok":
+            return True
+        logger.warning(f"[DB INTEGRITY FAIL]: PRAGMA result {res}. Triggering auto-recovery...")
+        from modules.session_memory import SessionMemory
+        mem = SessionMemory(db_path)
+        return mem.repair_or_recover()
     except Exception as e:
-        logger.warning(f"[DB INTEGRITY FAIL]: {e}")
-        return False
+        logger.warning(f"[DB INTEGRITY FAIL]: {e}. Triggering auto-recovery...")
+        try:
+            from modules.session_memory import SessionMemory
+            mem = SessionMemory(db_path)
+            return mem.repair_or_recover()
+        except Exception:
+            return False
 
 
 def check_disk_health(path: str = BASE_DIR) -> dict:

@@ -312,8 +312,9 @@ async function askAI(prompt) {
 
 // Create HTTP Server
 const server = http.createServer((req, res) => {
-  // CORS Preflight
-  if (req.method === 'OPTIONS') {
+  try {
+    // CORS Preflight
+    if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -786,12 +787,21 @@ const server = http.createServer((req, res) => {
   }
 
   // 4. Command Execution (/api/command, /api/conversational-command, /api/execute)
-  if ((pathname === '/api/command' || pathname === '/api/conversational-command' || pathname === '/api/execute') && req.method === 'POST') {
-    parseBody(data => {
-      const rawCmd = (data.command || '').trim();
-      let targetNode = (data.targetNode || 'host').toLowerCase().trim();
-      const cmd = rawCmd.toLowerCase();
-      console.log(`[JARVIS DISPATCH]: "${rawCmd}" (Target Node: ${targetNode})`);
+  if (pathname === '/api/command' || pathname === '/api/conversational-command' || pathname === '/api/execute') {
+    const handleCommand = (data) => {
+      try {
+        const rawCmd = (typeof (data && data.command) === 'string' ? data.command : (data && data.command !== undefined && data.command !== null ? String(data.command) : '')).trim();
+        let targetNode = (typeof (data && data.targetNode) === 'string' ? data.targetNode : 'host').toLowerCase().trim();
+        const cmd = rawCmd.toLowerCase();
+        console.log(`[JARVIS DISPATCH]: "${rawCmd}" (Target Node: ${targetNode})`);
+
+        if (!rawCmd) {
+          return sendJSON(res, {
+            success: true,
+            command: '',
+            response: 'Ji Basit bhai, main active hoon. Aap bataiye kya madad karoon?'
+          });
+        }
 
       // ═══════════════════════════════════════════════════════════
       // CONVERSATIONAL BRAIN — First-pass real human-like processing
@@ -2162,8 +2172,37 @@ const server = http.createServer((req, res) => {
         sendJSON(res, { success: true, command: rawCmd, response: `Ji Basit bhai, "${rawCmd}" process ho gayi hai.` });
       });
       } // end processCommandNormally
+      } catch (cmdErr) {
+        console.error('[JARVIS COMMAND RUNTIME ERROR]:', cmdErr);
+        sendJSON(res, { success: false, error: 'Command execution error', message: cmdErr.message }, 200);
+      }
+    };
+
+    if (req.method === 'GET') {
+      const qCmd = url.searchParams.get('command') || url.searchParams.get('cmd') || url.searchParams.get('q');
+      if (qCmd) {
+        return handleCommand({ command: qCmd, targetNode: url.searchParams.get('targetNode') || 'host' });
+      }
+      return sendJSON(res, {
+        success: true,
+        status: 'ONLINE',
+        message: 'Jarvis Command API is operational. Send POST with JSON body {"command": "..."} or GET with ?command=...',
+        supported_engines: ['basit1', 'basit2', 'basit3', 'basit4', 'basitswarm', 'arsenal', 'basitloop', 'gemini-spark'],
+        sample_commands: ['status', 'system info', 'open chrome', 'take screenshot', '/basit1 optimize code']
+      });
+    }
+
+    if (req.method === 'POST') {
+      return parseBody(data => {
+        handleCommand(data);
+      });
+    }
+
+    return sendJSON(res, {
+      success: true,
+      status: 'ONLINE',
+      message: 'Method supported: GET, POST'
     });
-    return;
   }
 
 
@@ -2660,7 +2699,11 @@ const server = http.createServer((req, res) => {
   }
 
   // 404 Fallback
-  sendJSON(res, { error: 'Not Found', path: pathname }, 404);
+  sendJSON(res, { success: false, error: 'Not Found', path: pathname }, 404);
+  } catch (serverErr) {
+    console.error('⚠️ [JARVIS HTTP HANDLER ERROR]:', serverErr);
+    sendJSON(res, { success: false, error: 'Internal Server Error', message: serverErr.message }, 500);
+  }
 });
 
 // Crash-proof immortal server guards

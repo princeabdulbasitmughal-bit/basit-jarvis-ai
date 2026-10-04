@@ -29,6 +29,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
+from modules.atomic_storage import atomic_write_json, atomic_read_json
+
 # ============================================================
 # HUMAN PERSONALITY LAYER — Jarvis ki "insaniyat"
 # ============================================================
@@ -158,7 +160,8 @@ ACTION_PATTERNS = {
         r"(?:music|gaana|song|gana)\s+(?:chala\s+do|chalao|play\s+karo|play|lagao)",
         r"(?:spotify|youtube\s+music)\s+(?:kholo|chalao|open\s+karo)",
         r"(?:chalao|play\s+karo|laga\s+do|lagao)\s+(?P<query>.+?)(?:\s+(?:song|gaana|music))?$",
-        r"(?P<query>.+?)\s+(?:chalao|play\s+karo|laga\s+do|sunao)",
+        r"(?P<query>.+?)\s+(?:song|gaana|music)\s+(?:sunao|chalao|lagao)",
+        r"(?P<query>.+?)\s+(?:chalao|play\s+karo|laga\s+do)$",
     ],
     "check_weather": [
         r"(?:weather|mausam)\s+(?:kaisa\s+hai|batao|check\s+karo|kya\s+hai)",
@@ -232,12 +235,12 @@ class ConversationalBrain:
             'hira': '923010000000', 'faisal': '923012222222',
         }
         contacts_path = os.path.join(BASE_DIR, 'data', 'contacts.json')
-        if os.path.exists(contacts_path):
-            try:
-                saved = json.loads(open(contacts_path, encoding='utf-8').read())
+        try:
+            saved, _ = atomic_read_json(contacts_path, default={}, auto_heal_from_backup=True)
+            if isinstance(saved, dict):
                 contacts.update(saved)
-            except Exception:
-                pass
+        except Exception:
+            pass
         return contacts
 
     def _scan_recent_files(self):
@@ -804,10 +807,9 @@ $bmp.Dispose()
             else:
                 delay_sec = val * 60
         try:
-            reminders = []
-            if os.path.exists(reminders_path):
-                with open(reminders_path, encoding='utf-8') as f:
-                    reminders = json.load(f)
+            reminders, _ = atomic_read_json(reminders_path, default=[], auto_heal_from_backup=True)
+            if not isinstance(reminders, list):
+                reminders = []
             reminder = {
                 "id": len(reminders) + 1,
                 "task": content[:100],
@@ -816,8 +818,7 @@ $bmp.Dispose()
                 "fire_at": (datetime.now() + timedelta(seconds=delay_sec)).strftime("%Y-%m-%d %H:%M:%S")
             }
             reminders.append(reminder)
-            with open(reminders_path, 'w', encoding='utf-8') as f:
-                json.dump(reminders, f, indent=2, ensure_ascii=False)
+            atomic_write_json(reminders_path, reminders, backup=True, ensure_ascii=False)
             # Fire alert in background thread
             def _alert():
                 time.sleep(delay_sec)
@@ -901,7 +902,7 @@ $bmp.Dispose()
         # Check high-priority explicit actions (e.g. joke, calculate, note)
         # to avoid boredom emotion intercepting explicit requests like "bore ho raha hoon koi joke sunao"
         detected = self.detect_action(text)
-        if detected and detected[0] in ("tell_joke", "calculate", "create_note", "set_reminder", "play_music"):
+        if detected and detected[0] in ("tell_joke", "calculate", "create_note", "set_reminder"):
             action_name, entities = detected
             result = self.execute_action(action_name, entities, text)
             if result:

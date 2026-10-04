@@ -481,11 +481,15 @@ def run_audit():
     # The second key completely overwrites the first!
     print("Analyzing ACTION_PATTERNS definitions...")
     raw_file = open(os.path.join(BASE_DIR, 'modules', 'conversational_brain.py'), encoding='utf-8').read()
-    reminder_matches = [m.start() for m in re.finditer(r'["\']set_reminder["\']\s*:', raw_file)]
-    if len(reminder_matches) > 1:
-        msg = f"FOUND BUG: 'set_reminder' is defined {len(reminder_matches)} times in ACTION_PATTERNS dictionary. Python dictionaries silently overwrite earlier duplicate keys, causing loss of patterns."
-        print(f"⚠️  {msg}")
-        audit_report["edge_cases"].append({"id": "BUG-01", "severity": "MEDIUM", "description": msg})
+    action_patterns_block = re.search(r'ACTION_PATTERNS\s*=\s*\{([\s\S]*?)\n\}', raw_file)
+    if action_patterns_block:
+        reminder_matches = [m.start() for m in re.finditer(r'["\']set_reminder["\']\s*:', action_patterns_block.group(1))]
+        if len(reminder_matches) > 1:
+            msg = f"FOUND BUG: 'set_reminder' is defined {len(reminder_matches)} times in ACTION_PATTERNS dictionary. Python dictionaries silently overwrite earlier duplicate keys, causing loss of patterns."
+            print(f"⚠️  {msg}")
+            audit_report["edge_cases"].append({"id": "BUG-01", "severity": "MEDIUM", "description": msg})
+        else:
+            print("✓ ACTION_PATTERNS duplicate check: Clean (no duplicate keys found).")
 
     # Finding 2: Isolated 'hi' trigger bug
     # GREETING_TRIGGERS contains 'hi ' with a space, so bare 'hi' without spaces or trailing chars fails detection

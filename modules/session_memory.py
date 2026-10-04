@@ -17,36 +17,112 @@ class SessionMemory:
     def __init__(self, db_path: str = DB_PATH):
         self.db_path = db_path
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        self._init_db()
+        if not self.verify_integrity():
+            self.repair_or_recover()
+        else:
+            self._init_db()
 
     def _conn(self):
-        return sqlite3.connect(self.db_path, timeout=5)
+        conn = sqlite3.connect(self.db_path, timeout=10)
+        try:
+            conn.execute("PRAGMA journal_mode = WAL;")
+            conn.execute("PRAGMA synchronous = NORMAL;")
+        except Exception:
+            pass
+        return conn
+
+    def verify_integrity(self) -> bool:
+        if not os.path.exists(self.db_path):
+            return True
+        try:
+            conn = sqlite3.connect(self.db_path, timeout=5)
+            cur = conn.cursor()
+            cur.execute("PRAGMA integrity_check;")
+            res = cur.fetchone()
+            conn.close()
+            return bool(res and res[0] == "ok")
+        except Exception:
+            return False
+
+    def backup(self, backup_path: str = None) -> bool:
+        """Physical live snapshot using SQLite online backup API."""
+        try:
+            dst_path = backup_path or (self.db_path + ".bak")
+            os.makedirs(os.path.dirname(dst_path), exist_ok=True)
+            with sqlite3.connect(self.db_path, timeout=10) as src:
+                dst = sqlite3.connect(dst_path)
+                src.backup(dst)
+                dst.close()
+            return True
+        except Exception:
+            return False
+
+    def repair_or_recover(self) -> bool:
+        """
+        Attempts to restore from .bak or quarantines corrupt DB and initializes fresh.
+        Returns True if recovered/healthy.
+        """
+        if self.verify_integrity():
+            return True
+
+        bak_path = self.db_path + ".bak"
+        # Check if backup exists and is healthy
+        if os.path.exists(bak_path):
+            try:
+                test_conn = sqlite3.connect(bak_path, timeout=5)
+                res = test_conn.cursor().execute("PRAGMA integrity_check;").fetchone()
+                test_conn.close()
+                if res and res[0] == "ok":
+                    import shutil
+                    shutil.copy2(bak_path, self.db_path)
+                    if self.verify_integrity():
+                        return True
+            except Exception:
+                pass
+
+        # If backup not viable, quarantine corrupted DB
+        try:
+            if os.path.exists(self.db_path):
+                corrupt_path = f"{self.db_path}.corrupt.{int(time.time())}"
+                import shutil
+                shutil.move(self.db_path, corrupt_path)
+        except Exception:
+            pass
+
+        # Re-initialize clean DB
+        self._init_db()
+        return True
 
     def _init_db(self):
-        with self._conn() as c:
-            c.executescript("""
-                CREATE TABLE IF NOT EXISTS conversations (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    role TEXT NOT NULL,
-                    content TEXT NOT NULL,
-                    engine TEXT,
-                    timestamp REAL DEFAULT (strftime('%s','now'))
-                );
-                CREATE TABLE IF NOT EXISTS preferences (
-                    key TEXT PRIMARY KEY,
-                    value TEXT,
-                    updated_at REAL DEFAULT (strftime('%s','now'))
-                );
-                CREATE TABLE IF NOT EXISTS engine_log (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    engine TEXT NOT NULL,
-                    task TEXT,
-                    result_summary TEXT,
-                    latency_sec REAL,
-                    success INTEGER DEFAULT 1,
-                    timestamp REAL DEFAULT (strftime('%s','now'))
-                );
-            """)
+        try:
+            with self._conn() as c:
+                c.executescript("""
+                    CREATE TABLE IF NOT EXISTS conversations (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        role TEXT NOT NULL,
+                        content TEXT NOT NULL,
+                        engine TEXT,
+                        timestamp REAL DEFAULT (strftime('%s','now'))
+                    );
+                    CREATE TABLE IF NOT EXISTS preferences (
+                        key TEXT PRIMARY KEY,
+                        value TEXT,
+                        updated_at REAL DEFAULT (strftime('%s','now'))
+                    );
+                    CREATE TABLE IF NOT EXISTS engine_log (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        engine TEXT NOT NULL,
+                        task TEXT,
+                        result_summary TEXT,
+                        latency_sec REAL,
+                        success INTEGER DEFAULT 1,
+                        timestamp REAL DEFAULT (strftime('%s','now'))
+                    );
+                """)
+            # Create a live backup after init
+            self.backup()
+        except Exception as e:
+            pass
 
     def vacuum(self):
         try:
