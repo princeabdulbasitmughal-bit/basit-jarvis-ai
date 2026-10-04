@@ -19,7 +19,8 @@ if sys.stderr is None:
 import logging
 from typing import Dict, Any, Optional
 from pydantic import BaseModel
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException, Security, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,14 +47,36 @@ except Exception as e:
 
 app = FastAPI(title="Basit Jarvis PC Controller API", version="3.0.0")
 
-# Enable CORS so SuperSender Pro (running on port 3000/3001) can freely call this API
+# CORS: Restrict to localhost origins only — wildcard + credentials = browser exploit
+_ALLOWED_ORIGINS = [
+    "http://localhost:3000", "http://localhost:3001", "http://localhost:8888",
+    "http://127.0.0.1:3000", "http://127.0.0.1:8888",
+    "http://localhost:8899", "http://127.0.0.1:8899",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_ALLOWED_ORIGINS,
+    allow_credentials=False,      # False when using Bearer token auth
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
+
+# ── Bearer Token Auth Guard ────────────────────────────────────────────────────
+_bearer_scheme = HTTPBearer(auto_error=False)
+_JARVIS_API_KEY = os.environ.get("JARVIS_API_KEY", "")
+
+def require_auth(credentials: Optional[HTTPAuthorizationCredentials] = Security(_bearer_scheme)):
+    """Dependency: validates Bearer token. Returns 401 if missing or wrong."""
+    if not _JARVIS_API_KEY:
+        # No API key configured — skip auth (dev mode)
+        return True
+    if not credentials or credentials.credentials != _JARVIS_API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing API key. Provide: Authorization: Bearer <JARVIS_API_KEY>",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return True
 
 # Initialize single global instance of BasitJarvis with bulletproof fallback
 jarvis = None
@@ -305,14 +328,14 @@ def run_basitloop(req: BasitLoopRequest):
 
 
 @app.post("/api/terminal")
-def execute_terminal(req: TerminalRequest):
-    """Executes shell or PowerShell command on PC."""
+def execute_terminal(req: TerminalRequest, _auth: bool = Depends(require_auth)):
+    """Executes shell or PowerShell command on PC. Requires Bearer token auth."""
     res = jarvis.system.run_shell_command(req.command, cwd=req.cwd)
     return res
 
 
 @app.post("/api/process_guard")
-def sweep_processes():
+def sweep_processes(_auth: bool = Depends(require_auth)):
     """Sweeps zombie node.exe / cmd.exe processes to prevent system hang."""
     res = jarvis.basit_engines.basit3.sweep_zombies()
     return {"success": True, "sweep": res}
