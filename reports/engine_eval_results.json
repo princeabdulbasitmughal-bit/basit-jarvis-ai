@@ -4,17 +4,17 @@
     "name": "Open-Source AI Arsenal / GPU Cluster",
     "status_code": 200,
     "success": true,
-    "latency_ms": 17334.25,
+    "latency_ms": 6612.27,
     "status": "Working",
     "error": null,
-    "preview": "Arsenal: 5/7 nodes online (including Gemini 2.0 & Apache Spark) | Health: OPTIMAL"
+    "preview": "Arsenal: 6/7 nodes online (including Gemini 2.0 & Apache Spark) | Health: OPTIMAL"
   },
   "/api/engine/basit3": {
     "engine": "/api/engine/basit3",
     "name": "Basit3 Guardian / Security & Process Guard",
     "status_code": 200,
     "success": true,
-    "latency_ms": 4245.25,
+    "latency_ms": 3341.29,
     "status": "Working",
     "error": null,
     "preview": "Zombie Sweep: 0 killed (0.0MB freed)"
@@ -24,39 +24,39 @@
     "name": "Basit1 Coder / Devin OpenHands",
     "status_code": 200,
     "success": true,
-    "latency_ms": 35785.56,
+    "latency_ms": 14022.88,
     "status": "Working",
     "error": null,
-    "preview": "Basit1 generated code in 32.54s | Quality: C (65/100) | 1 files written."
+    "preview": "Basit1 generated code in 11.2s | Quality: C (65/100) | 1 files written."
   },
   "/api/engine/basit2": {
     "engine": "/api/engine/basit2",
     "name": "Basit2 Deep Research",
     "status_code": 200,
     "success": true,
-    "latency_ms": 42486.23,
+    "latency_ms": 28169.6,
     "status": "Working",
     "error": null,
-    "preview": "Basit2 synthesized research in 39.56s."
+    "preview": "Basit2 synthesized research in 25.3s."
   },
   "/api/engine/basit4": {
     "engine": "/api/engine/basit4",
     "name": "Basit4 AI Hedge Fund Consensus",
     "status_code": 200,
     "success": true,
-    "latency_ms": 18199.31,
+    "latency_ms": 18425.6,
     "status": "Working",
     "error": null,
-    "preview": "Basit4 completed 6-persona hedge fund analysis in 15.18s."
+    "preview": "Basit4 completed 6-persona hedge fund analysis in 15.44s."
   },
   "/api/engine/gemini-spark": {
     "engine": "/api/engine/gemini-spark",
     "name": "Gemini-Spark Master Engine",
     "status_code": 200,
     "success": true,
-    "latency_ms": 23456.94,
+    "latency_ms": 21953.33,
     "status": "Working",
     "error": null,
-    "preview": "Gemini Spark synthesized distributed pipeline in 20.08s."
+    "preview": "Gemini Spark synthesized distributed pipeline in 18.91s."
   }
 }

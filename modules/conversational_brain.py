@@ -137,18 +137,17 @@ ACTION_PATTERNS = {
         r"(?P<app>chrome|firefox|vs\s*code|vscode|spotify|notepad|excel|word|powerpoint)\s+(?:kholo|open\s+karo|chalao|start\s+karo|launch\s+karo)",
         r"(?:kholo|open\s+karo)\s+(?P<app>chrome|firefox|vs\s*code|vscode|spotify|notepad)",
     ],
-    "search_web": [
-        r"(?:google|search|dhundo|dhundhao)\s+(?:karo\s+)?(?P<query>.+)",
-        r"(?P<query>.+)\s+(?:search\s+karo|google\s+karo|dhundo)",
-    ],
     "download_media": [
         r"(?:download|save|nikalo)\s+(?:karo\s+)?(?:video|audio|song|gaana|clip|media)?\s*(?P<url>https?://\S+)",
         r"(?P<url>https?://\S+)\s+(?:ko\s+)?(?:download|save)\s+karo",
     ],
     "set_reminder": [
-
         r"(?:reminder|yaad|yaad\s+dilao|mujhe\s+yaad\s+dilao)\s+(?:karo\s+)?(?P<task>.+)\s+(?:at|baje|ko)\s+(?P<time>\d+(?::\d+)?(?:\s*[ap]m)?)",
         r"(?P<time>\d+(?::\d+)?(?:\s*[ap]m)?)\s+(?:ko|baje|at)\s+(?:mujhe\s+)?(?:remind|yaad\s+dilao)\s+(?P<task>.+)",
+        r"(?:reminder|alarm|yaad\s+dilao|remind)\s+(?:set\s+karo|lagao|karo)?.*?(?:(\d+)\s*(?:minute|min|second|sec|hour|hr|ghante))?",
+        r"(\d+)\s*(?:minute|min|hour|hr|ghante)\s+(?:mein|baad|after)\s+(?P<content>.+)",
+        r"(?:remind\s+me|yaad\s+dilana)\s+(?:to\s+|ke\s+)?(?P<content>.+)",
+        r"(?:set|lao|lagao)\s+(?:ek\s+)?(?:reminder|alarm)\s+(?:for\s+|ke\s+liye\s+)?(?P<content>.+)",
     ],
     "tell_joke": [
         r"(?:koi\s+)?(?:joke|latifa|chutkula)\s+(?:sunao|batao|kaho)",
@@ -161,13 +160,6 @@ ACTION_PATTERNS = {
         r"(?:chalao|play\s+karo|laga\s+do|lagao)\s+(?P<query>.+?)(?:\s+(?:song|gaana|music))?$",
         r"(?P<query>.+?)\s+(?:chalao|play\s+karo|laga\s+do|sunao)",
     ],
-    "set_reminder": [
-        r"(?:reminder|alarm|yaad\s+dilao|remind)\s+(?:set\s+karo|lagao|karo)?.*?(?:(\d+)\s*(?:minute|min|second|sec|hour|hr|ghante))?",
-        r"(\d+)\s*(?:minute|min|hour|hr|ghante)\s+(?:mein|baad|after)\s+(?P<content>.+)",
-        r"(?:remind\s+me|yaad\s+dilana)\s+(?:to\s+|ke\s+)?(?P<content>.+)",
-        r"(?:set|lao|lagao)\s+(?:ek\s+)?(?:reminder|alarm)\s+(?:for\s+|ke\s+liye\s+)?(?P<content>.+)",
-    ],
-
     "check_weather": [
         r"(?:weather|mausam)\s+(?:kaisa\s+hai|batao|check\s+karo|kya\s+hai)",
     ],
@@ -176,32 +168,35 @@ ACTION_PATTERNS = {
         r"(?P<text>.+)\s+(?:urdu|english|hindi)\s+mein\s+(?:likho|batao|translate\s+karo)",
     ],
     "calculate": [
-        r"(?:calculate|hisab|nikalo|compute)\s+(?:karo\s+)?(?P<expr>.+)",
+        r"^(?:calculate|hisab|nikalo|compute)\s+(?:karo\s+)?(?P<expr>.+)",
         r"(?P<expr>.+?)\s+(?:calculate|hisab|compute)(?:\s+karo)?$",
         r"(?P<expr>[\d\s\+\-\*\/\.\(\)\^\w]+)\s+(?:kitna\s+hota\s+hai|kitne\s+hote\s+hain|equals\s+what|\=)",
         r"^(?P<expr>\d+\s*[\+\-\*\/\^]\s*[\d\.\s\+\-\*\/\^]+)$",
-        r"^(?P<expr>\d+\s*(?:plus|minus|times|into|taqseem|zarab|divided\s+by)\s*[\d\.\s\w]+)$",
+        r"^(?P<expr>\d+\s*(?:plus|minus|times|into|taqseem|zarab|divided\s+by|multiplied\s+by|multiply\s+by|jama|tafriq|ghaat|power)\s*[\d\.\s\w]+)$",
     ],
-
+    "git_commit": [
+        r"git\s+commit\s+(?:karo\s+)?(?P<msg>.+)",
+        r"(?:commit|save\s+changes|changes\s+save\s+karo)\s+(?:karo\s+)?(?:with\s+)?(?:message\s+)?(?P<msg>.+)",
+    ],
     "create_note": [
         r"(?:note|naya\s+note|likho)\s+(?:karo\s+)?(?P<content>.+)",
         r"(?:save|sacha\s+karo|store)\s+(?:karo\s+)?(?:yeh|this)?\s*:?\s*(?P<content>.+)",
     ],
     "system_status": [
-        r"(?:system|computer|pc|laptop)\s+(?:ki\s+)?(?:status|health|kaisa\s+hai|kya\s+hal\s+hai)",
+        r"(?:system|computer|pc|laptop)\s+(?:ki|ka)?\s*(?:status|health|kaisa\s+hai|kya\s+hal\s+hai|kaisa\s+hal\s+hai|kya\s+haal\s+hai)",
         r"(?:cpu|ram|disk|battery)\s+(?:kitna|kya\s+hai|check)",
-    ],
-    "git_commit": [
-        r"git\s+commit\s+(?:karo\s+)?(?P<msg>.+)",
-        r"(?:commit|save\s+changes|changes\s+save\s+karo)\s+(?:karo\s+)?(?:with\s+)?(?:message\s+)?(?P<msg>.+)",
     ],
     "generate_code": [
         r"(?:code|script|function|api)\s+(?:banao|likho|generate\s+karo)\s+(?:for\s+|ke\s+liye\s+)?(?P<task>.+)",
         r"(?P<task>.+)\s+(?:ka\s+code|ka\s+script|banao|implement\s+karo)",
     ],
     "research_topic": [
-        r"(?:research|analyze|pata\s+karo|dhundo)\s+(?:karo\s+)?(?P<topic>.+)",
+        r"\b(?:research|analyze|pata\s+karo)\b\s+(?:karo\s+)?(?P<topic>.+)",
         r"(?P<topic>.+)\s+(?:ke\s+baray\s+mein|ke\s+baare\s+mein|about)\s+(?:batao|research\s+karo)",
+    ],
+    "search_web": [
+        r"\b(?:google|search|dhundo|dhundhao)\b\s+(?:karo\s+)?(?P<query>.+)",
+        r"(?P<query>.+)\s+(?:search\s+karo|google\s+karo|dhundo)",
     ],
 }
 
@@ -286,7 +281,9 @@ class ConversationalBrain:
 
     def detect_emotion(self, text: str) -> str:
         """Detect emotional context of user's message."""
-        lower = text.lower()
+        lower = text.lower().strip()
+        if lower == "hi" or re.search(r'\bhi\b', lower):
+            return "greeting"
         if any(t in lower for t in BOREDOM_TRIGGERS):
             return "boredom"
         if any(t in lower for t in THANKS_TRIGGERS):
@@ -299,11 +296,12 @@ class ConversationalBrain:
         """
         Match text against action patterns.
         Returns (action_name, extracted_entities) or None.
+        Preserves original casing for extracted entities.
         """
-        lower = text.lower().strip()
+        clean_text = text.strip()
         for action, patterns in ACTION_PATTERNS.items():
             for pat in patterns:
-                match = re.search(pat, lower, re.IGNORECASE)
+                match = re.search(pat, clean_text, re.IGNORECASE)
                 if match:
                     try:
                         entities = match.groupdict()
@@ -658,7 +656,8 @@ $bmp.Dispose()
 
             strip_phrases = [
                 r'kitna\s+hota\s+hai', r'kitne\s+hote\s+hain', r'kitna\s+hai',
-                r'batao', r'equals', r'what\s+is', r'ka\s+jawab', r'\='
+                r'batao', r'equals', r'what\s+is', r'ka\s+jawab', r'\=',
+                r'calculate\s+karo', r'calculate', r'hisab\s+karo', r'hisab', r'karo'
             ]
             for phrase in strip_phrases:
                 expr_proc = re.sub(phrase, '', expr_proc)
@@ -669,6 +668,8 @@ $bmp.Dispose()
                 return f"Bhai yeh expression samajh nahi aaya: '{expr}'. Seedha likho jaise '25 * 4 + 10'."
             result = eval(expr_clean, {"__builtins__": {}}, {})
             return f"Hisab: {expr.strip()} = **{result}** ✅"
+        except ZeroDivisionError:
+            return "Zero se divide (taqseem) nahi kiya ja sakta bhai! ➗❌"
         except Exception:
             return f"Bhai yeh expression samajh nahi aaya: '{expr}'. Seedha likho jaise '25 * 4 + 10'."
 
@@ -897,6 +898,23 @@ $bmp.Dispose()
 
         lower = text.lower()
 
+        # Check high-priority explicit actions (e.g. joke, calculate, note)
+        # to avoid boredom emotion intercepting explicit requests like "bore ho raha hoon koi joke sunao"
+        detected = self.detect_action(text)
+        if detected and detected[0] in ("tell_joke", "calculate", "create_note", "set_reminder", "play_music"):
+            action_name, entities = detected
+            result = self.execute_action(action_name, entities, text)
+            if result:
+                self.conversation_history.append({"role": "jarvis", "content": result, "time": datetime.now().isoformat()})
+                speak = result.split('\n')[0][:100]
+                return {
+                    "response": result,
+                    "speak": speak,
+                    "action_taken": action_name,
+                    "action_result": result,
+                    "needs_engine": None
+                }
+
         # 1. EMOTIONAL CONTEXT
         emotion = self.detect_emotion(text)
         if emotion == "boredom":
@@ -918,8 +936,9 @@ $bmp.Dispose()
                 reply = self._pick(JARVIS_CONFIRMATIONS["greeting_day"])
             return {"response": reply, "speak": reply, "action_taken": "conversation", "needs_engine": None}
 
-        # 2. ACTION DETECTION
-        detected = self.detect_action(text)
+        # 2. ACTION DETECTION (Remaining actions)
+        if not detected:
+            detected = self.detect_action(text)
         if detected:
             action_name, entities = detected
             working_reply = self._pick(JARVIS_CONFIRMATIONS["working"])
@@ -956,20 +975,12 @@ $bmp.Dispose()
                 }
 
         # 3. ENGINE ROUTING HINTS
-        if re.search(r'\b(?:code|script|api|function|program|app|build|implement|develop)\b', lower):
+        if re.search(r'\b(?:stock|market|invest|nvda|btc|tsla|aapl|crypto|price|trading)\b', lower):
             return {
-                "response": self._pick(JARVIS_CONFIRMATIONS["working"]),
-                "speak": "Ji bhai, code likh raha hoon!",
+                "response": "Market analysis kar raha hoon! 📈",
+                "speak": "Market analysis shuru ho gaya Basit bhai!",
                 "action_taken": "route_to_engine",
-                "needs_engine": "basit1"
-            }
-
-        if re.search(r'\b(?:research|analyze|explain|kya hai|batao|compare|difference|pata karo)\b', lower):
-            return {
-                "response": self._pick(JARVIS_CONFIRMATIONS["working"]),
-                "speak": "Ji bhai, research kar raha hoon!",
-                "action_taken": "route_to_engine",
-                "needs_engine": "basit2"
+                "needs_engine": "basit4"
             }
 
         if re.search(r'\b(?:security|audit|hack|vulnerability|scan)\b', lower):
@@ -980,12 +991,20 @@ $bmp.Dispose()
                 "needs_engine": "basit3"
             }
 
-        if re.search(r'\b(?:stock|market|invest|nvda|btc|tsla|aapl|crypto|price|trading)\b', lower):
+        if re.search(r'\b(?:code|script|api|function|program|app|build|implement|develop)\b', lower):
             return {
-                "response": "Market analysis kar raha hoon! 📈",
-                "speak": "Market analysis shuru ho gaya Basit bhai!",
+                "response": self._pick(JARVIS_CONFIRMATIONS["working"]),
+                "speak": "Ji bhai, code likh raha hoon!",
                 "action_taken": "route_to_engine",
-                "needs_engine": "basit4"
+                "needs_engine": "basit1"
+            }
+
+        if re.search(r'\b(?:research|analyze|explain|kya hai|compare|difference|pata karo)\b', lower) or re.search(r'\b(?:ke baare mein batao|detail batao)\b', lower):
+            return {
+                "response": self._pick(JARVIS_CONFIRMATIONS["working"]),
+                "speak": "Ji bhai, research kar raha hoon!",
+                "action_taken": "route_to_engine",
+                "needs_engine": "basit2"
             }
 
         # 4. GENERAL AI CONVERSATION
