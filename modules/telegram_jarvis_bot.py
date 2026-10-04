@@ -86,9 +86,13 @@ def _build_keyboard():
 def _is_authorized(chat_id: int) -> bool:
     """Check if user is authorized to use Jarvis bot."""
     if not ALLOWED_CHAT_IDS:
-        # No whitelist configured — warn but allow (for initial setup)
-        logger.warning("⚠️  No TELEGRAM_ALLOWED_CHAT_IDS set — allowing all users temporarily!")
-        return True
+        # SECURITY: No whitelist configured — DENY ALL (fail-closed)
+        # Set TELEGRAM_ALLOWED_CHAT_IDS env var to enable the bot.
+        logger.warning(
+            "🔒 SECURITY: TELEGRAM_ALLOWED_CHAT_IDS not configured — "
+            f"denying chat_id={chat_id}. Set env var to enable access."
+        )
+        return False   # ← was True (fail-open bug) — now fail-CLOSED
     return chat_id in ALLOWED_CHAT_IDS
 
 
