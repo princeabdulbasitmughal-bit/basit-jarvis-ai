@@ -236,6 +236,19 @@ def get_status():
     }
 
 
+@app.get("/api/metrics")
+def get_metrics():
+    """Returns real-time system metrics."""
+    stats = jarvis.system.get_system_status()
+    return {
+        "success": True,
+        "cpu_percent": stats.get("cpu_percent", 0.0),
+        "ram_percent": stats.get("ram_percent", 0.0),
+        "disk_percent": stats.get("disk_percent", 0.0),
+        "telemetry": stats
+    }
+
+
 @app.post("/api/command")
 def execute_command(req: CommandRequest):
     """Executes any natural language or direct PC command."""
