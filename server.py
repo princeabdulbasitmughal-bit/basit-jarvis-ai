@@ -227,6 +227,13 @@ class ClipboardRequest(BaseModel):
     text: str
 
 
+@app.get("/ping")
+@app.get("/api/ping")
+def ping():
+    """Fast health check ping endpoint."""
+    return {"status": "ONLINE", "service": "Basit Jarvis PC Controller", "code": 200}
+
+
 @app.get("/api/status")
 def get_status():
     """Returns real-time PC health, resource utilization, and Jarvis state."""
