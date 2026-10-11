@@ -3,10 +3,7 @@
 👑 BASIT JARVIS AI — KOKORO NEURAL TTS ENGINE
 ================================================================================
 Replaces pyttsx3 robotic voice with Kokoro-82M ultra-realistic neural TTS.
-Fallback chain: Kokoro-82M → pyttsx3 → silent (no crash)
-
-Install: pip install kokoro-onnx soundfile sounddevice
-Model:   hexgrad/Kokoro-82M (MIT license, runs 100% locally)
+Fallback chain: Kokoro-82M -> modules.tts (pyttsx3 COM-isolated) -> silent
 ================================================================================
 """
 
@@ -14,8 +11,22 @@ import os
 import sys
 import threading
 import queue
-import tempfile
 import time
+import logging
+
+# Ensure UTF-8 output encoding for Windows terminals
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+if hasattr(sys.stderr, 'reconfigure'):
+    try:
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
+logger = logging.getLogger("Jarvis.KokoroTTS")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -24,7 +35,6 @@ _tts_queue = queue.Queue()
 _tts_thread = None
 _kokoro_model = None
 _kokoro_available = False
-_pyttsx3_engine = None
 _voice_speed = 1.0
 _voice_enabled = True
 
@@ -37,67 +47,26 @@ def _init_kokoro():
         model_path = os.path.join(BASE_DIR, "models", "kokoro-v0_19.onnx")
         voices_path = os.path.join(BASE_DIR, "models", "voices.bin")
 
-        # Download if not present
-        if not os.path.exists(model_path):
-            print("[KOKORO] Model not found locally — downloading from HuggingFace...")
-            _download_kokoro_model(model_path, voices_path)
+        if not os.path.exists(model_path) or not os.path.exists(voices_path):
+            logger.info("[KOKORO] Model files not present locally — fallback to modules.tts")
+            _kokoro_available = False
+            return
 
-        if os.path.exists(model_path) and os.path.exists(voices_path):
-            _kokoro_model = Kokoro(model_path, voices_path)
-            _kokoro_available = True
-            print("[KOKORO] ✅ Neural TTS loaded — ultra-realistic voice ACTIVE")
-        else:
-            print("[KOKORO] ⚠️  Model files not found — falling back to pyttsx3")
+        _kokoro_model = Kokoro(model_path, voices_path)
+        _kokoro_available = True
+        logger.info("[KOKORO] [OK] Neural TTS loaded — ultra-realistic voice ACTIVE")
     except ImportError:
-        print("[KOKORO] kokoro-onnx not installed — pip install kokoro-onnx")
+        logger.info("[KOKORO] kokoro-onnx not installed — fallback to modules.tts")
+        _kokoro_available = False
     except Exception as e:
-        print(f"[KOKORO] Failed to load: {e}")
+        logger.warning(f"[KOKORO] Failed to load: {e}")
+        _kokoro_available = False
 
 
-def _download_kokoro_model(model_path, voices_path):
-    """Download Kokoro model from HuggingFace."""
-    try:
-        import urllib.request
-        os.makedirs(os.path.dirname(model_path), exist_ok=True)
-
-        model_url = "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/kokoro-v0_19.onnx"
-        voices_url = "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/voices.bin"
-
-        print("[KOKORO] Downloading model (~83MB)...")
-        urllib.request.urlretrieve(model_url, model_path)
-        print("[KOKORO] Downloading voices (~24MB)...")
-        urllib.request.urlretrieve(voices_url, voices_path)
-        print("[KOKORO] ✅ Download complete!")
-    except Exception as e:
-        print(f"[KOKORO] Download failed: {e}")
-
-
-def _init_pyttsx3_fallback():
-    """Initialize pyttsx3 as fallback TTS."""
-    global _pyttsx3_engine
-    try:
-        import pyttsx3
-        _pyttsx3_engine = pyttsx3.init()
-        _pyttsx3_engine.setProperty('rate', 175)
-        _pyttsx3_engine.setProperty('volume', 0.9)
-        # Try to set a better voice
-        voices = _pyttsx3_engine.getProperty('voices')
-        for v in voices:
-            if 'david' in v.name.lower() or 'english' in v.name.lower():
-                _pyttsx3_engine.setProperty('voice', v.id)
-                break
-        print("[PYTTSX3] ✅ Fallback TTS ready")
-    except Exception as e:
-        print(f"[PYTTSX3] Fallback init failed: {e}")
-
-
-def _speak_kokoro(text: str):
+def _speak_kokoro(text: str) -> bool:
     """Speak using Kokoro-82M neural TTS."""
     try:
         import sounddevice as sd
-        import soundfile as sf
-        import numpy as np
-
         samples, sample_rate = _kokoro_model.create(
             text,
             voice="af",        # American Female — natural sounding
@@ -108,25 +77,19 @@ def _speak_kokoro(text: str):
         sd.wait()
         return True
     except Exception as e:
-        print(f"[KOKORO] Speak error: {e}")
+        logger.error(f"[KOKORO] Speak error: {e}")
         return False
 
 
-def _speak_pyttsx3(text: str):
-    """Speak using pyttsx3 fallback."""
-    global _pyttsx3_engine
+def _speak_pyttsx3(text: str) -> bool:
+    """Speak using unified modules.tts fallback."""
     try:
-        if _pyttsx3_engine is None:
-            _init_pyttsx3_fallback()
-        if _pyttsx3_engine:
-            _pyttsx3_engine.say(text)
-            _pyttsx3_engine.runAndWait()
-            return True
+        from modules.tts import get_tts
+        get_tts().speak(text, block=True)
+        return True
     except Exception as e:
-        print(f"[PYTTSX3] Speak error: {e}")
-        # Reinitialize on error
-        _pyttsx3_engine = None
-    return False
+        logger.error(f"[PYTTSX3 FALLBACK] Speak error: {e}")
+        return False
 
 
 def _tts_worker():
@@ -140,7 +103,7 @@ def _tts_worker():
                 _tts_queue.task_done()
                 continue
 
-            # Try Kokoro first, then pyttsx3
+            # Try Kokoro first, then pyttsx3 fallback
             success = False
             if _kokoro_available and _kokoro_model:
                 success = _speak_kokoro(text)
@@ -151,7 +114,7 @@ def _tts_worker():
         except queue.Empty:
             continue
         except Exception as e:
-            print(f"[TTS WORKER] Error: {e}")
+            logger.error(f"[TTS WORKER] Error: {e}")
 
 
 def speak(text: str, blocking: bool = False):
@@ -165,14 +128,16 @@ def speak(text: str, blocking: bool = False):
     if not text or not _voice_enabled:
         return
 
-    # Clean text for TTS (remove emoji, markdown)
+    # Clean text for TTS
     clean = _clean_for_tts(text)
     if not clean.strip():
         return
 
     if blocking:
         if _kokoro_available and _kokoro_model:
-            _speak_kokoro(clean)
+            success = _speak_kokoro(clean)
+            if not success:
+                _speak_pyttsx3(clean)
         else:
             _speak_pyttsx3(clean)
     else:
@@ -180,26 +145,9 @@ def speak(text: str, blocking: bool = False):
 
 
 def _clean_for_tts(text: str) -> str:
-    """Remove emojis, markdown, and special chars from TTS text."""
-    import re
-    # Remove emojis
-    emoji_pattern = re.compile(
-        "["
-        u"\U0001F600-\U0001F64F"
-        u"\U0001F300-\U0001F5FF"
-        u"\U0001F680-\U0001F6FF"
-        u"\U0001F1E0-\U0001F1FF"
-        u"\U00002702-\U000027B0"
-        u"\U000024C2-\U0001F251"
-        "]+", flags=re.UNICODE
-    )
-    text = emoji_pattern.sub('', text)
-    # Remove markdown bold/italic
-    text = re.sub(r'\*{1,3}(.*?)\*{1,3}', r'\1', text)
-    text = re.sub(r'`(.*?)`', r'\1', text)
-    # Remove URLs
-    text = re.sub(r'http\S+', 'link', text)
-    return text.strip()
+    """Remove emojis, markdown, and special formatting from TTS text."""
+    from modules.tts import clean_text_for_speech
+    return clean_text_for_speech(text)
 
 
 def set_voice_enabled(enabled: bool):
@@ -207,7 +155,7 @@ def set_voice_enabled(enabled: bool):
     global _voice_enabled
     _voice_enabled = enabled
     status = "ENABLED" if enabled else "MUTED"
-    print(f"[KOKORO TTS] Voice {status}")
+    logger.info(f"[KOKORO TTS] Voice {status}")
 
 
 def set_speed(speed: float):
@@ -221,7 +169,7 @@ def get_status() -> dict:
     return {
         "engine": "kokoro-82M" if _kokoro_available else "pyttsx3",
         "kokoro_available": _kokoro_available,
-        "pyttsx3_available": _pyttsx3_engine is not None,
+        "pyttsx3_available": True,
         "voice_enabled": _voice_enabled,
         "speed": _voice_speed,
         "queue_size": _tts_queue.qsize()
@@ -233,25 +181,23 @@ def init_tts():
     global _tts_thread
 
     # Try Kokoro first (non-blocking init)
-    kokoro_thread = threading.Thread(target=_init_kokoro, daemon=True)
+    kokoro_thread = threading.Thread(target=_init_kokoro, daemon=True, name="KokoroInit")
     kokoro_thread.start()
 
-    # Initialize pyttsx3 fallback immediately
-    _init_pyttsx3_fallback()
-
-    # Start TTS worker thread
-    _tts_thread = threading.Thread(target=_tts_worker, daemon=True, name="JarvisTTS")
-    _tts_thread.start()
-    print("[KOKORO TTS] 🎙️ TTS engine initialized — background worker running")
+    # Start TTS worker thread if not already running
+    if _tts_thread is None or not _tts_thread.is_alive():
+        _tts_thread = threading.Thread(target=_tts_worker, daemon=True, name="JarvisKokoroWorker")
+        _tts_thread.start()
+    logger.info("[KOKORO TTS] TTS engine initialized — worker running")
 
 
 def shutdown_tts():
     """Gracefully shut down TTS engine."""
-    _tts_queue.put(None)  # Signal worker to stop
+    _tts_queue.put(None)
     if _tts_thread:
         _tts_thread.join(timeout=3)
-    print("[KOKORO TTS] Shutdown complete")
+    logger.info("[KOKORO TTS] Shutdown complete")
 
 
-# ── Auto-initialize on import ──────────────────────────────────────────────
+# Auto-initialize on import
 init_tts()

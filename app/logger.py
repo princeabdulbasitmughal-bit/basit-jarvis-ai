@@ -1,25 +1,43 @@
 """
-Centralised logger configuration.
-
-The logger is configured once and imported wherever logging is required.
+Centralised logging configuration.
 """
 
 import logging
-from .config import LOG_LEVEL
+import sys
+from logging.config import dictConfig
 
-_logger = logging.getLogger("hello_app")
-if not _logger.handlers:
-    # Configure only once (idempotent)
-    _logger.setLevel(LOG_LEVEL)
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter(
-        fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-    handler.setFormatter(formatter)
-    _logger.addHandler(handler)
-    _logger.propagate = False
+from .config import get_settings
 
-def get_logger() -> logging.Logger:
-    """Return the configured application logger."""
-    return _logger
+
+def configure_logging() -> None:
+    """
+    Configures the root logger using dictConfig.
+    """
+    settings = get_settings()
+    log_level = settings.LOG_LEVEL
+
+    logging_config: dict[str, Any] = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "standard": {
+                "format": "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+                "datefmt": "%Y-%m-%d %H:%M:%S",
+            },
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "standard",
+                "stream": sys.stdout,
+                "level": log_level,
+            },
+        },
+        "root": {"handlers": ["console"], "level": log_level},
+    }
+
+    dictConfig(logging_config)
+
+
+configure_logging()
+logger = logging.getLogger(__name__)

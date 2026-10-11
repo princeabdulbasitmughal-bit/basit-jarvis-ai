@@ -1,0 +1,703 @@
+{
+  "timestamp": "2026-10-11 08:10:23",
+  "total_agents": 99,
+  "passed": 99,
+  "failed": 0,
+  "pass_rate_pct": 100.0,
+  "total_duration_ms": 470.8395004272461,
+  "results": [
+    {
+      "agent_id": 1,
+      "squadron": "SQ-01",
+      "status": "PASS",
+      "ms": 5.077838897705078,
+      "detail": "All Unicode & codecs sanitized safely"
+    },
+    {
+      "agent_id": 2,
+      "squadron": "SQ-01",
+      "status": "PASS",
+      "ms": 6.099939346313477,
+      "detail": "All Unicode & codecs sanitized safely"
+    },
+    {
+      "agent_id": 3,
+      "squadron": "SQ-01",
+      "status": "PASS",
+      "ms": 14.394521713256836,
+      "detail": "All Unicode & codecs sanitized safely"
+    },
+    {
+      "agent_id": 4,
+      "squadron": "SQ-01",
+      "status": "PASS",
+      "ms": 14.420270919799805,
+      "detail": "All Unicode & codecs sanitized safely"
+    },
+    {
+      "agent_id": 5,
+      "squadron": "SQ-01",
+      "status": "PASS",
+      "ms": 11.82103157043457,
+      "detail": "All Unicode & codecs sanitized safely"
+    },
+    {
+      "agent_id": 6,
+      "squadron": "SQ-01",
+      "status": "PASS",
+      "ms": 14.392614364624023,
+      "detail": "All Unicode & codecs sanitized safely"
+    },
+    {
+      "agent_id": 7,
+      "squadron": "SQ-01",
+      "status": "PASS",
+      "ms": 12.207269668579102,
+      "detail": "All Unicode & codecs sanitized safely"
+    },
+    {
+      "agent_id": 8,
+      "squadron": "SQ-01",
+      "status": "PASS",
+      "ms": 13.269424438476562,
+      "detail": "All Unicode & codecs sanitized safely"
+    },
+    {
+      "agent_id": 9,
+      "squadron": "SQ-01",
+      "status": "PASS",
+      "ms": 13.269424438476562,
+      "detail": "All Unicode & codecs sanitized safely"
+    },
+    {
+      "agent_id": 10,
+      "squadron": "SQ-01",
+      "status": "PASS",
+      "ms": 6.056785583496094,
+      "detail": "All Unicode & codecs sanitized safely"
+    },
+    {
+      "agent_id": 11,
+      "squadron": "SQ-02",
+      "status": "PASS",
+      "ms": 11.585712432861328,
+      "detail": "COM isolation verified, worker healthy"
+    },
+    {
+      "agent_id": 12,
+      "squadron": "SQ-02",
+      "status": "PASS",
+      "ms": 1.5959739685058594,
+      "detail": "COM isolation verified, worker healthy"
+    },
+    {
+      "agent_id": 13,
+      "squadron": "SQ-02",
+      "status": "PASS",
+      "ms": 0.5738735198974609,
+      "detail": "COM isolation verified, worker healthy"
+    },
+    {
+      "agent_id": 14,
+      "squadron": "SQ-02",
+      "status": "PASS",
+      "ms": 1.1391639709472656,
+      "detail": "COM isolation verified, worker healthy"
+    },
+    {
+      "agent_id": 15,
+      "squadron": "SQ-02",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "COM isolation verified, worker healthy"
+    },
+    {
+      "agent_id": 16,
+      "squadron": "SQ-02",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "COM isolation verified, worker healthy"
+    },
+    {
+      "agent_id": 17,
+      "squadron": "SQ-02",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "COM isolation verified, worker healthy"
+    },
+    {
+      "agent_id": 18,
+      "squadron": "SQ-02",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "COM isolation verified, worker healthy"
+    },
+    {
+      "agent_id": 19,
+      "squadron": "SQ-02",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "COM isolation verified, worker healthy"
+    },
+    {
+      "agent_id": 20,
+      "squadron": "SQ-02",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "COM isolation verified, worker healthy"
+    },
+    {
+      "agent_id": 21,
+      "squadron": "SQ-03",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Markdown, code fences & URLs stripped"
+    },
+    {
+      "agent_id": 22,
+      "squadron": "SQ-03",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Markdown, code fences & URLs stripped"
+    },
+    {
+      "agent_id": 23,
+      "squadron": "SQ-03",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Markdown, code fences & URLs stripped"
+    },
+    {
+      "agent_id": 24,
+      "squadron": "SQ-03",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Markdown, code fences & URLs stripped"
+    },
+    {
+      "agent_id": 25,
+      "squadron": "SQ-03",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Markdown, code fences & URLs stripped"
+    },
+    {
+      "agent_id": 26,
+      "squadron": "SQ-03",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Markdown, code fences & URLs stripped"
+    },
+    {
+      "agent_id": 27,
+      "squadron": "SQ-03",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Markdown, code fences & URLs stripped"
+    },
+    {
+      "agent_id": 28,
+      "squadron": "SQ-03",
+      "status": "PASS",
+      "ms": 0.5335807800292969,
+      "detail": "Markdown, code fences & URLs stripped"
+    },
+    {
+      "agent_id": 29,
+      "squadron": "SQ-03",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Markdown, code fences & URLs stripped"
+    },
+    {
+      "agent_id": 30,
+      "squadron": "SQ-03",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Markdown, code fences & URLs stripped"
+    },
+    {
+      "agent_id": 31,
+      "squadron": "SQ-04",
+      "status": "PASS",
+      "ms": 33.13255310058594,
+      "detail": "Voices enumerated: 2 voices active"
+    },
+    {
+      "agent_id": 32,
+      "squadron": "SQ-04",
+      "status": "PASS",
+      "ms": 34.244537353515625,
+      "detail": "Voices enumerated: 2 voices active"
+    },
+    {
+      "agent_id": 33,
+      "squadron": "SQ-04",
+      "status": "PASS",
+      "ms": 40.450096130371094,
+      "detail": "Voices enumerated: 2 voices active"
+    },
+    {
+      "agent_id": 34,
+      "squadron": "SQ-04",
+      "status": "PASS",
+      "ms": 40.95935821533203,
+      "detail": "Voices enumerated: 2 voices active"
+    },
+    {
+      "agent_id": 35,
+      "squadron": "SQ-04",
+      "status": "PASS",
+      "ms": 66.19858741760254,
+      "detail": "Voices enumerated: 2 voices active"
+    },
+    {
+      "agent_id": 36,
+      "squadron": "SQ-04",
+      "status": "PASS",
+      "ms": 40.393829345703125,
+      "detail": "Voices enumerated: 2 voices active"
+    },
+    {
+      "agent_id": 37,
+      "squadron": "SQ-04",
+      "status": "PASS",
+      "ms": 65.07086753845215,
+      "detail": "Voices enumerated: 2 voices active"
+    },
+    {
+      "agent_id": 38,
+      "squadron": "SQ-04",
+      "status": "PASS",
+      "ms": 56.60128593444824,
+      "detail": "Voices enumerated: 2 voices active"
+    },
+    {
+      "agent_id": 39,
+      "squadron": "SQ-04",
+      "status": "PASS",
+      "ms": 45.86076736450195,
+      "detail": "Voices enumerated: 2 voices active"
+    },
+    {
+      "agent_id": 40,
+      "squadron": "SQ-04",
+      "status": "PASS",
+      "ms": 59.37027931213379,
+      "detail": "Voices enumerated: 2 voices active"
+    },
+    {
+      "agent_id": 41,
+      "squadron": "SQ-05",
+      "status": "PASS",
+      "ms": 14.390230178833008,
+      "detail": "Engine: pyttsx3, fallback active"
+    },
+    {
+      "agent_id": 42,
+      "squadron": "SQ-05",
+      "status": "PASS",
+      "ms": 24.599790573120117,
+      "detail": "Engine: pyttsx3, fallback active"
+    },
+    {
+      "agent_id": 43,
+      "squadron": "SQ-05",
+      "status": "PASS",
+      "ms": 38.74015808105469,
+      "detail": "Engine: pyttsx3, fallback active"
+    },
+    {
+      "agent_id": 44,
+      "squadron": "SQ-05",
+      "status": "PASS",
+      "ms": 38.199663162231445,
+      "detail": "Engine: pyttsx3, fallback active"
+    },
+    {
+      "agent_id": 45,
+      "squadron": "SQ-05",
+      "status": "PASS",
+      "ms": 30.048131942749023,
+      "detail": "Engine: pyttsx3, fallback active"
+    },
+    {
+      "agent_id": 46,
+      "squadron": "SQ-05",
+      "status": "PASS",
+      "ms": 17.504453659057617,
+      "detail": "Engine: pyttsx3, fallback active"
+    },
+    {
+      "agent_id": 47,
+      "squadron": "SQ-05",
+      "status": "PASS",
+      "ms": 22.567033767700195,
+      "detail": "Engine: pyttsx3, fallback active"
+    },
+    {
+      "agent_id": 48,
+      "squadron": "SQ-05",
+      "status": "PASS",
+      "ms": 19.749879837036133,
+      "detail": "Engine: pyttsx3, fallback active"
+    },
+    {
+      "agent_id": 49,
+      "squadron": "SQ-05",
+      "status": "PASS",
+      "ms": 36.554813385009766,
+      "detail": "Engine: pyttsx3, fallback active"
+    },
+    {
+      "agent_id": 50,
+      "squadron": "SQ-05",
+      "status": "PASS",
+      "ms": 19.75727081298828,
+      "detail": "Engine: pyttsx3, fallback active"
+    },
+    {
+      "agent_id": 51,
+      "squadron": "SQ-06",
+      "status": "PASS",
+      "ms": 8.651256561279297,
+      "detail": "Endpoint /api/speak returned 200 OK"
+    },
+    {
+      "agent_id": 52,
+      "squadron": "SQ-06",
+      "status": "PASS",
+      "ms": 21.240711212158203,
+      "detail": "Endpoint /api/speak returned 200 OK"
+    },
+    {
+      "agent_id": 53,
+      "squadron": "SQ-06",
+      "status": "PASS",
+      "ms": 22.26710319519043,
+      "detail": "Endpoint /api/speak returned 200 OK"
+    },
+    {
+      "agent_id": 54,
+      "squadron": "SQ-06",
+      "status": "PASS",
+      "ms": 19.522428512573242,
+      "detail": "Endpoint /api/speak returned 200 OK"
+    },
+    {
+      "agent_id": 55,
+      "squadron": "SQ-06",
+      "status": "PASS",
+      "ms": 26.911258697509766,
+      "detail": "Endpoint /api/speak returned 200 OK"
+    },
+    {
+      "agent_id": 56,
+      "squadron": "SQ-06",
+      "status": "PASS",
+      "ms": 28.5494327545166,
+      "detail": "Endpoint /api/speak returned 200 OK"
+    },
+    {
+      "agent_id": 57,
+      "squadron": "SQ-06",
+      "status": "PASS",
+      "ms": 25.233745574951172,
+      "detail": "Endpoint /api/speak returned 200 OK"
+    },
+    {
+      "agent_id": 58,
+      "squadron": "SQ-06",
+      "status": "PASS",
+      "ms": 25.67744255065918,
+      "detail": "Endpoint /api/speak returned 200 OK"
+    },
+    {
+      "agent_id": 59,
+      "squadron": "SQ-06",
+      "status": "PASS",
+      "ms": 23.82373809814453,
+      "detail": "Endpoint /api/speak returned 200 OK"
+    },
+    {
+      "agent_id": 60,
+      "squadron": "SQ-06",
+      "status": "PASS",
+      "ms": 29.897212982177734,
+      "detail": "Endpoint /api/speak returned 200 OK"
+    },
+    {
+      "agent_id": 61,
+      "squadron": "SQ-07",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Queue capacity healthy (pending: 8)"
+    },
+    {
+      "agent_id": 62,
+      "squadron": "SQ-07",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Queue capacity healthy (pending: 8)"
+    },
+    {
+      "agent_id": 63,
+      "squadron": "SQ-07",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Queue capacity healthy (pending: 8)"
+    },
+    {
+      "agent_id": 64,
+      "squadron": "SQ-07",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Queue capacity healthy (pending: 8)"
+    },
+    {
+      "agent_id": 65,
+      "squadron": "SQ-07",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Queue capacity healthy (pending: 8)"
+    },
+    {
+      "agent_id": 66,
+      "squadron": "SQ-07",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Queue capacity healthy (pending: 8)"
+    },
+    {
+      "agent_id": 67,
+      "squadron": "SQ-07",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Queue capacity healthy (pending: 8)"
+    },
+    {
+      "agent_id": 68,
+      "squadron": "SQ-07",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Queue capacity healthy (pending: 8)"
+    },
+    {
+      "agent_id": 69,
+      "squadron": "SQ-07",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Queue capacity healthy (pending: 8)"
+    },
+    {
+      "agent_id": 70,
+      "squadron": "SQ-07",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Queue capacity healthy (pending: 8)"
+    },
+    {
+      "agent_id": 71,
+      "squadron": "SQ-08",
+      "status": "PASS",
+      "ms": 398.4065055847168,
+      "detail": "NLU math speech calculated correctly (225)"
+    },
+    {
+      "agent_id": 72,
+      "squadron": "SQ-08",
+      "status": "PASS",
+      "ms": 403.7299156188965,
+      "detail": "NLU math speech calculated correctly (225)"
+    },
+    {
+      "agent_id": 73,
+      "squadron": "SQ-08",
+      "status": "PASS",
+      "ms": 404.2682647705078,
+      "detail": "NLU math speech calculated correctly (225)"
+    },
+    {
+      "agent_id": 74,
+      "squadron": "SQ-08",
+      "status": "PASS",
+      "ms": 411.8642807006836,
+      "detail": "NLU math speech calculated correctly (225)"
+    },
+    {
+      "agent_id": 75,
+      "squadron": "SQ-08",
+      "status": "PASS",
+      "ms": 394.40298080444336,
+      "detail": "NLU math speech calculated correctly (225)"
+    },
+    {
+      "agent_id": 76,
+      "squadron": "SQ-08",
+      "status": "PASS",
+      "ms": 415.024995803833,
+      "detail": "NLU math speech calculated correctly (225)"
+    },
+    {
+      "agent_id": 77,
+      "squadron": "SQ-08",
+      "status": "PASS",
+      "ms": 395.68090438842773,
+      "detail": "NLU math speech calculated correctly (225)"
+    },
+    {
+      "agent_id": 78,
+      "squadron": "SQ-08",
+      "status": "PASS",
+      "ms": 409.6708297729492,
+      "detail": "NLU math speech calculated correctly (225)"
+    },
+    {
+      "agent_id": 79,
+      "squadron": "SQ-08",
+      "status": "PASS",
+      "ms": 398.78273010253906,
+      "detail": "NLU math speech calculated correctly (225)"
+    },
+    {
+      "agent_id": 80,
+      "squadron": "SQ-08",
+      "status": "PASS",
+      "ms": 391.28756523132324,
+      "detail": "NLU math speech calculated correctly (225)"
+    },
+    {
+      "agent_id": 81,
+      "squadron": "SQ-09",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Roman Urdu & English speech strings validated"
+    },
+    {
+      "agent_id": 82,
+      "squadron": "SQ-09",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Roman Urdu & English speech strings validated"
+    },
+    {
+      "agent_id": 83,
+      "squadron": "SQ-09",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Roman Urdu & English speech strings validated"
+    },
+    {
+      "agent_id": 84,
+      "squadron": "SQ-09",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Roman Urdu & English speech strings validated"
+    },
+    {
+      "agent_id": 85,
+      "squadron": "SQ-09",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Roman Urdu & English speech strings validated"
+    },
+    {
+      "agent_id": 86,
+      "squadron": "SQ-09",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Roman Urdu & English speech strings validated"
+    },
+    {
+      "agent_id": 87,
+      "squadron": "SQ-09",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Roman Urdu & English speech strings validated"
+    },
+    {
+      "agent_id": 88,
+      "squadron": "SQ-09",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Roman Urdu & English speech strings validated"
+    },
+    {
+      "agent_id": 89,
+      "squadron": "SQ-09",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Roman Urdu & English speech strings validated"
+    },
+    {
+      "agent_id": 90,
+      "squadron": "SQ-09",
+      "status": "PASS",
+      "ms": 0.0,
+      "detail": "Roman Urdu & English speech strings validated"
+    },
+    {
+      "agent_id": 91,
+      "squadron": "SQ-10",
+      "status": "PASS",
+      "ms": 22.32050895690918,
+      "detail": "Fault injection handled, mute/unmute verified"
+    },
+    {
+      "agent_id": 92,
+      "squadron": "SQ-10",
+      "status": "PASS",
+      "ms": 30.709505081176758,
+      "detail": "Fault injection handled, mute/unmute verified"
+    },
+    {
+      "agent_id": 93,
+      "squadron": "SQ-10",
+      "status": "PASS",
+      "ms": 24.634122848510742,
+      "detail": "Fault injection handled, mute/unmute verified"
+    },
+    {
+      "agent_id": 94,
+      "squadron": "SQ-10",
+      "status": "PASS",
+      "ms": 21.323442459106445,
+      "detail": "Fault injection handled, mute/unmute verified"
+    },
+    {
+      "agent_id": 95,
+      "squadron": "SQ-10",
+      "status": "PASS",
+      "ms": 24.676799774169922,
+      "detail": "Fault injection handled, mute/unmute verified"
+    },
+    {
+      "agent_id": 96,
+      "squadron": "SQ-10",
+      "status": "PASS",
+      "ms": 22.436141967773438,
+      "detail": "Fault injection handled, mute/unmute verified"
+    },
+    {
+      "agent_id": 97,
+      "squadron": "SQ-10",
+      "status": "PASS",
+      "ms": 24.033069610595703,
+      "detail": "Fault injection handled, mute/unmute verified"
+    },
+    {
+      "agent_id": 98,
+      "squadron": "SQ-10",
+      "status": "PASS",
+      "ms": 21.638154983520508,
+      "detail": "Fault injection handled, mute/unmute verified"
+    },
+    {
+      "agent_id": 99,
+      "squadron": "SQ-10",
+      "status": "PASS",
+      "ms": 19.974946975708008,
+      "detail": "Fault injection handled, mute/unmute verified"
+    }
+  ]
+}

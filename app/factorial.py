@@ -28,3 +28,4 @@ if __name__ == "__main__":
         print(f"The factorial of {n} is {compute_factorial(n)}")
     except ValueError as e:
         print(f"Error: {e}")
+        sys.exit(1)

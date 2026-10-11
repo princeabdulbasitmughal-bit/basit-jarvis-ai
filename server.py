@@ -106,10 +106,8 @@ if jarvis is None:
             self.macros = MacroEngine()
             self.content_team = ContentTeam(ai_brain=self.brain)
             
-            class SafeTTS:
-                def speak(self, text: str):
-                    logger.info(f"[VOICE]: {text}")
-            self.tts = SafeTTS()
+            from modules.tts import get_tts
+            self.tts = get_tts()
 
         def process_command(self, cmd: str) -> str:
             intents = self.nlu.parse(cmd)
@@ -173,6 +171,12 @@ class CommandRequest(BaseModel):
 
 class SpeakRequest(BaseModel):
     text: str
+    block: Optional[bool] = False
+
+class VoiceSetRequest(BaseModel):
+    voice: Any
+    rate: Optional[int] = None
+    volume: Optional[float] = None
 
 class MacroRequest(BaseModel):
     name: str
@@ -263,9 +267,81 @@ def execute_command(req: CommandRequest):
 
 @app.post("/api/speak")
 def speak_text(req: SpeakRequest):
-    """Speaks text out loud via PC speakers."""
-    jarvis.tts.speak(req.text)
-    return {"success": True, "spoken": req.text}
+    """Speaks text out loud via PC speakers with automatic sanitization and COM isolation."""
+    try:
+        from modules.tts import get_tts
+        tts_engine = getattr(jarvis, "tts", None) or get_tts()
+        tts_engine.speak(req.text, block=bool(req.block))
+        return {
+            "success": True,
+            "spoken": req.text,
+            "voice": getattr(tts_engine, "active_voice_name", "Microsoft David"),
+            "rate": getattr(tts_engine, "rate", 180),
+            "volume": getattr(tts_engine, "volume", 0.95)
+        }
+    except Exception as e:
+        logger.error(f"Error in /api/speak: {e}")
+        return {"success": False, "error": str(e)}
+
+
+@app.get("/api/voices")
+def get_voices():
+    """Returns available TTS voices and current active voice settings."""
+    try:
+        from modules.tts import get_tts
+        tts_engine = getattr(jarvis, "tts", None) or get_tts()
+        voices = tts_engine.get_available_voices()
+        return {
+            "success": True,
+            "active_voice": getattr(tts_engine, "active_voice_name", "Microsoft David"),
+            "voice_index": getattr(tts_engine, "voice_index", 0),
+            "rate": getattr(tts_engine, "rate", 180),
+            "volume": getattr(tts_engine, "volume", 0.95),
+            "muted": getattr(tts_engine, "muted", False),
+            "voices": voices
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e), "voices": []}
+
+
+@app.post("/api/voice/set")
+def set_voice_endpoint(req: VoiceSetRequest):
+    """Switches active voice by index or name, and adjusts rate or volume."""
+    try:
+        from modules.tts import get_tts
+        tts_engine = getattr(jarvis, "tts", None) or get_tts()
+        changed = tts_engine.set_voice(req.voice)
+        if req.rate is not None:
+            tts_engine.set_rate(req.rate)
+        if req.volume is not None:
+            tts_engine.set_volume(req.volume)
+        return {
+            "success": changed,
+            "active_voice": getattr(tts_engine, "active_voice_name", "Microsoft David"),
+            "voice_index": getattr(tts_engine, "voice_index", 0),
+            "rate": getattr(tts_engine, "rate", 180),
+            "volume": getattr(tts_engine, "volume", 0.95)
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/voice/mute")
+def mute_voice():
+    """Mutes Jarvis voice output."""
+    from modules.tts import get_tts
+    tts_engine = getattr(jarvis, "tts", None) or get_tts()
+    tts_engine.mute()
+    return {"success": True, "muted": True}
+
+
+@app.post("/api/voice/unmute")
+def unmute_voice():
+    """Unmutes Jarvis voice output."""
+    from modules.tts import get_tts
+    tts_engine = getattr(jarvis, "tts", None) or get_tts()
+    tts_engine.unmute()
+    return {"success": True, "muted": False}
 
 
 @app.post("/api/volume")
