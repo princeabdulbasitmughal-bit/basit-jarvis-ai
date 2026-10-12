@@ -38,6 +38,12 @@ def clean_text_for_speech(text: str) -> str:
     """Removes emojis, markdown, URLs, and special formatting for clean speech."""
     if not text:
         return ""
+    # Expand currency symbols
+    text = re.sub(r'\$(\d+(?:\.\d+)?)', r'\1 dollars', text)
+    text = text.replace('$', ' dollars ')
+    # Expand percentage
+    text = re.sub(r'(\d+(?:\.\d+)?)\s*%', r'\1 percent', text)
+    text = text.replace('%', ' percent ')
     # Remove code blocks
     text = re.sub(r'```.*?```', 'code block omitted', text, flags=re.DOTALL)
     text = re.sub(r'`(.*?)`', r'\1', text)

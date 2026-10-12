@@ -1026,6 +1026,10 @@ $bmp.Dispose()
             })
         return formatted
 
+    def process(self, user_input: str) -> Dict[str, Any]:
+        """Alias for respond() method for multi-orchestrator compatibility."""
+        return self.respond(user_input)
+
 
 # ============================================================
 # SINGLETON — server.js can import once and reuse
