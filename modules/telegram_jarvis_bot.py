@@ -95,6 +95,9 @@ def _is_authorized(chat_id: int) -> bool:
         return False   # ← was True (fail-open bug) — now fail-CLOSED
     return chat_id in ALLOWED_CHAT_IDS
 
+# Public alias for authorization check
+is_authorized_user = _is_authorized
+
 
 def _unauthorized_message():
     return (
