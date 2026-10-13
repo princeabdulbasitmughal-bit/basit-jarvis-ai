@@ -622,16 +622,44 @@ class BasitJarvis:
             notes = self.system.get_all_notes()
             if notes:
                 latest = notes[-3:]
-                summary = " Here are your latest notes: " + "; ".join([n["text"] for n in latest])
+                summary = " Here are your latest notes: " + "; ".join([(n.get("text") or n.get("content", "")) for n in latest])
                 self.tts.speak(summary)
-                return json.dumps(notes, indent=2)
+                return json.dumps(notes, indent=2, ensure_ascii=False)
             else:
                 self.tts.speak("You have no saved notes, sir.")
                 return "No notes found."
 
-        # AI Brain Query
+        elif intent == "get_all_reminders":
+            reminders = self.system.get_all_reminders()
+            if reminders:
+                latest = reminders[-3:]
+                summary = " Here are your active reminders: " + "; ".join([r.get("task", "") for r in latest])
+                self.tts.speak(summary)
+                return json.dumps(reminders, indent=2, ensure_ascii=False)
+            else:
+                self.tts.speak("You have no active reminders, sir.")
+                return "No active reminders found."
+
+        # AI Brain & Conversational Brain Query
         elif intent == "ai_query":
             q = entities.get("query", raw)
+            try:
+                from modules.conversational_brain import get_brain
+                cbrain = get_brain()
+                cbrain.ai_brain = self.brain
+                cres = cbrain.respond(q)
+                if cres and cres.get("response") and cres.get("action_taken") != "route_to_engine":
+                    reply = cres["response"]
+                    self.tts.speak(cres.get("speak") or reply[:120])
+                    return reply
+                elif cres and cres.get("needs_engine"):
+                    eng = cres["needs_engine"]
+                    eng_res = self.basit_engines.dispatch(eng, q, target_dir=self.base_dir)
+                    reply = eng_res.get("response") or eng_res.get("report") or eng_res.get("summary") or json.dumps(eng_res, ensure_ascii=False)
+                    self.tts.speak(eng_res.get("summary", "Task completed, sir."))
+                    return reply
+            except Exception as e:
+                logger.debug(f"ConversationalBrain fallback error: {e}")
             history = self.memory.get_conversation_history()
             reply = self.brain.ask(q, history)
             self.tts.speak(reply)

@@ -271,7 +271,7 @@ class AIBrain:
             logger.debug(f"Groq query failed: {e}")
         return None
 
-    def _ask_mistral(self, query: str, history: Optional[List[Dict[str, str]]] = None, max_tokens: int = 1024) -> Optional[str]:
+    def _ask_mistral(self, query: str, history: Optional[List[Dict[str, str]]] = None, max_tokens: int = 1024, system_prompt: Optional[str] = None) -> Optional[str]:
         """Queries Mistral Codestral for precise coding."""
         try:
             url = "https://api.mistral.ai/v1/chat/completions"
@@ -279,7 +279,7 @@ class AIBrain:
                 "Authorization": f"Bearer {self.mistral_api_key}",
                 "Content-Type": "application/json"
             }
-            messages = [{"role": "system", "content": self.system_prompt}]
+            messages = [{"role": "system", "content": system_prompt or self.system_prompt}]
             if history:
                 messages.extend(history[-6:])
             messages.append({"role": "user", "content": query})

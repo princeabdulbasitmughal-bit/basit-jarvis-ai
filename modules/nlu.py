@@ -371,8 +371,11 @@ class NaturalLanguageUnderstanding:
         if note_match:
             return {"intent": "take_quick_note", "entities": {"text": note_match.group(1).strip()}, "raw": cmd}
 
-        if any(w in lower for w in ["read notes", "show notes", "notes sunao", "notes parho", "my notes"]):
+        if any(w in lower for w in ["read notes", "show notes", "notes sunao", "notes parho", "my notes", "notes dikhao", "meri notes", "mere notes"]):
             return {"intent": "get_all_notes", "entities": {}, "raw": cmd}
+
+        if any(w in lower for w in ["show reminders", "read reminders", "my reminders", "reminders dikhao", "mere reminders", "meri reminders"]):
+            return {"intent": "get_all_reminders", "entities": {}, "raw": cmd}
 
         # ======================================================================
         # 12. MEDIA CONTROL

@@ -1,3 +1,3 @@
 """
-Application package initialization.
+Application package initializer.
 """

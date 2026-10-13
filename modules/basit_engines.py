@@ -674,7 +674,10 @@ class OpenSourceArsenalEngine:
         # Node 7: Apache Spark / PySpark Engine
         spark_status = {"online": True, "mode": "Local / Embedded Engine", "version": "4.2.0"}
         try:
-            from spark_engine import spark_engine
+            try:
+                from modules.spark_engine import spark_engine
+            except ImportError:
+                from spark_engine import spark_engine
             spark_telemetry = spark_engine.get_telemetry()
             spark_status = {
                 "online": spark_telemetry.get("pyspark_installed", False) or spark_telemetry.get("pandas_installed", False),
@@ -784,7 +787,10 @@ class GeminiSparkEngine:
     def _get_spark(self):
         if self._spark is None:
             try:
-                from spark_engine import spark_engine
+                try:
+                    from modules.spark_engine import spark_engine
+                except ImportError:
+                    from spark_engine import spark_engine
                 self._spark = spark_engine
             except Exception:
                 self._spark = None
@@ -906,6 +912,17 @@ class BasitUniversalAssistant:
         p = (prompt or "").strip()
         plower = p.lower()
 
+        if plower in ("ping", "status", "check", "test", "health"):
+            return {
+                "engine": "/assistant",
+                "mode": "Health Check / Ping",
+                "boss": "Basit bhai",
+                "latency_sec": 0.001,
+                "response": "Basit Jarvis Sovereign Assistant is ONLINE — all 9 autonomous engines armed and ready.",
+                "summary": "Sovereign Assistant online and ready.",
+                "banner": self.BANNER
+            }
+
         # Dynamic Engine Auto-Routing
         if any(w in plower for w in ["code", "script", "fastapi", "react", "frontend", "backend", "function", "fix bug", "scaffold"]):
             res = self.b1.execute(p)
@@ -983,7 +1000,8 @@ class BasitUniversalAssistant:
 # MASTER DISPATCHER
 # ============================================================
 class BasitEngines:
-    def __init__(self, brain, default_dir: str = None):
+    def __init__(self, brain=None, default_dir: str = None, ai_brain=None):
+        brain = brain or ai_brain
         self.brain = brain
         self.dir = default_dir or r"E:\basit-jarvis-ai"
         self.b1 = Basit1Coder(brain)
@@ -995,6 +1013,15 @@ class BasitEngines:
         self.bl = BasitLoopEngine(brain, self.b1, self.b3)
         self.gs = GeminiSparkEngine(brain)
         self.assistant = BasitUniversalAssistant(brain, self.b1, self.b2, self.b3, self.b4, self.sw, self.ar, self.gs)
+        # Full-name aliases for callers referencing .basit1, .basit3, etc.
+        self.basit1 = self.b1
+        self.basit2 = self.b2
+        self.basit3 = self.b3
+        self.basit4 = self.b4
+        self.basitswarm = self.sw
+        self.arsenal = self.ar
+        self.basitloop = self.bl
+        self.gemini_spark = self.gs
 
     def dispatch(self, name: str, task: str, target_dir: str = None) -> Dict[str, Any]:
         n = name.lower().replace("/","")

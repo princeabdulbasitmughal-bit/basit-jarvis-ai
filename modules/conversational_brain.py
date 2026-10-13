@@ -181,6 +181,14 @@ ACTION_PATTERNS = {
         r"git\s+commit\s+(?:karo\s+)?(?P<msg>.+)",
         r"(?:commit|save\s+changes|changes\s+save\s+karo)\s+(?:karo\s+)?(?:with\s+)?(?:message\s+)?(?P<msg>.+)",
     ],
+    "get_notes": [
+        r"(?:meri|mere|my|all|saari|sari)?\s*notes\s+(?:dikhao|batao|sunao|parho|show|read|list)",
+        r"(?:show|read|list|display)\s+(?:my\s+|all\s+)?notes",
+    ],
+    "get_reminders": [
+        r"(?:meri|mere|my|all|saare|sare)?\s*reminders?\s+(?:dikhao|batao|sunao|show|list)",
+        r"(?:show|read|list|display)\s+(?:my\s+|all\s+)?reminders?",
+    ],
     "create_note": [
         r"(?:note|naya\s+note|likho)\s+(?:karo\s+)?(?P<content>.+)",
         r"(?:save|sacha\s+karo|store)\s+(?:karo\s+)?(?:yeh|this)?\s*:?\s*(?P<content>.+)",
@@ -342,6 +350,12 @@ class ConversationalBrain:
 
         elif action == "check_weather":
             return self._check_weather()
+
+        elif action == "get_notes":
+            return self._get_notes()
+
+        elif action == "get_reminders":
+            return self._get_reminders()
 
         elif action == "create_note":
             content = entities.get("content", original_text)
@@ -693,14 +707,18 @@ $bmp.Dispose()
             notes = []
             if os.path.exists(notes_path):
                 try:
-                    notes = json.loads(open(notes_path).read())
+                    with open(notes_path, 'r', encoding='utf-8') as f:
+                        notes = json.load(f)
                     if not isinstance(notes, list): notes = []
                 except Exception:
                     notes = []
+            now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             note = {
                 "id": len(notes) + 1,
+                "text": content,
                 "content": content,
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                "created_at": now_str,
+                "timestamp": now_str,
                 "created_by": "voice"
             }
             notes.append(note)
@@ -709,6 +727,35 @@ $bmp.Dispose()
             return f"{self._pick(JARVIS_CONFIRMATIONS['done'])} Note save ho gaya: \"{content[:60]}{'...' if len(content) > 60 else ''}\" 📝"
         except Exception as e:
             return f"Note save nahi ho saka: {str(e)[:80]}"
+
+    def _get_notes(self) -> str:
+        """Retrieve and format recent saved notes."""
+        try:
+            notes_path = os.path.join(BASE_DIR, 'notes.json')
+            if not os.path.exists(notes_path):
+                return "Abhi koi saved notes nahi hain Basit bhai! 📝"
+            with open(notes_path, 'r', encoding='utf-8') as f:
+                notes = json.load(f)
+            if not notes or not isinstance(notes, list):
+                return "Abhi koi saved notes nahi hain Basit bhai! 📝"
+            recent = notes[-5:]
+            lines = [f"• [{n.get('created_at') or n.get('timestamp', '')}] {n.get('text') or n.get('content', '')}" for n in recent]
+            return f"📝 Aapke recent notes ({len(notes)} total):\n" + "\n".join(lines)
+        except Exception as e:
+            return f"Notes read nahi ho sake: {str(e)[:60]}"
+
+    def _get_reminders(self) -> str:
+        """Retrieve and format saved reminders."""
+        try:
+            reminders_path = os.path.join(BASE_DIR, 'data', 'reminders.json')
+            reminders, _ = atomic_read_json(reminders_path, default=[], auto_heal_from_backup=True)
+            if not reminders or not isinstance(reminders, list):
+                return "Abhi koi active reminders nahi hain Basit bhai! ⏰"
+            recent = reminders[-5:]
+            lines = [f"• [{r.get('fire_at', r.get('set_at', ''))}] {r.get('task', '')}" for r in recent]
+            return f"⏰ Aapke active reminders ({len(reminders)} total):\n" + "\n".join(lines)
+        except Exception as e:
+            return f"Reminders read nahi ho sake: {str(e)[:60]}"
 
     def _git_commit(self, msg: str) -> str:
         """Auto git add + commit."""
@@ -902,7 +949,7 @@ $bmp.Dispose()
         # Check high-priority explicit actions (e.g. joke, calculate, note)
         # to avoid boredom emotion intercepting explicit requests like "bore ho raha hoon koi joke sunao"
         detected = self.detect_action(text)
-        if detected and detected[0] in ("tell_joke", "calculate", "create_note", "set_reminder"):
+        if detected and detected[0] in ("tell_joke", "calculate", "get_notes", "get_reminders", "create_note", "set_reminder"):
             action_name, entities = detected
             result = self.execute_action(action_name, entities, text)
             if result:

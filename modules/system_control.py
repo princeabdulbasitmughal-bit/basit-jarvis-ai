@@ -539,31 +539,74 @@ class SystemControl:
             try:
                 with open(notes_path, "r", encoding="utf-8") as f:
                     notes = json.load(f)
+                if not isinstance(notes, list):
+                    notes = []
             except Exception:
                 notes = []
         
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         entry = {
             "id": len(notes) + 1,
             "text": note_text,
-            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "content": note_text,
+            "created_at": now_str,
+            "timestamp": now_str
         }
         notes.append(entry)
         
         with open(notes_path, "w", encoding="utf-8") as f:
-            json.dump(notes, f, indent=2)
+            json.dump(notes, f, indent=2, ensure_ascii=False)
         logger.info(f"Saved note: '{note_text}'")
         return entry
 
     def get_all_notes(self) -> List[Dict[str, Any]]:
-        """Retrieves all saved notes."""
+        """Retrieves all saved notes with normalized text/content and created_at/timestamp fields."""
         notes_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "notes.json")
         if not os.path.exists(notes_path):
             return []
         try:
             with open(notes_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                raw_notes = json.load(f)
+            if not isinstance(raw_notes, list):
+                return []
+            normalized = []
+            for idx, n in enumerate(raw_notes):
+                if isinstance(n, dict):
+                    txt = n.get("text") or n.get("content") or ""
+                    ts = n.get("created_at") or n.get("timestamp") or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    item = dict(n)
+                    item.setdefault("id", idx + 1)
+                    item["text"] = txt
+                    item["content"] = txt
+                    item["created_at"] = ts
+                    item["timestamp"] = ts
+                    normalized.append(item)
+            return normalized
         except Exception:
             return []
+
+    def get_all_reminders(self) -> List[Dict[str, Any]]:
+        """Retrieves all saved reminders from data/reminders.json."""
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        reminders_path = os.path.join(base_dir, "data", "reminders.json")
+        if not os.path.exists(reminders_path):
+            return []
+        try:
+            with open(reminders_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data if isinstance(data, list) else []
+        except Exception:
+            return []
+
+    def open_sound_settings(self) -> bool:
+        """Opens Windows Sound Settings dialog (ms-settings:sound or mmsys.cpl)."""
+        try:
+            if sys.platform == "win32":
+                subprocess.Popen("start ms-settings:sound", shell=True)
+            return True
+        except Exception as e:
+            logger.warning(f"Could not open sound settings: {e}")
+            return False
 
     def cleanup_old_screenshots(self, max_days: int = 7) -> int:
         """Cleans up screenshots older than max_days."""
