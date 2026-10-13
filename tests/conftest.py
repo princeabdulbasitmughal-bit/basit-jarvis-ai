@@ -29,5 +29,11 @@ async def client_fixture() -> AsyncGenerator[AsyncClient, None]:
     """
     Provide an ``httpx.AsyncClient`` bound to the FastAPI application.
     """
-    async with AsyncClient(app=fastapi_app, base_url="http://testserver") as client:
-        yield client
+    import httpx
+    try:
+        transport = httpx.ASGITransport(app=fastapi_app)
+        async with AsyncClient(transport=transport, base_url="http://testserver") as client:
+            yield client
+    except (TypeError, AttributeError):
+        async with AsyncClient(app=fastapi_app, base_url="http://testserver") as client:
+            yield client

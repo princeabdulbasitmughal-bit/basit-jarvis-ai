@@ -51,6 +51,14 @@ async def root() -> Dict[str, str]:
     return {"message": "Telemetry service is running"}
 
 
+@app.get("/ping")
+async def ping() -> Dict[str, str]:
+    """
+    Health check ping endpoint returning pong.
+    """
+    return {"status": "ok", "message": "pong"}
+
+
 # Register routers
 app.include_router(metrics_router)
 
