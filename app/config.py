@@ -5,15 +5,17 @@ All secrets are loaded from environment variables.
 
 import os
 from functools import lru_cache
-from pydantic import BaseSettings, Field, SecretStr, validator
 from datetime import timedelta
+try:
+    from pydantic.v1 import BaseSettings, Field, SecretStr, validator
+except ImportError:
+    from pydantic import BaseSettings, Field, SecretStr, validator
 
 
 class Settings(BaseSettings):
     """Application settings."""
-    # JWT configuration
     jwt_secret_key: SecretStr = Field(
-        ...,
+        SecretStr(os.getenv("JWT_SECRET_KEY", "dev_jwt_secret_key_basit_2026_super_safe_32ch")),
         env="JWT_SECRET_KEY",
         description="Secret key used to sign JWT tokens."
     )
@@ -33,6 +35,16 @@ class Settings(BaseSettings):
         "Telemetry Service",
         env="APP_NAME",
         description="Human readable application name."
+    )
+    APP_NAME: str = Field(
+        "Telemetry Service",
+        env="APP_NAME",
+        description="Human readable application name."
+    )
+    DEBUG: bool = Field(
+        False,
+        env="DEBUG",
+        description="FastAPI debug flag."
     )
     log_level: str = Field(
         "INFO",

@@ -39,3 +39,4 @@ def configure_logging() -> None:
 
 # Configure logging as soon as the module is imported
 configure_logging()
+logger = logging.getLogger("telemetry")

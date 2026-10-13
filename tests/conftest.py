@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+os.environ.setdefault("JWT_SECRET_KEY", "dev_jwt_secret_key_basit_2026_super_safe_32ch")
 from typing import AsyncGenerator
 
 import pytest

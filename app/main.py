@@ -5,7 +5,7 @@ FastAPI application entry point.
 import logging
 from typing import Any, Dict
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from .auth import create_access_token, TokenData
@@ -18,7 +18,7 @@ app = FastAPI(title=settings.APP_NAME, debug=settings.DEBUG)
 
 
 @app.post("/token", response_model=Dict[str, str])
-async def login(form_data: OAuth2PasswordRequestForm = ...):
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Dummy login endpoint that issues JWTs.
     In a real-world scenario replace with proper credential validation.
