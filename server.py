@@ -1335,6 +1335,44 @@ def serve_dashboard():
     return "<h1>Basit Jarvis PC Controller API Online</h1><p>Visit <a href='/docs'>/docs</a> for Swagger UI.</p>"
 
 
+# ---------------------------------------------------------------------------
+# Direct ZIP Download Endpoints for Basit bhai
+# ---------------------------------------------------------------------------
+@app.get("/download/suite")
+@app.get("/download/master")
+@app.get("/download/all")
+def download_master_suite():
+    """Directly download the full Basit AI Master Suite ZIP archive."""
+    p = "E:/Basit_AI_Master_Project_Suite.zip"
+    if os.path.exists(p):
+        return FileResponse(p, media_type="application/zip", filename="Basit_AI_Master_Project_Suite.zip")
+    raise HTTPException(status_code=404, detail="Master Suite ZIP not found")
+
+
+@app.get("/download/omnitrade")
+def download_omnitrade_zip():
+    p = "E:/omnitrade-ai-matrix.zip"
+    if os.path.exists(p):
+        return FileResponse(p, media_type="application/zip", filename="omnitrade-ai-matrix.zip")
+    raise HTTPException(status_code=404, detail="OmniTrade ZIP not found")
+
+
+@app.get("/download/jarvis")
+def download_jarvis_zip():
+    p = "E:/basit-jarvis-ai.zip"
+    if os.path.exists(p):
+        return FileResponse(p, media_type="application/zip", filename="basit-jarvis-ai.zip")
+    raise HTTPException(status_code=404, detail="Jarvis ZIP not found")
+
+
+@app.get("/download/scalper")
+def download_scalper_zip():
+    p = "E:/scalping-robot-v5.zip"
+    if os.path.exists(p):
+        return FileResponse(p, media_type="application/zip", filename="scalping-robot-v5.zip")
+    raise HTTPException(status_code=404, detail="Scalper Robot ZIP not found")
+
+
 if __name__ == "__main__":
     logger.info("Starting Basit Jarvis PC Controller Server on http://0.0.0.0:8888 ...")
     uvicorn.run(app, host="0.0.0.0", port=8888, log_level="info")
