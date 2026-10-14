@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-13T09:17:13.034184",
-  "total_latency_sec": 1.93,
+  "timestamp": "2026-10-13T16:33:14.082920",
+  "total_latency_sec": 1.54,
   "subagents_count": 20,
   "optimal_count": 20,
   "cluster_status": "100% OPERATIONAL",
@@ -82,9 +82,9 @@
       "icon": "\ud83d\udcbe",
       "category": "Compute & Memory",
       "status": "OPTIMAL",
-      "latency_ms": 1925.6,
+      "latency_ms": 1514.3,
       "metric": "2 Engines Tracked \u2022 Auto-Pruning OK",
-      "details": "SQLite auto-pruned and vacuum ready in 1925.6ms."
+      "details": "SQLite auto-pruned and vacuum ready in 1514.3ms."
     },
     {
       "id": 9,
@@ -92,9 +92,9 @@
       "icon": "\ud83e\udde0",
       "category": "Compute & Memory",
       "status": "OPTIMAL",
-      "latency_ms": 0.2,
+      "latency_ms": 0.4,
       "metric": "Bilingual Classifier: URDU \u2022 Intent: coding",
-      "details": "Intent recognition validated (0.2ms, language detected: urdu)."
+      "details": "Intent recognition validated (0.4ms, language detected: urdu)."
     },
     {
       "id": 10,
@@ -102,9 +102,9 @@
       "icon": "\ud83d\udd0a",
       "category": "Compute & Memory",
       "status": "OPTIMAL",
-      "latency_ms": 54.8,
+      "latency_ms": 3.0,
       "metric": "Hardware Volume & Display Ready",
-      "details": "PyCaw & win32 multimedia hooks verified (54.8ms)."
+      "details": "PyCaw & win32 multimedia hooks verified (3.0ms)."
     },
     {
       "id": 11,
@@ -132,9 +132,9 @@
       "icon": "\ud83d\udde3\ufe0f",
       "category": "Security & Control",
       "status": "OPTIMAL",
-      "latency_ms": 154.2,
+      "latency_ms": 246.7,
       "metric": "Zero Speech Discard Guard",
-      "details": "Window utterance reference pool verified (154.2ms)."
+      "details": "Window utterance reference pool verified (246.7ms)."
     },
     {
       "id": 14,
@@ -142,9 +142,9 @@
       "icon": "\ud83e\uddf9",
       "category": "Security & Control",
       "status": "OPTIMAL",
-      "latency_ms": 1922.6,
+      "latency_ms": 1509.8,
       "metric": "Clean (0 killed, 0.0MB freed)",
-      "details": "RSS threshold & parent PID protection verified (1922.6ms)."
+      "details": "RSS threshold & parent PID protection verified (1509.8ms)."
     },
     {
       "id": 15,
@@ -152,9 +152,9 @@
       "icon": "\ud83d\udee1\ufe0f",
       "category": "Security & Control",
       "status": "OPTIMAL",
-      "latency_ms": 244.2,
+      "latency_ms": 246.4,
       "metric": "Cmd.exe Metacharacters Filtered",
-      "details": "Subprocess parameter sanitizer validated (244.2ms)."
+      "details": "Subprocess parameter sanitizer validated (246.4ms)."
     },
     {
       "id": 16,
@@ -162,9 +162,9 @@
       "icon": "\ud83d\udd11",
       "category": "Security & Control",
       "status": "OPTIMAL",
-      "latency_ms": 98.6,
+      "latency_ms": 66.2,
       "metric": "0 Environment Keys Configured",
-      "details": ".env token storage validated with zero plaintext leak (98.6ms)."
+      "details": ".env token storage validated with zero plaintext leak (66.2ms)."
     },
     {
       "id": 17,
@@ -172,9 +172,9 @@
       "icon": "\ud83c\udf33",
       "category": "Network & Orchestration",
       "status": "OPTIMAL",
-      "latency_ms": 1415.4,
-      "metric": "Git Tracked (23 pending)",
-      "details": "Version control health verified in 1415.4ms."
+      "latency_ms": 891.0,
+      "metric": "Git Tracked (13 pending)",
+      "details": "Version control health verified in 891.0ms."
     },
     {
       "id": 18,
@@ -182,8 +182,8 @@
       "icon": "\ud83c\udf10",
       "category": "Network & Orchestration",
       "status": "OPTIMAL",
-      "latency_ms": 1249.7,
-      "metric": "HTTP 200 Response (1249.7ms)",
+      "latency_ms": 780.1,
+      "metric": "HTTP 200 Response (780.1ms)",
       "details": "Zero-dependency native HTTP server alive and responsive."
     },
     {
@@ -192,9 +192,9 @@
       "icon": "\ud83d\udce6",
       "category": "Network & Orchestration",
       "status": "OPTIMAL",
-      "latency_ms": 218.8,
+      "latency_ms": 265.6,
       "metric": "Sequential Execution Engine",
-      "details": "Async command chain pipeline ready (218.8ms)."
+      "details": "Async command chain pipeline ready (265.6ms)."
     },
     {
       "id": 20,
@@ -202,9 +202,9 @@
       "icon": "\ud83d\udc51",
       "category": "Network & Orchestration",
       "status": "OPTIMAL",
-      "latency_ms": 142.1,
+      "latency_ms": 1.0,
       "metric": "Global 6-Engine Sovereign Mesh",
-      "details": "Master runner 31s SLA coordinator armed (142.1ms)."
+      "details": "Master runner 31s SLA coordinator armed (1.0ms)."
     }
   ]
 }

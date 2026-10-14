@@ -1,46 +1,30 @@
 """
-Centralised logging configuration.
-
-The logger is configured at import time, making it instantly available
-throughout the project via `logging.getLogger(__name__)`.
+Centralised logger configuration.
 """
 
 import logging
 import sys
-from logging.config import dictConfig
+from typing import Final
 
 from .config import get_settings
 
-LOGGING_CONFIG = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "standard": {
-            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-        },
-    },
-    "handlers": {
-        "default": {
-            "class": "logging.StreamHandler",
-            "formatter": "standard",
-            "stream": sys.stdout,
-        },
-    },
-    "root": {"handlers": ["default"], "level": "INFO"},
-}
+_LOG_FORMAT: Final = (
+    "%(asctime)s | %(levelname)s | %(name)s | %(filename)s:%(lineno)d | %(message)s"
+)
 
 
 def configure_logging() -> None:
-    """Apply the logging configuration."""
-    dictConfig(LOGGING_CONFIG)
-    logger = logging.getLogger(__name__)
-    logger.debug("Logging configured")
+    """Configure the root logger based on Settings."""
+    settings = get_settings()
+    logging.basicConfig(
+        level=getattr(logging, settings.LOG_LEVEL),
+        format=_LOG_FORMAT,
+        stream=sys.stdout,
+    )
+    # Reduce noise from third‑party libraries
+    for noisy_logger in ("uvicorn", "uvicorn.error", "uvicorn.access"):
+        logging.getLogger(noisy_logger).setLevel(logging.WARNING)
 
 
-# Configure logging as soon as the module is imported
 configure_logging()
-logger = logging.getLogger("telemetry")
-
-def get_logger() -> logging.Logger:
-    """Return the application logger instance."""
-    return logger
+logger = logging.getLogger(__name__)

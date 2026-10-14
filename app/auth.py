@@ -1,151 +1,75 @@
 """
-Authentication utilities: JWT creation, verification and FastAPI dependencies.
+JWT utilities and FastAPI security dependencies.
 """
 
 import logging
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Dict
 
-import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import ValidationError
+from jose import JWTError, jwt
 
 from .config import get_settings
-from .models import TokenData, User
+from .models import TokenData
 
 logger = logging.getLogger(__name__)
 
-# Simple in‑memory user store for demonstration purposes.
-# In production replace with DB lookup.
-_FAKE_USERS_DB = {
-    "alice": {
-        "username": "alice",
-        "full_name": "Alice Wonderland",
-        "disabled": False,
-        "hashed_password": "fakehashedsecret",  # not used in this demo
-    },
-    "bob": {
-        "username": "bob",
-        "full_name": "Bob Builder",
-        "disabled": True,
-        "hashed_password": "fakehashedbuilder",
-    },
-}
+_security = HTTPBearer(auto_error=False)
 
 
-def _get_user(username: str) -> Optional[User]:
-    """Retrieve a User object from the fake DB."""
-    user_dict = _FAKE_USERS_DB.get(username)
-    if not user_dict:
-        return None
-    return User(**user_dict)
-
-
-def create_access_token(*, data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """
-    Create a JWT token.
-
-    Args:
-        data: Payload data (must be JSON serializable).
-        expires_delta: Optional custom expiration timedelta.
-
-    Returns:
-        Encoded JWT string.
-    """
+def _create_jwt(payload: Dict[str, Any], expires_delta: timedelta) -> str:
+    """Encode a JWT token."""
     settings = get_settings()
-    to_encode = data.copy()
-    now = datetime.utcnow()
-    if expires_delta:
-        expire = now + expires_delta
-    else:
-        expire = now + timedelta(minutes=settings.access_token_expire_minutes)
+    to_encode = payload.copy()
+    expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
-    try:
-        encoded_jwt = jwt.encode(
-            to_encode,
-            settings.jwt_secret_key.get_secret_value(),
-            algorithm=settings.jwt_algorithm,
-        )
-        logger.debug("JWT created for payload: %s", to_encode)
-        return encoded_jwt
-    except Exception as exc:
-        logger.exception("Failed to encode JWT")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Token generation failed",
-        ) from exc
+    token = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    logger.debug("JWT token created for payload: %s", payload)
+    return token
 
 
-def decode_token(token: str) -> TokenData:
+def create_access_token(username: str) -> str:
     """
-    Decode a JWT token and return its payload.
-
-    Raises:
-        HTTPException: If token is invalid or expired.
+    Public helper to create a JWT access token for a given username.
     """
     settings = get_settings()
-    try:
-        payload = jwt.decode(
-            token,
-            settings.jwt_secret_key.get_secret_value(),
-            algorithms=[settings.jwt_algorithm],
-        )
-        token_data = TokenData(**payload)
-        logger.debug("JWT decoded successfully: %s", token_data)
-        return token_data
-    except jwt.ExpiredSignatureError:
-        logger.warning("Expired JWT token")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    except (jwt.InvalidTokenError, ValidationError) as exc:
-        logger.warning("Invalid JWT token: %s", exc)
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from exc
-
-
-bearer_scheme = HTTPBearer(auto_error=False)
+    return _create_jwt(
+        {"sub": username},
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
 
 
 async def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
-) -> User:
+    credentials: HTTPAuthorizationCredentials = Depends(_security),
+) -> str:
     """
-    FastAPI dependency that validates JWT and returns the current user.
-
-    Raises:
-        HTTPException: 401 if token missing/invalid or user disabled.
+    FastAPI dependency that validates the JWT token and returns the username.
+    Raises HTTPException(401) if token is missing or invalid.
     """
     if credentials is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing authentication token",
+            detail="Missing authorization credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = credentials.credentials
-    token_data = decode_token(token)
-    if token_data.username is None:
+    settings = get_settings()
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        token_data = TokenData(**payload)
+        if token_data.username is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token payload missing username",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        logger.debug("Authenticated request for user: %s", token_data.username)
+        return token_data.username
+    except JWTError as exc:
+        logger.warning("JWT validation error: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token payload missing username",
+            detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = _get_user(token_data.username)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    if user.disabled:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User account is disabled",
-        )
-    return user

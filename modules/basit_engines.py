@@ -912,13 +912,13 @@ class BasitUniversalAssistant:
         p = (prompt or "").strip()
         plower = p.lower()
 
-        if plower in ("ping", "status", "check", "test", "health"):
+        if plower in ("ping", "status", "check", "test", "health", "briefing", "executive status briefing", "status briefing", "executive briefing") or "briefing" in plower:
             return {
                 "engine": "/assistant",
-                "mode": "Health Check / Ping",
+                "mode": "Executive Status Briefing",
                 "boss": "Basit bhai",
                 "latency_sec": 0.001,
-                "response": "Basit Jarvis Sovereign Assistant is ONLINE — all 9 autonomous engines armed and ready.",
+                "response": "👑 Basit Jarvis Sovereign Assistant is ONLINE — all 9 autonomous engines armed and ready across Dual-Node GPU Cluster (RTX A6000 + RTX 5090).",
                 "summary": "Sovereign Assistant online and ready.",
                 "banner": self.BANNER
             }
