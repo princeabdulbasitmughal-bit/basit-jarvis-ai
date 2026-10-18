@@ -31,3 +31,6 @@ data/reminders.json
 venv/
 .venv/
 env/
+
+*.db-wal
+*.db-shm
