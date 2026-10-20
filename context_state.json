@@ -7,56 +7,6 @@
   "last_topic": "ai automation",
   "history": [
     {
-      "timestamp": 1792479833.1951516,
-      "user": "50 times 4 plus 25",
-      "intent": "ai_query",
-      "entities": {
-        "query": "50 times 4 plus 25"
-      },
-      "jarvis": "Hisab: 50 times 4 plus 25 = **225** \u2705"
-    },
-    {
-      "timestamp": 1792479833.2872407,
-      "user": "system status batao",
-      "intent": "system_status",
-      "entities": {},
-      "jarvis": "CPU is at 34.8 percent, RAM is using 187.6 gigabytes."
-    },
-    {
-      "timestamp": 1792480225.297686,
-      "user": "50 times 4 plus 25",
-      "intent": "ai_query",
-      "entities": {
-        "query": "50 times 4 plus 25"
-      },
-      "jarvis": "Hisab: 50 times 4 plus 25 = **225** \u2705"
-    },
-    {
-      "timestamp": 1792480225.3101113,
-      "user": "naya note likho: Swarm-33 live verification active",
-      "intent": "take_quick_note",
-      "entities": {
-        "text": "Swarm-33 live verification active"
-      },
-      "jarvis": "Note saved: 'Swarm-33 live verification active'"
-    },
-    {
-      "timestamp": 1792480225.3827307,
-      "user": "system status batao",
-      "intent": "system_status",
-      "entities": {},
-      "jarvis": "CPU is at 33.2 percent, RAM is using 189.8 gigabytes."
-    },
-    {
-      "timestamp": 1792480896.618094,
-      "user": "50 times 4 plus 25",
-      "intent": "ai_query",
-      "entities": {
-        "query": "50 times 4 plus 25"
-      },
-      "jarvis": "Hisab: 50 times 4 plus 25 = **225** \u2705"
-    },
-    {
       "timestamp": 1792480896.650551,
       "user": "naya note likho: Swarm-33 live verification active",
       "intent": "take_quick_note",
@@ -171,6 +121,56 @@
       "intent": "system_status",
       "entities": {},
       "jarvis": "CPU is at 51.0 percent, RAM is using 182.2 gigabytes."
+    },
+    {
+      "timestamp": 1792493661.5466974,
+      "user": "50 times 4 plus 25",
+      "intent": "ai_query",
+      "entities": {
+        "query": "50 times 4 plus 25"
+      },
+      "jarvis": "Hisab: 50 times 4 plus 25 = **225** \u2705"
+    },
+    {
+      "timestamp": 1792493661.5619893,
+      "user": "naya note likho: Swarm-33 live verification active",
+      "intent": "take_quick_note",
+      "entities": {
+        "text": "Swarm-33 live verification active"
+      },
+      "jarvis": "Note saved: 'Swarm-33 live verification active'"
+    },
+    {
+      "timestamp": 1792493661.6372423,
+      "user": "system status batao",
+      "intent": "system_status",
+      "entities": {},
+      "jarvis": "CPU is at 61.3 percent, RAM is using 197.3 gigabytes."
+    },
+    {
+      "timestamp": 1792494047.2672334,
+      "user": "50 times 4 plus 25",
+      "intent": "ai_query",
+      "entities": {
+        "query": "50 times 4 plus 25"
+      },
+      "jarvis": "Hisab: 50 times 4 plus 25 = **225** \u2705"
+    },
+    {
+      "timestamp": 1792494047.269261,
+      "user": "naya note likho: Swarm-33 live verification active",
+      "intent": "take_quick_note",
+      "entities": {
+        "text": "Swarm-33 live verification active"
+      },
+      "jarvis": "Note saved: 'Swarm-33 live verification active'"
+    },
+    {
+      "timestamp": 1792494047.3597162,
+      "user": "system status batao",
+      "intent": "system_status",
+      "entities": {},
+      "jarvis": "CPU is at 66.2 percent, RAM is using 172.0 gigabytes."
     }
   ]
 }
