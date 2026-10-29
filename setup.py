@@ -6,8 +6,8 @@ setup(
     packages=find_packages(),
     install_requires=[],
     entry_points={
-        "console_scripts": [
-            "factorial=app.factorial:main",
+        'console_scripts': [
+            'factorial=app.factorial:main',
         ],
     },
 )
