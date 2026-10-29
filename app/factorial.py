@@ -3,7 +3,7 @@ def compute_factorial(n: int) -> int:
     Compute the factorial of a non-negative integer n.
 
     Args:
-        n (int): A non-negative integer.
+        n (int): The non-negative integer for which to compute the factorial.
 
     Returns:
         int: The factorial of n.
@@ -28,4 +28,3 @@ if __name__ == "__main__":
         print(f"The factorial of {n} is {compute_factorial(n)}")
     except ValueError as e:
         print(f"Error: {e}")
-        sys.exit(1)
