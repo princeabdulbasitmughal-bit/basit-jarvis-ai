@@ -1,71 +1,48 @@
-"""
-FastAPI dependencies for authentication and shared utilities.
-"""
+"""FastAPI dependencies for authentication and request handling."""
 
 import logging
-from datetime import datetime, timezone
-from typing import Generator
+from typing import AsyncGenerator
 
-import jwt
 from fastapi import Depends, HTTPException, Request, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from .config import get_settings, Settings
+from .auth import decode_access_token
 from .models import TokenData
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
+security = HTTPBearer(auto_error=False)
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-
-def decode_jwt(token: str, settings: Settings) -> TokenData:
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
+) -> TokenData:
     """
-    Decode a JWT token and return the payload.
+    Dependency that validates a JWT and returns token data.
 
     Raises:
-        HTTPException: If token is invalid or expired.
+        HTTPException: 401 if token is missing or invalid.
     """
-    try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-        username: str = payload.get("sub")
-        exp: int = payload.get("exp")
-        if username is None or exp is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token payload missing required fields",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        return TokenData(username=username, exp=exp)
-    except jwt.ExpiredSignatureError:
-        logger.warning("Expired JWT token")
+    if credentials is None or credentials.scheme.lower() != "bearer":
+        _logger.debug("Missing or malformed Authorization header")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired",
+            detail="Not authenticated",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    except jwt.PyJWTError as exc:
-        logger.warning("Invalid JWT token: %s", exc)
+    token = credentials.credentials
+    try:
+        token_data = decode_access_token(token)
+        if token_data.username is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token missing subject",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return token_data
+    except Exception as exc:
+        _logger.debug("Authentication failed: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-
-async def get_current_user(
-    token: str = Depends(oauth2_scheme), settings: Settings = Depends(get_settings)
-) -> TokenData:
-    """
-    FastAPI dependency that validates JWT and returns token data.
-    """
-    return decode_jwt(token, settings)
-
-
-def get_request_id(request: Request) -> str:
-    """
-    Extract or generate a request ID for logging correlation.
-    """
-    request_id = request.headers.get("X-Request-ID")
-    if not request_id:
-        request_id = f"{datetime.now(tz=timezone.utc).timestamp()}-{id(request)}"
-    return request_id

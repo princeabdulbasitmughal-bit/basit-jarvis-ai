@@ -1,75 +1,61 @@
-"""
-JWT utilities and FastAPI security dependencies.
-"""
+"""Utility functions for JWT creation and verification."""
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict
 
-from fastapi import Depends, HTTPException, Request, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 
 from .config import get_settings
 from .models import TokenData
 
-logger = logging.getLogger(__name__)
-
-_security = HTTPBearer(auto_error=False)
-
-
-def _create_jwt(payload: Dict[str, Any], expires_delta: timedelta) -> str:
-    """Encode a JWT token."""
-    settings = get_settings()
-    to_encode = payload.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})
-    token = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
-    logger.debug("JWT token created for payload: %s", payload)
-    return token
+_logger = logging.getLogger(__name__)
+_settings = get_settings()
 
 
-def create_access_token(username: str) -> str:
+def create_access_token(data: Dict[str, Any], expires_delta: timedelta | None = None) -> str:
     """
-    Public helper to create a JWT access token for a given username.
+    Create a signed JWT access token.
+
+    Args:
+        data: Payload data (must be JSON serialisable).
+        expires_delta: Optional custom expiry; defaults to settings value.
+
+    Returns:
+        Signed JWT as a string.
     """
-    settings = get_settings()
-    return _create_jwt(
-        {"sub": username},
-        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (
+        expires_delta
+        or timedelta(minutes=_settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-
-
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(_security),
-) -> str:
-    """
-    FastAPI dependency that validates the JWT token and returns the username.
-    Raises HTTPException(401) if token is missing or invalid.
-    """
-    if credentials is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing authorization credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    token = credentials.credentials
-    settings = get_settings()
+    to_encode.update({"exp": expire})
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-        token_data = TokenData(**payload)
-        if token_data.username is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token payload missing username",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        logger.debug("Authenticated request for user: %s", token_data.username)
-        return token_data.username
+        encoded_jwt = jwt.encode(to_encode, _settings.JWT_SECRET_KEY, algorithm=_settings.JWT_ALGORITHM)
+        return encoded_jwt
+    except Exception as exc:
+        _logger.exception("Failed to encode JWT")
+        raise
+
+
+def decode_access_token(token: str) -> TokenData:
+    """
+    Decode and verify a JWT token.
+
+    Args:
+        token: JWT string.
+
+    Returns:
+        TokenData instance with extracted claims.
+
+    Raises:
+        JWTError: If token is invalid or expired.
+    """
+    try:
+        payload = jwt.decode(token, _settings.JWT_SECRET_KEY, algorithms=[_settings.JWT_ALGORITHM])
+        username: str | None = payload.get("sub")
+        exp: int | None = payload.get("exp")
+        return TokenData(username=username, exp=exp)
     except JWTError as exc:
-        logger.warning("JWT validation error: %s", exc)
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        _logger.warning("Invalid JWT token: %s", exc)
+        raise

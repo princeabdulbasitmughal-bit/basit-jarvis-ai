@@ -1,4 +1,4 @@
-def factorial(n):
+def compute_factorial(n: int) -> int:
     """
     Compute the factorial of a non-negative integer n.
 
@@ -13,10 +13,10 @@ def factorial(n):
     """
     if n < 0:
         raise ValueError("Factorial is not defined for negative numbers.")
-    result = 1
+    factorial = 1
     for i in range(1, n + 1):
-        result *= i
-    return result
+        factorial *= i
+    return factorial
 
 if __name__ == "__main__":
     import sys
@@ -24,7 +24,8 @@ if __name__ == "__main__":
         print("Usage: python factorial.py <number>")
         sys.exit(1)
     try:
-        num = int(sys.argv[1])
-        print(f"The factorial of {num} is {factorial(num)}")
+        number = int(sys.argv[1])
+        result = compute_factorial(number)
+        print(f"The factorial of {number} is {result}.")
     except ValueError as e:
         print(f"Error: {e}")

@@ -1,42 +1,36 @@
-"""
-Pydantic models used throughout the application.
-"""
+"""Pydantic models used across the application."""
 
 from datetime import datetime
-from typing import Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
 
 class Token(BaseModel):
-    """JWT access token response."""
+    """JWT token response."""
 
-    access_token: str = Field(..., description="Encoded JWT token")
-    token_type: str = Field(default="bearer", description="Token type")
+    access_token: str = Field(..., description="Encoded JWT access token")
+    token_type: str = Field("bearer", description="Token type, always 'bearer'")
 
 
 class TokenData(BaseModel):
-    """Data stored inside JWT token."""
+    """Data extracted from a validated JWT."""
 
     username: Optional[str] = None
     exp: Optional[int] = None
 
 
-class UserLogin(BaseModel):
-    """Login payload."""
+class TelemetryMetrics(BaseModel):
+    """Aggregated system metrics returned by the `/metrics` endpoint."""
 
-    username: str = Field(..., min_length=1)
-    password: str = Field(..., min_length=1)
-
-
-class MetricsResponse(BaseModel):
-    """System metrics returned by the /metrics endpoint."""
-
-    cpu_percent: float = Field(..., description="CPU utilization percent")
-    memory_total: int = Field(..., description="Total physical memory in bytes")
-    memory_used: int = Field(..., description="Used memory in bytes")
-    memory_percent: float = Field(..., description="Memory utilization percent")
-    disk_total: int = Field(..., description="Total disk space in bytes")
-    disk_used: int = Field(..., description="Used disk space in bytes")
-    disk_percent: float = Field(..., description="Disk utilization percent")
-    timestamp: datetime = Field(default_factory=datetime.utcnow, description="UTC timestamp")
+    timestamp: datetime = Field(..., description="UTC timestamp of collection")
+    cpu_percent: float = Field(..., description="Overall CPU utilization percentage")
+    memory: Dict[str, float] = Field(
+        ..., description="Memory usage (total, used, free) in MB"
+    )
+    disk: Dict[str, float] = Field(
+        ..., description="Disk usage (total, used, free) in GB"
+    )
+    network: Dict[str, int] = Field(
+        ..., description="Network I/O counters (bytes_sent, bytes_recv)"
+    )
